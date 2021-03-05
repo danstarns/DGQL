@@ -81,7 +81,7 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
-    photos: [ (user)-[:HAS_POSTS]->(posts:Photo) | posts { .title } ]
+    photos: [ (user)-[:HAS_POSTS]->(posts:Post) | posts { .title } ]
 } as user
 ```
 
