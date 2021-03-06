@@ -22,33 +22,38 @@ const driver = neo4j.driver(
 const client = new Client({ driver });
 
 async function main() {
-    await client.start();
-
-    const { user } = await client.run(`
+    const { match } = await client.run(`
         {
             match {
-                user @node(labels: ["User"]) @where(name: "Dan") {
+                user @node(label: "User") @where(name: "Dan") {
                     name
-                    posts @node(labels: ["Post"]) @relationship(type: "HAS_POSTS", direction: "OUT") {
-                        title
+                    posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                        post @node(label: "Post") {
+                            title
+                        }
+                        properties @relationship {
+                            since
+                        }
                     }
                 }
             }
         }
     `);
 
-    console.log(user);
+    console.log(match.user);
     /*
-        {
-            name: "Dan", 
+        [{
+            name: "Dan",
             posts: [
-                { title: "Checkout schemaless-graphql-neo4j" }
+                {
+                    node: {
+                        title: "Checkout schemaless-graphql-neo4j"
+                    }
+                }
             ]
-        }
+        }]
     */
 
-    await client.close();
-}
 
 main();
 ```
@@ -62,12 +67,12 @@ Given then following selection set;
 ```graphql
 {
     match {
-        user @node(labels: ["User"]) @where(name: "Dan") {
+        user @node(label: "User") @where(name: "Dan") {
             name
-            posts
-                @node(labels: ["Post"])
-                @relationship(type: "HAS_POSTS", direction: "OUT") {
-                title
+            posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                node @node(label: "Post") {
+                    title
+                }
             }
         }
     }
@@ -81,9 +86,11 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
-    photos: [ (user)-[:HAS_POSTS]->(posts:Post) | posts { .title } ]
+    photos: [ (user)-[:HAS_POSTS]->(posts:Post) | { node: { title: posts.title } } ]
 } as user
 ```
+
+No validation or typechecking is done; but the traversal of a AST and the recognition of directives. One couldn't use this engine with say Apollo Server.
 
 ## Usage
 
@@ -94,7 +101,7 @@ RETURN user {
 ```graphql
 {
     match {
-        user @node(labels: ["User"]) @where(id: 1) {
+        user @node(label: "User") @where(id: 1) {
             id
         }
     }
@@ -106,11 +113,15 @@ RETURN user {
 ```graphql
 {
     match {
-        user @node(labels: ["User"]) {
-            posts
-                @relationship(type: "HAS_POSTS", direction: "OUT")
-                @node(labels: ["Post"]) {
-                title
+        user @node(label: "User") @where(name: "Dan") {
+            name
+            posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                post @node(label: "Post") {
+                    title
+                }
+                properties @relationship {
+                    since
+                }
             }
         }
     }
