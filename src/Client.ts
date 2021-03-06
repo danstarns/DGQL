@@ -36,14 +36,20 @@ class Client {
         const firstOperation = document
             .definitions[0] as OperationDefinitionNode;
 
-        const matches = firstOperation.selectionSet.selections.filter(
+        const matchField = firstOperation.selectionSet.selections.find(
             (selection) =>
                 selection.kind === "Field" && selection.name.value === "match"
-        ) as FieldNode[];
+        ) as FieldNode;
 
-        const [match, mParams] = createMatchAndParams({ matches });
+        const [match, mParams] = createMatchAndParams({ matchField });
         cyphers.push(match);
         params = { ...params, ...mParams };
+
+        cyphers.push(
+            `RETURN ${(matchField.selectionSet?.selections as FieldNode[])
+                .map((x) => x.name.value)
+                .join(", ")}`
+        );
 
         if (noExecute) {
             return [cyphers.join("\n"), params];

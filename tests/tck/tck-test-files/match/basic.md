@@ -1,12 +1,10 @@
-## Match
-
-Tests for queries using match
+## Basic Match
 
 ---
 
 ### Match Node
 
-**GraphQL input**
+**Input GraphQL**
 
 ```graphql
 {
@@ -18,14 +16,18 @@ Tests for queries using match
 }
 ```
 
-**Expected Cypher output**
+**Output Cypher**
 
 ```cypher
-MATCH (user:User)
-RETURN user { .name } as user
+CALL {
+    MATCH (user:User)
+    RETURN user { .name } as user
+}
+
+RETURN user
 ```
 
-**Expected Cypher params**
+**Output Cypher params**
 
 ```selection-params
 {}

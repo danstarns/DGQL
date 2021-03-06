@@ -105,7 +105,22 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-#### Match across relationships
+#### Match many nodes
+
+```graphql
+{
+    match {
+        user @node(label: "User") {
+            name
+        }
+        post @node(label: "Post") {
+            content
+        }
+    }
+}
+```
+
+#### Match and project relationships
 
 ```graphql
 {

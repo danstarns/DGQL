@@ -2,7 +2,6 @@ import {
     ArgumentNode,
     DirectiveNode,
     FieldNode,
-    SelectionNode,
     StringValueNode,
 } from "graphql";
 
@@ -53,16 +52,15 @@ function createMatchProjectionAndParams({
 }
 
 function createMatchAndParams({
-    matches,
+    matchField,
 }: {
-    matches: FieldNode[];
+    matchField: FieldNode;
 }): [string, any] {
     let cyphers: string[] = [];
     let params: Record<string, unknown> = {};
 
-    matches.forEach((match) => {
-        const selections = match.selectionSet?.selections as FieldNode[];
-        const root = selections[0] as FieldNode;
+    matchField.selectionSet?.selections.forEach((field) => {
+        const root = field as FieldNode;
 
         const nodeDirective = root.directives?.find(
             (x) => x.name.value === "node"
@@ -74,8 +72,8 @@ function createMatchAndParams({
 
         const varName = root.name.value;
 
-        const matchStmt = `MATCH (${varName}${label ? `:${label}` : ""})`;
-        cyphers.push(matchStmt);
+        cyphers.push(`CALL {`);
+        cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
 
         if (root.selectionSet?.selections) {
             const [projStr] = createMatchProjectionAndParams({
@@ -87,9 +85,11 @@ function createMatchAndParams({
         } else {
             cyphers.push(`RETURN ${varName}`);
         }
+
+        cyphers.push(`}`); // close CALL
     });
 
-    return [cyphers.join("\n"), {}];
+    return [cyphers.join("\n"), params];
 }
 
 export default createMatchAndParams;
