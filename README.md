@@ -1,6 +1,6 @@
 # schemaless-graphql-neo4j
 
-GraphQL to Cypher translation engine.
+Turn untyped & dynamic GraphQL queries into cypher.
 
 ## Getting Started
 
@@ -57,9 +57,9 @@ main();
 
 ## What is it ? 🧐
 
-Using the GraphQL parser to produce an AST from your **selection set**. Traversal of the AST enables the translator to generate cypher via; picking up on **client directives** that give the query context.
+GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional server, say Apollo, and understand the rich tooling surrounding just the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate cypher via; picking up on client directives that give the query context.
 
-Given the following selection set;
+Given the below;
 
 ```graphql
 {
@@ -87,9 +87,7 @@ RETURN user {
 } as user
 ```
 
-No validation or typechecking is done; but the traversal of a AST and the recognition of directives. One couldn't use this engine with say Apollo Server.
-
-The lack of schema means you can formulate adhoc queries, using a maybe more familiar language; GraphQL. Using this language enables developers to receive a JSON like structure, similar in-shape to there formulated query, thus making the response more predictable & easier to manage.
+The lack of schema means no validation or type checking is done but on the flip-side you can formulate ad-hoc queries, using a maybe more familiar language; GraphQL. Using this language enables developers to receive a JSON like structure, similar in-shape to there formulated query, thus making the response more predictable & easier to manage.
 
 ## Usage
 
