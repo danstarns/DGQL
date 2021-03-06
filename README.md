@@ -1,6 +1,6 @@
 # schemaless-graphql-neo4j
 
-Turn untyped & dynamic GraphQL queries into cypher.
+Turn untyped & dynamic GraphQL queries into Cypher.
 
 ## Getting Started
 
@@ -57,7 +57,7 @@ main();
 
 ## What is it ? 🧐
 
-GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional server, say Apollo, and understand the rich tooling surrounding just the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate cypher via; picking up on client directives that give the query context.
+GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional server, say Apollo, and understand the rich tooling surrounding just the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher via; picking up on Client Directives that give the query context.
 
 Given the below;
 
@@ -76,7 +76,7 @@ Given the below;
 }
 ```
 
-the following cypher is produced;
+the following Cypher is produced;
 
 ```cypher
 MATCH (user:User)
@@ -87,7 +87,7 @@ RETURN user {
 } as user
 ```
 
-The lack of schema means no validation or type checking is done but on the flip-side you can formulate ad-hoc queries, using a maybe more familiar language; GraphQL. Using this language enables developers to receive a JSON like structure, similar in-shape to there formulated query, thus making the response more predictable & easier to manage.
+The lack of schema means no validation or type checking is performed, usually the expensive part of GraphQL execution. The flip-side to this is that; you can formulate ad-hoc queries using a maybe more familiar language; GraphQL. Using this language enables developers to receive a JSON like structure, similar in-shape to there formulated query, thus making the response more predictable & easier to manage.
 
 ## Usage
 
