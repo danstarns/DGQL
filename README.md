@@ -57,7 +57,7 @@ main();
 
 ## What is it ? 🧐
 
-GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional server, say Apollo, and understand the rich tooling surrounding just the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher via; picking up on Client Directives that give the query context.
+GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional execution paradigms, say using Apollo Server, and understand the rich tooling surrounding just the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher via; picking up on Client Directives that give the query context.
 
 Given the below;
 
