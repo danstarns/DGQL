@@ -21,10 +21,16 @@ class Client {
         this.driver = input.driver;
     }
 
-    async run<T = any>(selectionSet: SelectionSet): Promise<T | undefined> {
+    async run<T = any>({
+        selectionSet,
+        noExecute,
+    }: {
+        selectionSet: SelectionSet;
+        noExecute?: boolean;
+    }): Promise<T | [string, Record<string, unknown>]> {
         const document = selectionSetToDocument(selectionSet);
 
-        let cyphers: string[];
+        const cyphers: string[] = [];
         let params: Record<string, unknown> = {};
 
         const firstOperation = document
@@ -35,11 +41,17 @@ class Client {
                 selection.kind === "Field" && selection.name.value === "match"
         ) as FieldNode[];
 
-        const [str] = createMatchAndParams({ matches });
+        const [match, mParams] = createMatchAndParams({ matches });
+        cyphers.push(match);
+        params = { ...params, ...mParams };
 
-        console.log(str);
+        if (noExecute) {
+            return [cyphers.join("\n"), params];
+        }
 
-        return;
+        console.log(cyphers.join("\n"));
+
+        return {} as T;
     }
 }
 

@@ -28,11 +28,8 @@ async function main() {
                 user @node(label: "User") @where(name: "Dan") {
                     name
                     posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                        post @node(label: "Post") {
+                        node @node(label: "Post") {
                             title
-                        }
-                        properties @relationship {
-                            since
                         }
                     }
                 }
