@@ -1,4 +1,4 @@
-## Basic Match
+## Match
 
 Tests for queries using match
 
@@ -28,8 +28,7 @@ RETURN user { .name } as user
 **Expected Cypher params**
 
 ```selection-params
-{
-}
+{}
 ```
 
 ---
