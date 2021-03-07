@@ -30,7 +30,9 @@ CALL {
         name: user.name,
         posts: [
             (user)-[:HAS_POSTS]->(post:Post) | {
-                content: post.content
+                post: {
+                    content: post.content
+                }
             }
         ]
     } as user

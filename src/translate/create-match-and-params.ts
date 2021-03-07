@@ -2,9 +2,7 @@ import {
     ArgumentNode,
     DirectiveNode,
     FieldNode,
-    SelectionNode,
     StringValueNode,
-    valueFromASTUntyped,
 } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
 
@@ -75,7 +73,7 @@ function createMatchProjectionAndParams({
             };
 
             res.strs.push(
-                `${value.name.value}: [ ${pathStr} |  ${nestedMatchProjectionAndParams[0]} ]`
+                `${value.name.value}: [ ${pathStr} |  { ${subnode.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
             );
         }
 

@@ -44,15 +44,32 @@ class Client {
         // put params in a nested object to make passing vars down easier.
         params = { params: { ...params } };
 
-        console.log(cyphers.join("\n"));
-        console.log("===============");
-        console.log(JSON.stringify(params, null, 2));
-
         if (noExecute) {
             return [cyphers.join("\n"), params];
         }
 
-        return {} as T;
+        const session = this.driver.session({ defaultAccessMode: "WRITE" });
+
+        let result: neo4j.QueryResult;
+        try {
+            result = await session.writeTransaction((work) =>
+                work.run(cyphers.join("\n"), params)
+            );
+        } finally {
+            session.close();
+        }
+
+        const matches = (matchField.selectionSet
+            ?.selections as FieldNode[]).reduce((res, selection) => {
+            return {
+                ...res,
+                [selection.name.value]: result.records
+                    .filter((x) => x.keys.includes(selection.name.value))
+                    .map((x) => x.toObject()[selection.name.value]),
+            };
+        }, {});
+
+        return ({ match: matches } as unknown) as T;
     }
 }
 
