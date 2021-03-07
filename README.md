@@ -31,8 +31,8 @@ async function main() {
                     }
                     RETURN {
                         name
-                        posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                            node @node(label: "Post") {
+                        posts @edge(type: "HAS_POST", direction: "OUT") {
+                            post @node(label: "Post") {
                                 RETURN {
                                     title
                                 }
@@ -52,7 +52,7 @@ async function main() {
             name: "Dan",
             posts: [
                 {
-                    node: {
+                    post: {
                         title: "Checkout schemaless-graphql-neo4j"
                     }
                 }
@@ -79,8 +79,8 @@ Given the below;
             }
             RETURN {
                 name
-                posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                    node @node(label: "Post") {
+                posts @edge(type: "HAS_POST", direction: "OUT") {
+                    post @node(label: "Post") {
                         RETURN {
                             title
                         }
@@ -99,7 +99,7 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
-    posts: [ (user)-[:HAS_POSTS]->(posts:Post) | { node: { title: posts.title } } ]
+    posts: [ (user)-[:HAS_POSTS]->(posts:Post) | { post: { title: posts.title } } ]
 } as user
 ```
 
@@ -115,9 +115,6 @@ The lack of schema means no validation or type checking is performed, usually th
 {
     MATCH {
         user @node(label: "User") {
-            WHERE {
-                id(equal: 1)
-            }
             RETURN {
                 id
             }
@@ -151,9 +148,6 @@ The lack of schema means no validation or type checking is performed, usually th
 {
     MATCH {
         user @node(label: "User") {
-            WHERE {
-                name(equal: "Dan")
-            }
             RETURN {
                 name
                 posts @edge(type: "HAS_POSTS", direction: "OUT") {
@@ -163,6 +157,25 @@ The lack of schema means no validation or type checking is performed, usually th
                         }
                     }
                 }
+            }
+        }
+    }
+}
+```
+
+### Where
+
+#### equal
+
+```graphql
+{
+    MATCH {
+        user @node(label: "User") {
+            WHERE {
+                id(equal: 1)
+            }
+            RETURN {
+                id
             }
         }
     }
