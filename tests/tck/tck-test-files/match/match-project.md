@@ -9,11 +9,11 @@
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    post @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post) {
                         RETURN {
                             content
                         }
@@ -62,10 +62,10 @@ RETURN user
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
+                posts @edge(type: HAS_POST, direction: OUT) {
                     post @node {
                         RETURN {
                             content
@@ -115,11 +115,11 @@ RETURN user
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    post @node(label: "Post")
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post)
                     properties @relationship {
                         RETURN {
                             since
@@ -169,11 +169,11 @@ RETURN user
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    post @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post) {
                         RETURN {
                             id
                         }

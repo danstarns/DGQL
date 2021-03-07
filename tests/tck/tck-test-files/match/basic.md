@@ -46,7 +46,7 @@ RETURN node
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
             }

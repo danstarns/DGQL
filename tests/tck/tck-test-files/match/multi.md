@@ -9,12 +9,12 @@
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
             }
         }
-        post @node(label: "Post") {
+        post @node(label: Post) {
             RETURN {
                 content
             }

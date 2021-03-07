@@ -25,14 +25,14 @@ async function main() {
     const query = `
         {
             MATCH {
-                user @node(label: "User") {
+                user @node(label: User) {
                     WHERE {
                         name(equal: "Dan")
                     }
                     RETURN {
                         name
-                        posts @edge(type: "HAS_POST", direction: "OUT") {
-                            post @node(label: "Post") {
+                        posts @edge(type: HAS_POST, direction: OUT) {
+                            post @node(label: Post) {
                                 RETURN {
                                     title
                                 }
@@ -73,14 +73,14 @@ Given the below;
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             WHERE {
                 name(equal: "Dan")
             }
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    post @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post) {
                         RETURN {
                             title
                         }
@@ -114,7 +114,7 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 id
             }
@@ -128,12 +128,12 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        users @node(label: "User") {
+        users @node(label: User) {
             RETURN {
                 name
             }
         }
-        posts @node(label: "Post") {
+        posts @node(label: Post) {
             RETURN {
                 content
             }
@@ -147,11 +147,11 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    node @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    node @node(label: Post) {
                         RETURN {
                             title
                         }
@@ -168,11 +168,11 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 name
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    post @node(label: "Post")
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post)
                     properties @relationship {
                         RETURN {
                             since
@@ -194,7 +194,7 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             WHERE {
                 id(equal: 1)
             }
@@ -211,11 +211,11 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 id
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    node @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    node @node(label: Post) {
                         WHERE {
                             content(equal: "Cool")
                         }
@@ -235,11 +235,11 @@ The lack of schema means no validation or type checking is performed, usually th
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             RETURN {
                 id
-                posts @edge(type: "HAS_POST", direction: "OUT") {
-                    node @node(label: "Post") {
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    node @node(label: Post) {
                         RETURN {
                             content
                         }
@@ -268,7 +268,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 ```graphql
 {
     MATCH {
-        user @node(label: "User") {
+        user @node(label: User) {
             WHERE {
                 id(equal: $id)
             }
