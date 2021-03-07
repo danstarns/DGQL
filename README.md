@@ -99,7 +99,7 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
-    posts: [ (user)-[:HAS_POSTS]->(posts:Post) | { post: { title: posts.title } } ]
+    posts: [ (user)-[:HAS_POST]->(posts:Post) | { post: { title: posts.title } } ]
 } as user
 ```
 
@@ -150,7 +150,7 @@ The lack of schema means no validation or type checking is performed, usually th
         user @node(label: "User") {
             RETURN {
                 name
-                posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                posts @edge(type: "HAS_POST", direction: "OUT") {
                     node @node(label: "Post") {
                         RETURN {
                             title
@@ -187,7 +187,9 @@ The lack of schema means no validation or type checking is performed, usually th
 
 ### Where
 
-#### equal
+#### Operators
+
+##### equal
 
 ```graphql
 {
@@ -198,6 +200,56 @@ The lack of schema means no validation or type checking is performed, usually th
             }
             RETURN {
                 id
+            }
+        }
+    }
+}
+```
+
+#### Filter Relationships
+
+```graphql
+{
+    MATCH {
+        user @node(label: "User") {
+            RETURN {
+                id
+                posts @edge(type: "HAS_POST", direction: "OUT") {
+                    node @node(label: "Post") {
+                        WHERE {
+                            content(equal: "Cool")
+                        }
+                        RETURN {
+                            content
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+#### Filter By Relationship Property
+
+```graphql
+{
+    MATCH {
+        user @node(label: "User") {
+            RETURN {
+                id
+                posts @edge(type: "HAS_POST", direction: "OUT") {
+                    node @node(label: "Post") {
+                        RETURN {
+                            content
+                        }
+                    }
+                    properties @relationship {
+                        WHERE {
+                            since(equal: "1999")
+                        }
+                    }
+                }
             }
         }
     }

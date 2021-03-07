@@ -28,12 +28,12 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    RETURN user { name: user.name } as user
+    RETURN user { name: user.name } AS user
 }
 
 CALL {
     MATCH (post:Post)
-    RETURN post { content: post.content } as post
+    RETURN post { content: post.content } AS post
 }
 
 RETURN user, post

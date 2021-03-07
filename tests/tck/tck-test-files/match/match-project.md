@@ -39,7 +39,7 @@ CALL {
                 }
             }
         ]
-    } as user
+    } AS user
 }
 
 RETURN user
@@ -93,7 +93,7 @@ CALL {
                 }
             }
         ]
-    } as user
+    } AS user
 }
 
 RETURN user
@@ -154,7 +154,7 @@ CALL {
                 }
             }
         ]
-    } as user
+    } AS user
 }
 
 RETURN user

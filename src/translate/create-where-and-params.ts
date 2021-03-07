@@ -3,9 +3,11 @@ import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 function createWhereAndParams({
     varName,
     whereField,
+    chainStr,
 }: {
     varName: string;
     whereField: FieldNode;
+    chainStr?: string;
 }): [string, Record<string, unknown>] {
     const strs: string[] = [];
     let params: Record<string, unknown> = {};
@@ -16,13 +18,20 @@ function createWhereAndParams({
     }
 
     selections.forEach((field) => {
+        let param: string;
+        if (chainStr) {
+            param = `${chainStr}_${field.name.value}`;
+        } else {
+            param = `${varName}_${field.name.value}`;
+        }
+
         let innerStrs: string[] = [];
 
         (field.arguments as ArgumentNode[]).forEach((arg) => {
             const value = valueFromASTUntyped(arg.value);
 
             if (arg.name.value === "equal") {
-                const paramName = `${varName}_${field.name.value}_${arg.name.value}`;
+                const paramName = `${param}_${arg.name.value}`;
                 params[paramName] = value;
                 innerStrs.push(
                     `${varName}.${field.name.value} = $params.${paramName}`

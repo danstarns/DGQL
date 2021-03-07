@@ -23,7 +23,7 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    RETURN user { name: user.name } as user
+    RETURN user { name: user.name } AS user
 }
 
 RETURN user

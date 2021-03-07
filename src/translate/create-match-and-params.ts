@@ -5,12 +5,12 @@ import {
     StringValueNode,
 } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
-
-type Direction = "IN" | "OUT";
+import { Direction } from "../types";
 
 function createMatchProjectionAndParams({
     varName,
     returnField,
+    chainStr,
 }: {
     varName: string;
     returnField: FieldNode;
@@ -22,6 +22,14 @@ function createMatchProjectionAndParams({
     }
 
     function reducer(res: Res, value: FieldNode): Res {
+        let param: string;
+
+        if (chainStr) {
+            param = `${chainStr}_${value.name.value}`;
+        } else {
+            param = `${varName}_${value.name.value}`;
+        }
+
         const nodeDirective = value.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
@@ -71,68 +79,106 @@ function createMatchProjectionAndParams({
                 | FieldNode
                 | undefined;
 
+            const nodeWhere = ((node.selectionSet?.selections ||
+                []) as FieldNode[]).find((x) => x.name.value === "WHERE") as
+                | FieldNode
+                | undefined;
+
             const relationshipReturn =
                 relationship &&
                 ((relationship.selectionSet?.selections as FieldNode[]).find(
                     (x) => x.name.value === "RETURN"
                 ) as FieldNode | undefined);
 
-            if (nodeReturn && relationshipReturn) {
-                const nestedNodeMatchProjectionAndParams = createMatchProjectionAndParams(
+            const relationshipWhere =
+                relationship &&
+                (((relationship.selectionSet?.selections ||
+                    []) as FieldNode[]).find(
+                    (x) => x.name.value === "WHERE"
+                ) as FieldNode | undefined);
+
+            let nestedNodeMatchProjectionAndParams: [string?, any?] = ["", {}];
+            if (nodeReturn) {
+                nestedNodeMatchProjectionAndParams = createMatchProjectionAndParams(
                     {
                         returnField: nodeReturn,
                         varName: node.name.value,
+                        chainStr: `${param}_${node.name.value}`,
                     }
                 );
-                const nestedRelationshipMatchProjectionAndParams = createMatchProjectionAndParams(
+            }
+
+            let nestedRelationshipMatchProjectionAndParams: [string?, any?] = [
+                "",
+                {},
+            ];
+            if (relationshipReturn) {
+                nestedRelationshipMatchProjectionAndParams = createMatchProjectionAndParams(
                     {
                         returnField: relationshipReturn,
                         varName: relationship.name.value,
+                        chainStr: `${param}_${relationship.name.value}`,
                     }
                 );
-                res.params = {
-                    ...res.params,
-                    ...nestedNodeMatchProjectionAndParams[1],
-                    ...nestedRelationshipMatchProjectionAndParams[1],
-                };
+            }
 
+            let nodeWhereAndParams: [string?, any?] = ["", {}];
+            if (nodeWhere) {
+                nodeWhereAndParams = createWhereAndParams({
+                    varName: node.name.value,
+                    whereField: nodeWhere,
+                    chainStr: `${param}_${node.name.value}_where`,
+                });
+            }
+
+            let relationshipWhereAndParams: [string?, any?] = ["", {}];
+            if (relationshipWhere) {
+                relationshipWhereAndParams = createWhereAndParams({
+                    varName: relationship.name.value,
+                    whereField: relationshipWhere,
+                    chainStr: `${param}_${relationship.name.value}_where`,
+                });
+            }
+
+            const whereStrs = [
+                ...(nodeWhereAndParams[0]
+                    ? [nodeWhereAndParams[0].replace("WHERE", "")]
+                    : []),
+                ...(relationshipWhereAndParams[0]
+                    ? [relationshipWhereAndParams[0].replace("WHERE", "")]
+                    : []),
+            ];
+            let whereStr = whereStrs.length
+                ? `WHERE ${whereStrs.join(" AND ")}`
+                : "";
+
+            res.params = {
+                ...res.params,
+                ...nestedNodeMatchProjectionAndParams[1],
+                ...nestedRelationshipMatchProjectionAndParams[1],
+                ...nodeWhereAndParams[1],
+                ...relationshipWhereAndParams[1],
+            };
+
+            if (
+                nestedNodeMatchProjectionAndParams[0] &&
+                nestedRelationshipMatchProjectionAndParams[0]
+            ) {
                 res.strs.push(
                     [
-                        `${value.name.value}: [ ${pathStr} |  { `,
+                        `${value.name.value}: [ ${pathStr} ${whereStr} | { `,
                         `${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]},`,
                         `${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]}`,
                         `} ]`,
                     ].join(" ")
                 );
-            } else if (nodeReturn) {
-                const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
-                    {
-                        returnField: nodeReturn,
-                        varName: node.name.value,
-                    }
-                );
-                res.params = {
-                    ...res.params,
-                    ...nestedMatchProjectionAndParams[1],
-                };
-
+            } else if (nestedNodeMatchProjectionAndParams[0]) {
                 res.strs.push(
-                    `${value.name.value}: [ ${pathStr} |  { ${node.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
+                    `${value.name.value}: [ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]} } ]`
                 );
-            } else if (relationshipReturn) {
-                const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
-                    {
-                        returnField: relationshipReturn,
-                        varName: relationship.name.value,
-                    }
-                );
-                res.params = {
-                    ...res.params,
-                    ...nestedMatchProjectionAndParams[1],
-                };
-
+            } else if (nestedRelationshipMatchProjectionAndParams[0]) {
                 res.strs.push(
-                    `${value.name.value}: [ ${pathStr} |  { ${relationship.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
+                    `${value.name.value}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]} } ]`
                 );
             }
         }
@@ -185,18 +231,22 @@ function createMatchAndParams({
             const whereAndParams = createWhereAndParams({
                 varName,
                 whereField,
+                chainStr: `${varName}_where`,
             });
             cyphers.push(whereAndParams[0]);
             params = { ...params, ...whereAndParams[1] };
         }
 
         if (returnField) {
-            const [projStr] = createMatchProjectionAndParams({
+            const matchProjectionAndParams = createMatchProjectionAndParams({
                 varName,
                 returnField,
             });
+            params = { ...params, ...matchProjectionAndParams[1] };
 
-            cyphers.push(`RETURN ${varName} ${projStr} as ${varName}`);
+            cyphers.push(
+                `RETURN ${varName} ${matchProjectionAndParams[0]} AS ${varName}`
+            );
         } else {
             cyphers.push(`RETURN ${varName}`);
         }

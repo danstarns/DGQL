@@ -1,4 +1,4 @@
-import { DocumentNode } from "graphql";
+import { DocumentNode, FieldNode } from "graphql";
 
 export type Query = string | DocumentNode;
 
@@ -11,3 +11,5 @@ export type Translation = {
     params: Record<string, unknown>;
     returnVariables: ReturnVariables;
 };
+
+export type Direction = "IN" | "OUT";
