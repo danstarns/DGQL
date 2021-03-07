@@ -3,7 +3,13 @@ import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
 
-function translate({ query }: { query: Query }): Translation {
+function translate({
+    query,
+    variables = {},
+}: {
+    query: Query;
+    variables?: Record<string, unknown>;
+}): Translation {
     const document = queryToDocument(query);
 
     const cyphers: string[] = [];
@@ -16,7 +22,7 @@ function translate({ query }: { query: Query }): Translation {
             selection.kind === "Field" && selection.name.value === "MATCH"
     ) as FieldNode;
 
-    const [match, mParams] = createMatchAndParams({ matchField });
+    const [match, mParams] = createMatchAndParams({ matchField, variables });
     cyphers.push(match);
     params = { ...params, ...mParams };
 

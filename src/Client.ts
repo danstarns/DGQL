@@ -10,13 +10,26 @@ class Client {
         this.driver = input.driver;
     }
 
-    translate({ query }: { query: Query }): Translation {
-        return translate({ query });
+    translate({
+        query,
+        variables,
+    }: {
+        query: Query;
+        variables: Record<string, unknown>;
+    }): Translation {
+        return translate({ query, variables });
     }
 
-    async run<T = any>({ query }: { query: Query }): Promise<T> {
+    async run<T = any>({
+        query,
+        variables = {},
+    }: {
+        query: Query;
+        variables?: Record<string, unknown>;
+    }): Promise<T> {
         const translation = translate({
             query,
+            variables,
         });
 
         return (execute({

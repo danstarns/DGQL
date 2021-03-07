@@ -1,5 +1,7 @@
 import { ReturnVariables } from "../types";
 import * as neo4j from "neo4j-driver";
+import serialize from "./serialize";
+import deserialize from "./deserialize";
 
 async function execute({
     cypher,
@@ -17,7 +19,7 @@ async function execute({
     let result: neo4j.QueryResult;
     try {
         result = await session.writeTransaction((work) =>
-            work.run(cypher, params)
+            work.run(cypher, serialize(params))
         );
     } finally {
         session.close();
@@ -28,7 +30,7 @@ async function execute({
             ...res,
             [name]: result.records
                 .filter((x) => x.keys.includes(name))
-                .map((x) => x.toObject()[name]),
+                .map((x) => deserialize(x.toObject()[name])),
         };
     }, {});
 

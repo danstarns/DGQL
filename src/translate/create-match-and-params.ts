@@ -3,6 +3,7 @@ import {
     DirectiveNode,
     FieldNode,
     StringValueNode,
+    valueFromASTUntyped,
 } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
 import { Direction } from "../types";
@@ -11,10 +12,12 @@ function createMatchProjectionAndParams({
     varName,
     returnField,
     chainStr,
+    variables,
 }: {
     varName: string;
     returnField: FieldNode;
     chainStr?: string;
+    variables: Record<string, unknown>;
 }): [string, any] {
     interface Res {
         strs: string[];
@@ -53,16 +56,22 @@ function createMatchProjectionAndParams({
                 (x) => x.name.value === "type"
             ) as ArgumentNode).value as StringValueNode).value;
 
-            const direction: Direction = ((edgeDirective.arguments?.find(
-                (x) => x.name.value === "direction"
-            ) as ArgumentNode).value as StringValueNode).value as Direction;
+            const direction: Direction = valueFromASTUntyped(
+                (edgeDirective.arguments?.find(
+                    (x) => x.name.value === "direction"
+                ) as ArgumentNode).value,
+                variables
+            ) as Direction;
 
             const nodeDirective = node.directives?.find(
                 (x) => x.name.value === "node"
             );
-            const label = ((nodeDirective?.arguments?.find(
-                (x) => x.name.value === "label"
-            ) as ArgumentNode)?.value as StringValueNode)?.value;
+            const label = valueFromASTUntyped(
+                (nodeDirective?.arguments?.find(
+                    (x) => x.name.value === "label"
+                ) as ArgumentNode)?.value,
+                variables
+            );
 
             const inStr = direction === "IN" ? "<-" : "-";
             const outStr = direction === "OUT" ? "->" : "-";
@@ -104,6 +113,7 @@ function createMatchProjectionAndParams({
                         returnField: nodeReturn,
                         varName: node.name.value,
                         chainStr: `${param}_${node.name.value}`,
+                        variables,
                     }
                 );
             }
@@ -118,6 +128,7 @@ function createMatchProjectionAndParams({
                         returnField: relationshipReturn,
                         varName: relationship.name.value,
                         chainStr: `${param}_${relationship.name.value}`,
+                        variables,
                     }
                 );
             }
@@ -128,6 +139,7 @@ function createMatchProjectionAndParams({
                     varName: node.name.value,
                     whereField: nodeWhere,
                     chainStr: `${param}_${node.name.value}_where`,
+                    variables,
                 });
             }
 
@@ -137,6 +149,7 @@ function createMatchProjectionAndParams({
                     varName: relationship.name.value,
                     whereField: relationshipWhere,
                     chainStr: `${param}_${relationship.name.value}_where`,
+                    variables,
                 });
             }
 
@@ -206,8 +219,10 @@ function createMatchProjectionAndParams({
 
 function createMatchAndParams({
     matchField,
+    variables,
 }: {
     matchField: FieldNode;
+    variables: Record<string, unknown>;
 }): [string, any] {
     let cyphers: string[] = [];
     let params: Record<string, unknown> = {};
@@ -220,9 +235,12 @@ function createMatchAndParams({
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
-        const label = ((nodeDirective?.arguments?.find(
-            (x) => x.name.value === "label"
-        ) as ArgumentNode)?.value as StringValueNode)?.value;
+        const label = valueFromASTUntyped(
+            (nodeDirective?.arguments?.find(
+                (x) => x.name.value === "label"
+            ) as ArgumentNode)?.value,
+            variables
+        );
 
         cyphers.push(`CALL {`);
         cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
@@ -232,6 +250,7 @@ function createMatchAndParams({
                 varName,
                 whereField,
                 chainStr: `${varName}_where`,
+                variables,
             });
             cyphers.push(whereAndParams[0]);
             params = { ...params, ...whereAndParams[1] };
@@ -241,6 +260,7 @@ function createMatchAndParams({
             const matchProjectionAndParams = createMatchProjectionAndParams({
                 varName,
                 returnField,
+                variables,
             });
             params = { ...params, ...matchProjectionAndParams[1] };
 

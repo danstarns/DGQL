@@ -4,10 +4,12 @@ function createWhereAndParams({
     varName,
     whereField,
     chainStr,
+    variables,
 }: {
     varName: string;
     whereField: FieldNode;
     chainStr?: string;
+    variables: Record<string, unknown>;
 }): [string, Record<string, unknown>] {
     const strs: string[] = [];
     let params: Record<string, unknown> = {};
@@ -28,7 +30,7 @@ function createWhereAndParams({
         let innerStrs: string[] = [];
 
         (field.arguments as ArgumentNode[]).forEach((arg) => {
-            const value = valueFromASTUntyped(arg.value);
+            const value = valueFromASTUntyped(arg.value, variables);
 
             if (arg.name.value === "equal") {
                 const paramName = `${param}_${arg.name.value}`;
