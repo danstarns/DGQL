@@ -1,9 +1,4 @@
-import {
-    ArgumentNode,
-    DirectiveNode,
-    FieldNode,
-    valueFromASTUntyped,
-} from "graphql";
+import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 
 function createWhereAndParams({
     varName,
@@ -26,7 +21,7 @@ function createWhereAndParams({
         (field.arguments as ArgumentNode[]).forEach((arg) => {
             const value = valueFromASTUntyped(arg.value);
 
-            if (arg.name.value === "EQUAL") {
+            if (arg.name.value === "equal") {
                 const paramName = `${varName}_${field.name.value}_${arg.name.value}`;
                 params[paramName] = value;
                 innerStrs.push(

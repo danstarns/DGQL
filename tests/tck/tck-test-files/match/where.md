@@ -11,7 +11,7 @@
     MATCH {
         user @node(label: "User") {
             WHERE {
-                name(EQUAL: "Dan")
+                name(equal: "Dan")
             }
             RETURN {
                 name
@@ -26,7 +26,7 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    WHERE user.name = $params.user_name_EQUAL
+    WHERE user.name = $params.user_name_equal
     RETURN user { name: user.name } as user
 }
 
@@ -38,7 +38,7 @@ RETURN user
 ```selection-params
 {
     "params": {
-        "user_name_EQUAL": "Dan"
+        "user_name_equal": "Dan"
     }
 }
 ```

@@ -27,7 +27,7 @@ async function main() {
             MATCH {
                 user @node(label: "User") {
                     WHERE {
-                        name(EQUAL: "Dan")
+                        name(equal: "Dan")
                     }
                     RETURN {
                         name
@@ -73,7 +73,7 @@ Given the below;
     MATCH {
         user @node(label: "User") {
             WHERE {
-                name(EQUAL: "Dan")
+                name(equal: "Dan")
             }
             RETURN {
                 name
@@ -114,7 +114,7 @@ The lack of schema means no validation or type checking is performed, usually th
     MATCH {
         user @node(label: "User") {
             WHERE {
-                id(EQUAL: 1)
+                id(equal: 1)
             }
             RETURN {
                 id
@@ -150,7 +150,7 @@ The lack of schema means no validation or type checking is performed, usually th
     MATCH {
         user @node(label: "User") {
             WHERE {
-                name(EQUAL: "Dan")
+                name(equal: "Dan")
             }
             RETURN {
                 name
