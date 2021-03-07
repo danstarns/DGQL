@@ -25,17 +25,14 @@ describe("TCK Generated tests", () => {
                 async (_, obj) => {
                     const test = obj as Test;
 
-                    const selectionSet = test.selectionSet as string;
-                    const selectionSetParams = test.selectionSetParams;
-                    const cypherQuery = test.cypherQuery as string;
-
-                    const [str, params] = await client.run({
-                        selectionSet: selectionSet,
-                        noExecute: true,
+                    const translate = client.translate({
+                        query: test.query as string,
                     });
 
-                    expect(trimmer(str)).toEqual(trimmer(cypherQuery));
-                    expect(params).toEqual(selectionSetParams);
+                    expect(trimmer(translate.cypher)).toEqual(
+                        trimmer(test.cypher as string)
+                    );
+                    expect(translate.params).toEqual(test.params);
                 }
             );
         });

@@ -23,7 +23,7 @@ describe("match", () => {
             charset: "alphabetic",
         });
 
-        const selectionSet = `
+        const query = `
             {
                 MATCH {
                     test @node(label: "${id}") {
@@ -43,7 +43,7 @@ describe("match", () => {
                 { id }
             );
 
-            const result = await client.run({ selectionSet });
+            const result = await client.run({ query });
 
             expect(result?.MATCH?.test).toEqual([{ id }]);
         } finally {
@@ -64,7 +64,7 @@ describe("match", () => {
             charset: "alphabetic",
         });
 
-        const selectionSet = `
+        const query = `
             {
                 MATCH {
                     test1 @node(label: "${id1}") {
@@ -89,7 +89,7 @@ describe("match", () => {
                 { id1, id2 }
             );
 
-            const result = await client.run({ selectionSet });
+            const result = await client.run({ query });
 
             expect(result?.MATCH?.test1).toEqual([{ id: id1 }]);
             expect(result?.MATCH?.test2).toEqual([{ id: id2 }]);

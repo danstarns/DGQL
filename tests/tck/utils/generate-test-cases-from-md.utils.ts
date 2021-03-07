@@ -7,9 +7,9 @@ type Params = {
 
 export type Test = {
     name: string;
-    selectionSet?: string;
-    selectionSetParams?: Params;
-    cypherQuery?: string;
+    query?: string;
+    params?: Params;
+    cypher?: string;
 };
 
 export type TestCase = {
@@ -39,9 +39,9 @@ export function generateTestCasesFromMd(dir: string): TestCase[] {
 }
 
 const nameRe = /###(?<capture>([^\n]+))/;
-const selectionSetRe = /```graphql(?<capture>(.|\s)*?)```/;
-const selectionSetParamsRe = /```selection-params(?<capture>(.|\s)*?)```/;
-const cypherQueryRe = /```cypher(?<capture>(.|\s)*?)```/;
+const queryRe = /```graphql(?<capture>(.|\s)*?)```/;
+const paramsRe = /```params(?<capture>(.|\s)*?)```/;
+const cypherRe = /```cypher(?<capture>(.|\s)*?)```/;
 
 function generateTests(filePath: string): TestCase {
     const data = fs.readFileSync(filePath, { encoding: "utf8" });
@@ -67,17 +67,17 @@ function extractTests(contents: string): Test[] {
                     return {} as Test;
                 }
 
-                const selectionSet = captureOrEmptyString(t, selectionSetRe);
-                const selectionSetParams = JSON.parse(
-                    captureOrEmptyString(t, selectionSetParamsRe) || "{}"
+                const query = captureOrEmptyString(t, queryRe);
+                const params = JSON.parse(
+                    captureOrEmptyString(t, paramsRe) || "{}"
                 ) as Params;
-                const cypherQuery = captureOrEmptyString(t, cypherQueryRe);
+                const cypher = captureOrEmptyString(t, cypherRe);
 
                 return {
                     name,
-                    selectionSet,
-                    selectionSetParams,
-                    cypherQuery,
+                    query,
+                    params,
+                    cypher,
                 };
             }
         )

@@ -35,7 +35,7 @@ RETURN user
 
 **Output Cypher params**
 
-```selection-params
+```params
 {
     "params": {
         "user_name_equal": "Dan"

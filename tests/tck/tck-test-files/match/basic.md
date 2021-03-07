@@ -31,7 +31,7 @@ RETURN user
 
 **Output Cypher params**
 
-```selection-params
+```params
 {
     "params": {}
 }
