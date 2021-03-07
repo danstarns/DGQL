@@ -33,7 +33,9 @@ async function main() {
                         name
                         posts @edge(type: "HAS_POSTS", direction: "OUT") {
                             node @node(label: "Post") {
-                                title
+                                RETURN {
+                                    title
+                                }
                             }
                         }
                     }
@@ -77,7 +79,9 @@ Given the below;
                 name
                 posts @edge(type: "HAS_POSTS", direction: "OUT") {
                     node @node(label: "Post") {
-                        title
+                        RETURN {
+                            title
+                        }
                     }
                 }
             }
@@ -152,7 +156,9 @@ The lack of schema means no validation or type checking is performed, usually th
                 name
                 posts @edge(type: "HAS_POSTS", direction: "OUT") {
                     node @node(label: "Post") {
-                        title
+                        RETURN {
+                            title
+                        }
                     }
                 }
             }
