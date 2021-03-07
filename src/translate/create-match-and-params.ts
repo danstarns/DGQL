@@ -66,21 +66,23 @@ function createMatchProjectionAndParams({
             const nodeDirective = node.directives?.find(
                 (x) => x.name.value === "node"
             );
-            const label = valueFromASTUntyped(
-                (nodeDirective?.arguments?.find(
-                    (x) => x.name.value === "label"
-                ) as ArgumentNode)?.value,
-                variables
-            );
+            const labelArg = (nodeDirective?.arguments || []).find(
+                (x) => x.name.value === "label"
+            ) as ArgumentNode;
+
+            const label = labelArg
+                ? valueFromASTUntyped(labelArg.value, variables)
+                : (undefined as string | undefined);
 
             const inStr = direction === "IN" ? "<-" : "-";
             const outStr = direction === "OUT" ? "->" : "-";
             const typeStr = `[${
                 relationship ? relationship.name.value : ""
             }:${type}]`;
+            const labelStr = label ? `:${label}` : "";
             const toNodeStr = node
-                ? `(${node.name.value}:${label})`
-                : `(:${label})`;
+                ? `(${node.name.value}${labelStr})`
+                : `(${labelStr})`;
             const pathStr = `(${varName})${inStr}${typeStr}${outStr}${toNodeStr}`;
 
             const nodeReturn = ((node.selectionSet?.selections ||
@@ -235,12 +237,14 @@ function createMatchAndParams({
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
-        const label = valueFromASTUntyped(
-            (nodeDirective?.arguments?.find(
-                (x) => x.name.value === "label"
-            ) as ArgumentNode)?.value,
-            variables
-        );
+
+        const labelArg = (nodeDirective?.arguments || [])?.find(
+            (x) => x.name.value === "label"
+        ) as ArgumentNode;
+
+        const label = labelArg
+            ? valueFromASTUntyped(labelArg.value, variables)
+            : (undefined as string | undefined);
 
         cyphers.push(`CALL {`);
         cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);

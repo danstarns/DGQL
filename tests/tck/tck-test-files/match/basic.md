@@ -9,6 +9,43 @@
 ```graphql
 {
     MATCH {
+        node {
+            RETURN {
+                name
+            }
+        }
+    }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    MATCH (node)
+    RETURN node { name: node.name } AS node
+}
+
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
+### Match Node with label
+
+**Input GraphQL**
+
+```graphql
+{
+    MATCH {
         user @node(label: "User") {
             RETURN {
                 name

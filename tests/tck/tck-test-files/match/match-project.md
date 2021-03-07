@@ -55,6 +55,59 @@ RETURN user
 
 ---
 
+### Match Node & Project Connection Node (without label)
+
+**Input GraphQL**
+
+```graphql
+{
+    MATCH {
+        user @node(label: "User") {
+            RETURN {
+                name
+                posts @edge(type: "HAS_POST", direction: "OUT") {
+                    post @node {
+                        RETURN {
+                            content
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    MATCH (user:User)
+    RETURN user {
+        name: user.name,
+        posts: [
+            (user)-[:HAS_POST]->(post) | {
+                post: {
+                    content: post.content
+                }
+            }
+        ]
+    } AS user
+}
+
+RETURN user
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
 ### Match Node & Project Connection Properties
 
 **Input GraphQL**
