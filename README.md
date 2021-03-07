@@ -24,12 +24,17 @@ const client = new Client({ driver });
 async function main() {
     const { match } = await client.run(`
         {
-            match {
-                user @node(label: "User") @where(name: "Dan") {
-                    name
-                    posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                        node @node(label: "Post") {
-                            title
+            MATCH {
+                user @node(label: "User") {
+                    WHERE {
+                        name(EQUAL: "Dan")
+                    }
+                    RETURN {
+                        name
+                        posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                            node @node(label: "Post") {
+                                title
+                            }
                         }
                     }
                 }
@@ -63,12 +68,17 @@ Given the below;
 
 ```graphql
 {
-    match {
-        user @node(label: "User") @where(name: "Dan") {
-            name
-            posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                node @node(label: "Post") {
-                    title
+    MATCH {
+        user @node(label: "User") {
+            WHERE {
+                name(EQUAL: "Dan")
+            }
+            RETURN {
+                name
+                posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                    node @node(label: "Post") {
+                        title
+                    }
                 }
             }
         }
@@ -97,9 +107,14 @@ The lack of schema means no validation or type checking is performed, usually th
 
 ```graphql
 {
-    match {
-        user @node(label: "User") @where(id: 1) {
-            id
+    MATCH {
+        user @node(label: "User") {
+            WHERE {
+                id(EQUAL: 1)
+            }
+            RETURN {
+                id
+            }
         }
     }
 }
@@ -109,12 +124,16 @@ The lack of schema means no validation or type checking is performed, usually th
 
 ```graphql
 {
-    match {
-        user @node(label: "User") {
-            name
+    MATCH {
+        users @node(label: "User") {
+            RETURN {
+                name
+            }
         }
-        post @node(label: "Post") {
-            content
+        posts @node(label: "Post") {
+            RETURN {
+                content
+            }
         }
     }
 }
@@ -124,15 +143,17 @@ The lack of schema means no validation or type checking is performed, usually th
 
 ```graphql
 {
-    match {
-        user @node(label: "User") @where(name: "Dan") {
-            name
-            posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                post @node(label: "Post") {
-                    title
-                }
-                properties @relationship {
-                    since
+    MATCH {
+        user @node(label: "User") {
+            WHERE {
+                name(EQUAL: "Dan")
+            }
+            RETURN {
+                name
+                posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                    node @node(label: "Post") {
+                        title
+                    }
                 }
             }
         }
