@@ -1,4 +1,5 @@
 // See https://github.com/neo4j/graphql/blob/master/packages/graphql/tests/tck/tck-test-files/cypher-pringles.md
+// See https://gist.github.com/danstarns/4ff18b00bb947c3d186603a65a7752d5
 {
     MATCH {
         node @node(label: Product) {
