@@ -1,10 +1,10 @@
 import { FieldNode, OperationDefinitionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
-import { selectionSetToDocument } from "../utils";
+import { queryToDocument } from "../utils";
 
 function translate({ query }: { query: Query }): Translation {
-    const document = selectionSetToDocument(query);
+    const document = queryToDocument(query);
 
     const cyphers: string[] = [];
     let params: Record<string, unknown> = {};

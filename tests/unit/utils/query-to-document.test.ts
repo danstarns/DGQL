@@ -1,9 +1,9 @@
-import { selectionSetToDocument, removeLoc } from "../../../src/utils";
+import { queryToDocument, removeLoc } from "../../../src/utils";
 import { parse, print } from "graphql";
 
-describe("selectionSetToDocument", () => {
+describe("queryToDocument", () => {
     test("should return document on string input", () => {
-        const selectionSet = `
+        const query = `
             {
                 MATCH {
                     node @node(label: "Node") {
@@ -15,13 +15,13 @@ describe("selectionSetToDocument", () => {
             }
         `;
 
-        const result = selectionSetToDocument(selectionSet);
+        const result = queryToDocument(query);
 
-        expect(result).toEqual(parse(selectionSet));
+        expect(result).toEqual(parse(query));
     });
 
     test("should return document on document input", () => {
-        const selectionSet = `
+        const query = `
             {
                 MATCH {
                     node @node(label: "Node") {
@@ -33,9 +33,9 @@ describe("selectionSetToDocument", () => {
             }
         `;
 
-        const doc = removeLoc(parse(print(parse(selectionSet))));
+        const doc = removeLoc(parse(print(parse(query))));
 
-        const result = selectionSetToDocument(doc);
+        const result = queryToDocument(doc);
 
         expect(removeLoc(result)).toEqual(doc);
     });
