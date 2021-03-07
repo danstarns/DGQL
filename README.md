@@ -163,6 +163,28 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
+### Match and project relationship properties
+
+```graphql
+{
+    MATCH {
+        user @node(label: "User") {
+            RETURN {
+                name
+                posts @edge(type: "HAS_POST", direction: "OUT") {
+                    post @node(label: "Post")
+                    properties @relationship {
+                        RETURN {
+                            since
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ### Where
 
 #### equal

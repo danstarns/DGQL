@@ -31,9 +31,14 @@ function createMatchProjectionAndParams({
         ) as DirectiveNode;
 
         if (edgeDirective) {
-            const subnode = (value.selectionSet
+            const node = (value.selectionSet
                 ?.selections as FieldNode[]).find((x) =>
                 x.directives?.find((d) => d.name.value === "node")
+            ) as FieldNode;
+
+            const relationship = (value.selectionSet
+                ?.selections as FieldNode[]).find((x) =>
+                x.directives?.find((d) => d.name.value === "relationship")
             ) as FieldNode;
 
             const type = ((edgeDirective.arguments?.find(
@@ -44,36 +49,92 @@ function createMatchProjectionAndParams({
                 (x) => x.name.value === "direction"
             ) as ArgumentNode).value as StringValueNode).value as Direction;
 
-            const subNodeDirective = subnode.directives?.find(
+            const nodeDirective = node.directives?.find(
                 (x) => x.name.value === "node"
             );
-            const label = ((subNodeDirective?.arguments?.find(
+            const label = ((nodeDirective?.arguments?.find(
                 (x) => x.name.value === "label"
             ) as ArgumentNode)?.value as StringValueNode)?.value;
 
             const inStr = direction === "IN" ? "<-" : "-";
             const outStr = direction === "OUT" ? "->" : "-";
-            const pathStr = `(${varName})${inStr}[:${type}]${outStr}(${subnode.name.value}:${label})`;
+            const typeStr = `[${
+                relationship ? relationship.name.value : ""
+            }:${type}]`;
+            const toNodeStr = node
+                ? `(${node.name.value}:${label})`
+                : `(:${label})`;
+            const pathStr = `(${varName})${inStr}${typeStr}${outStr}${toNodeStr}`;
 
-            const innerReturn = (subnode.selectionSet
-                ?.selections as FieldNode[]).find(
-                (x) => x.name.value === "RETURN"
-            ) as FieldNode;
+            const nodeReturn = ((node.selectionSet?.selections ||
+                []) as FieldNode[]).find((x) => x.name.value === "RETURN") as
+                | FieldNode
+                | undefined;
 
-            const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
-                {
-                    returnField: innerReturn,
-                    varName: subnode.name.value,
-                }
-            );
-            res.params = {
-                ...res.params,
-                ...nestedMatchProjectionAndParams[1],
-            };
+            const relationshipReturn =
+                relationship &&
+                ((relationship.selectionSet?.selections as FieldNode[]).find(
+                    (x) => x.name.value === "RETURN"
+                ) as FieldNode | undefined);
 
-            res.strs.push(
-                `${value.name.value}: [ ${pathStr} |  { ${subnode.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
-            );
+            if (nodeReturn && relationshipReturn) {
+                const nestedNodeMatchProjectionAndParams = createMatchProjectionAndParams(
+                    {
+                        returnField: nodeReturn,
+                        varName: node.name.value,
+                    }
+                );
+                const nestedRelationshipMatchProjectionAndParams = createMatchProjectionAndParams(
+                    {
+                        returnField: relationshipReturn,
+                        varName: relationship.name.value,
+                    }
+                );
+                res.params = {
+                    ...res.params,
+                    ...nestedNodeMatchProjectionAndParams[1],
+                    ...nestedRelationshipMatchProjectionAndParams[1],
+                };
+
+                res.strs.push(
+                    [
+                        `${value.name.value}: [ ${pathStr} |  { `,
+                        `${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]},`,
+                        `${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]}`,
+                        `} ]`,
+                    ].join(" ")
+                );
+            } else if (nodeReturn) {
+                const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
+                    {
+                        returnField: nodeReturn,
+                        varName: node.name.value,
+                    }
+                );
+                res.params = {
+                    ...res.params,
+                    ...nestedMatchProjectionAndParams[1],
+                };
+
+                res.strs.push(
+                    `${value.name.value}: [ ${pathStr} |  { ${node.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
+                );
+            } else if (relationshipReturn) {
+                const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
+                    {
+                        returnField: relationshipReturn,
+                        varName: relationship.name.value,
+                    }
+                );
+                res.params = {
+                    ...res.params,
+                    ...nestedMatchProjectionAndParams[1],
+                };
+
+                res.strs.push(
+                    `${value.name.value}: [ ${pathStr} |  { ${relationship.name.value}: ${nestedMatchProjectionAndParams[0]} } ]`
+                );
+            }
         }
 
         if (!edgeDirective && !nodeDirective) {
