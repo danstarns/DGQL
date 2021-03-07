@@ -8,12 +8,16 @@
 
 ```graphql
 {
-    match {
+    MATCH {
         user @node(label: "User") {
-            name
-            posts @edge(type: "HAS_POSTS", direction: "OUT") {
-                post @node(label: "Post") {
-                    content
+            RETURN {
+                name
+                posts @edge(type: "HAS_POSTS", direction: "OUT") {
+                    post @node(label: "Post") {
+                        RETURN {
+                            content
+                        }
+                    }
                 }
             }
         }

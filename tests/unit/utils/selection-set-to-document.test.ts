@@ -5,9 +5,11 @@ describe("selectionSetToDocument", () => {
     test("should return document on string input", () => {
         const selectionSet = `
             {
-                match {
+                MATCH {
                     node @node(label: "Node") {
-                        id
+                        RETURN {
+                            id
+                        }
                     }
                 }
             }
@@ -21,9 +23,11 @@ describe("selectionSetToDocument", () => {
     test("should return document on document input", () => {
         const selectionSet = `
             {
-                match {
+                MATCH {
                     node @node(label: "Node") {
-                        id
+                        RETURN {
+                            id
+                        }
                     }
                 }
             }

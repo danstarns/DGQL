@@ -25,9 +25,11 @@ describe("match", () => {
 
         const selectionSet = `
             {
-                match {
+                MATCH {
                     test @node(label: "${id}") {
-                        id
+                        RETURN {
+                            id
+                        }
                     }
                 }
             }
@@ -43,7 +45,7 @@ describe("match", () => {
 
             const result = await client.run({ selectionSet });
 
-            expect(result?.match?.test).toEqual([{ id }]);
+            expect(result?.MATCH?.test).toEqual([{ id }]);
         } finally {
             await session.close();
         }
@@ -64,12 +66,16 @@ describe("match", () => {
 
         const selectionSet = `
             {
-                match {
+                MATCH {
                     test1 @node(label: "${id1}") {
-                        id
+                        RETURN {
+                            id
+                        }
                     }
                     test2 @node(label: "${id2}") {
-                        id
+                        RETURN {
+                            id
+                        }
                     }
                 }
             }
@@ -85,8 +91,8 @@ describe("match", () => {
 
             const result = await client.run({ selectionSet });
 
-            expect(result?.match?.test1).toEqual([{ id: id1 }]);
-            expect(result?.match?.test2).toEqual([{ id: id2 }]);
+            expect(result?.MATCH?.test1).toEqual([{ id: id1 }]);
+            expect(result?.MATCH?.test2).toEqual([{ id: id2 }]);
         } finally {
             await session.close();
         }

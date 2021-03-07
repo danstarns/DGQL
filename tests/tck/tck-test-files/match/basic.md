@@ -8,9 +8,11 @@
 
 ```graphql
 {
-    match {
+    MATCH {
         user @node(label: "User") {
-            name
+            RETURN {
+                name
+            }
         }
     }
 }

@@ -8,12 +8,16 @@
 
 ```graphql
 {
-    match {
+    MATCH {
         user @node(label: "User") {
-            name
+            RETURN {
+                name
+            }
         }
         post @node(label: "Post") {
-            content
+            RETURN {
+                content
+            }
         }
     }
 }

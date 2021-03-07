@@ -22,7 +22,7 @@ const driver = neo4j.driver(
 const client = new Client({ driver });
 
 async function main() {
-    const { match } = await client.run(`
+    const { MATCH } = await client.run(`
         {
             MATCH {
                 user @node(label: "User") {
@@ -44,7 +44,7 @@ async function main() {
         }
     `);
 
-    console.log(match.user);
+    console.log(MATCH.user);
     /*
         [{
             name: "Dan",

@@ -28,7 +28,7 @@ class Client {
 
         const matchField = firstOperation.selectionSet.selections.find(
             (selection) =>
-                selection.kind === "Field" && selection.name.value === "match"
+                selection.kind === "Field" && selection.name.value === "MATCH"
         ) as FieldNode;
 
         const [match, mParams] = createMatchAndParams({ matchField });
@@ -69,7 +69,7 @@ class Client {
             };
         }, {});
 
-        return ({ match: matches } as unknown) as T;
+        return ({ MATCH: matches } as unknown) as T;
     }
 }
 

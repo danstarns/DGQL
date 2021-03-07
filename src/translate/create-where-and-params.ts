@@ -1,25 +1,41 @@
-import { ArgumentNode, DirectiveNode, valueFromASTUntyped } from "graphql";
+import {
+    ArgumentNode,
+    DirectiveNode,
+    FieldNode,
+    valueFromASTUntyped,
+} from "graphql";
 
 function createWhereAndParams({
     varName,
-    whereDirective,
+    whereField,
 }: {
     varName: string;
-    whereDirective: DirectiveNode;
+    whereField: FieldNode;
 }): [string, Record<string, unknown>] {
     const strs: string[] = [];
     let params: Record<string, unknown> = {};
-    const args = whereDirective.arguments as ArgumentNode[];
+    const selections = whereField.selectionSet?.selections as FieldNode[];
 
-    if (args.length) {
+    if (selections.length) {
         strs.push("WHERE");
     }
 
-    args.forEach((arg) => {
-        const value = valueFromASTUntyped(arg.value);
-        const paramName = `${varName}_${arg.name.value}`;
-        params[paramName] = value;
-        strs.push(`${varName}.${arg.name.value} = $params.${paramName}`);
+    selections.forEach((field) => {
+        let innerStrs: string[] = [];
+
+        (field.arguments as ArgumentNode[]).forEach((arg) => {
+            const value = valueFromASTUntyped(arg.value);
+
+            if (arg.name.value === "EQUAL") {
+                const paramName = `${varName}_${field.name.value}_${arg.name.value}`;
+                params[paramName] = value;
+                innerStrs.push(
+                    `${varName}.${field.name.value} = $params.${paramName}`
+                );
+            }
+        });
+
+        strs.push(innerStrs.join(" AND "));
     });
 
     return [strs.join("\n"), params];

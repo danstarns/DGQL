@@ -8,9 +8,14 @@
 
 ```graphql
 {
-    match {
-        user @node(label: "User") @where(name: "Dan") {
-            name
+    MATCH {
+        user @node(label: "User") {
+            WHERE {
+                name(EQUAL: "Dan")
+            }
+            RETURN {
+                name
+            }
         }
     }
 }
@@ -21,7 +26,7 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    WHERE user.name = $params.user_name
+    WHERE user.name = $params.user_name_EQUAL
     RETURN user { name: user.name } as user
 }
 
@@ -33,7 +38,7 @@ RETURN user
 ```selection-params
 {
     "params": {
-        "user_name": "Dan"
+        "user_name_EQUAL": "Dan"
     }
 }
 ```

@@ -10,10 +10,10 @@ type Direction = "IN" | "OUT";
 
 function createMatchProjectionAndParams({
     varName,
-    selections,
+    returnField,
 }: {
     varName: string;
-    selections: FieldNode[];
+    returnField: FieldNode;
     chainStr?: string;
 }): [string, any] {
     interface Res {
@@ -31,6 +31,11 @@ function createMatchProjectionAndParams({
         ) as DirectiveNode;
 
         if (edgeDirective) {
+            const subnode = (value.selectionSet
+                ?.selections as FieldNode[]).find((x) =>
+                x.directives?.find((d) => d.name.value === "node")
+            ) as FieldNode;
+
             const type = ((edgeDirective.arguments?.find(
                 (x) => x.name.value === "type"
             ) as ArgumentNode).value as StringValueNode).value;
@@ -39,31 +44,25 @@ function createMatchProjectionAndParams({
                 (x) => x.name.value === "direction"
             ) as ArgumentNode).value as StringValueNode).value as Direction;
 
-            const subnode = (value.selectionSet
-                ?.selections as FieldNode[]).find((x) =>
-                x.directives?.find((d) => d.name.value === "node")
-            ) as FieldNode;
-
             const subNodeDirective = subnode.directives?.find(
                 (x) => x.name.value === "node"
             );
-
-            const whereDirective = subnode.directives?.find(
-                (x) => x.name.value === "where"
-            ) as DirectiveNode;
-
             const label = ((subNodeDirective?.arguments?.find(
                 (x) => x.name.value === "label"
             ) as ArgumentNode)?.value as StringValueNode)?.value;
 
             const inStr = direction === "IN" ? "<-" : "-";
             const outStr = direction === "OUT" ? "->" : "-";
-
             const pathStr = `(${varName})${inStr}[:${type}]${outStr}(${subnode.name.value}:${label})`;
+
+            const innerReturn = (subnode.selectionSet
+                ?.selections as FieldNode[]).find(
+                (x) => x.name.value === "RETURN"
+            ) as FieldNode;
 
             const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
                 {
-                    selections: subnode.selectionSet?.selections as FieldNode[],
+                    returnField: innerReturn,
                     varName: subnode.name.value,
                 }
             );
@@ -86,7 +85,8 @@ function createMatchProjectionAndParams({
         return res;
     }
 
-    const { strs, params } = selections.reduce(
+    const { strs, params } = (returnField.selectionSet
+        ?.selections as FieldNode[]).reduce(
         (r: Res, v: FieldNode) => reducer(r, v),
         {
             strs: [],
@@ -106,36 +106,33 @@ function createMatchAndParams({
     let params: Record<string, unknown> = {};
 
     (matchField.selectionSet?.selections as FieldNode[]).forEach((field) => {
+        const varName = field.name.value;
+        const selections = field.selectionSet?.selections as FieldNode[];
+        const whereField = selections.find((x) => x.name.value === "WHERE");
+        const returnField = selections.find((x) => x.name.value === "RETURN");
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
-
-        const whereDirective = field.directives?.find(
-            (x) => x.name.value === "where"
-        ) as DirectiveNode;
-
         const label = ((nodeDirective?.arguments?.find(
             (x) => x.name.value === "label"
         ) as ArgumentNode)?.value as StringValueNode)?.value;
 
-        const varName = field.name.value;
-
         cyphers.push(`CALL {`);
         cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
 
-        if (whereDirective) {
+        if (whereField) {
             const whereAndParams = createWhereAndParams({
                 varName,
-                whereDirective,
+                whereField,
             });
             cyphers.push(whereAndParams[0]);
             params = { ...params, ...whereAndParams[1] };
         }
 
-        if (field.selectionSet?.selections) {
+        if (returnField) {
             const [projStr] = createMatchProjectionAndParams({
                 varName,
-                selections: field.selectionSet.selections as FieldNode[],
+                returnField,
             });
 
             cyphers.push(`RETURN ${varName} ${projStr} as ${varName}`);
