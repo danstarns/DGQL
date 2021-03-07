@@ -2,8 +2,13 @@ import {
     ArgumentNode,
     DirectiveNode,
     FieldNode,
+    SelectionNode,
     StringValueNode,
+    valueFromASTUntyped,
 } from "graphql";
+import createWhereAndParams from "./create-where-and-params";
+
+type Direction = "IN" | "OUT";
 
 function createMatchProjectionAndParams({
     varName,
@@ -23,18 +28,61 @@ function createMatchProjectionAndParams({
             (x) => x.name.value === "node"
         ) as DirectiveNode;
 
-        const relDirective = value.directives?.find(
-            (x) => x.name.value === "relationship"
+        const edgeDirective = value.directives?.find(
+            (x) => x.name.value === "edge"
         ) as DirectiveNode;
 
-        if (relDirective) {
-            if (nodeDirective) {
-                // todo
-            }
+        if (edgeDirective) {
+            const type = ((edgeDirective.arguments?.find(
+                (x) => x.name.value === "type"
+            ) as ArgumentNode).value as StringValueNode).value;
+
+            const direction: Direction = ((edgeDirective.arguments?.find(
+                (x) => x.name.value === "direction"
+            ) as ArgumentNode).value as StringValueNode).value as Direction;
+
+            const subnode = (value.selectionSet
+                ?.selections as FieldNode[]).find((x) =>
+                x.directives?.find((d) => d.name.value === "node")
+            ) as FieldNode;
+
+            const subNodeDirective = subnode.directives?.find(
+                (x) => x.name.value === "node"
+            );
+
+            const whereDirective = subnode.directives?.find(
+                (x) => x.name.value === "where"
+            ) as DirectiveNode;
+
+            const label = ((subNodeDirective?.arguments?.find(
+                (x) => x.name.value === "label"
+            ) as ArgumentNode)?.value as StringValueNode)?.value;
+
+            const inStr = direction === "IN" ? "<-" : "-";
+            const outStr = direction === "OUT" ? "->" : "-";
+
+            const pathStr = `(${varName})${inStr}[:${type}]${outStr}(${subnode.name.value}:${label})`;
+
+            const nestedMatchProjectionAndParams = createMatchProjectionAndParams(
+                {
+                    selections: subnode.selectionSet?.selections as FieldNode[],
+                    varName: subnode.name.value,
+                }
+            );
+            res.params = {
+                ...res.params,
+                ...nestedMatchProjectionAndParams[1],
+            };
+
+            res.strs.push(
+                `${value.name.value}: [ ${pathStr} |  ${nestedMatchProjectionAndParams[0]} ]`
+            );
         }
 
-        if (!relDirective && !nodeDirective) {
-            res.strs.push(`.${value.name.value}`);
+        if (!edgeDirective && !nodeDirective) {
+            res.strs.push(
+                `${value.name.value}: ${varName}.${value.name.value}`
+            );
         }
 
         return res;
@@ -48,7 +96,7 @@ function createMatchProjectionAndParams({
         }
     );
 
-    return [`{ ${strs.join("\n")} }`, params];
+    return [`{ ${strs.join(", ")} }`, params];
 }
 
 function createMatchAndParams({
@@ -59,26 +107,37 @@ function createMatchAndParams({
     let cyphers: string[] = [];
     let params: Record<string, unknown> = {};
 
-    matchField.selectionSet?.selections.forEach((field) => {
-        const root = field as FieldNode;
-
-        const nodeDirective = root.directives?.find(
+    (matchField.selectionSet?.selections as FieldNode[]).forEach((field) => {
+        const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
+        ) as DirectiveNode;
+
+        const whereDirective = field.directives?.find(
+            (x) => x.name.value === "where"
         ) as DirectiveNode;
 
         const label = ((nodeDirective?.arguments?.find(
             (x) => x.name.value === "label"
         ) as ArgumentNode)?.value as StringValueNode)?.value;
 
-        const varName = root.name.value;
+        const varName = field.name.value;
 
         cyphers.push(`CALL {`);
         cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
 
-        if (root.selectionSet?.selections) {
+        if (whereDirective) {
+            const whereAndParams = createWhereAndParams({
+                varName,
+                whereDirective,
+            });
+            cyphers.push(whereAndParams[0]);
+            params = { ...params, ...whereAndParams[1] };
+        }
+
+        if (field.selectionSet?.selections) {
             const [projStr] = createMatchProjectionAndParams({
                 varName,
-                selections: root.selectionSet.selections as FieldNode[],
+                selections: field.selectionSet.selections as FieldNode[],
             });
 
             cyphers.push(`RETURN ${varName} ${projStr} as ${varName}`);

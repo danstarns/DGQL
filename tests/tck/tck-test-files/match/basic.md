@@ -21,7 +21,7 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    RETURN user { .name } as user
+    RETURN user { name: user.name } as user
 }
 
 RETURN user
@@ -30,7 +30,9 @@ RETURN user
 **Output Cypher params**
 
 ```selection-params
-{}
+{
+    "params": {}
+}
 ```
 
 ---

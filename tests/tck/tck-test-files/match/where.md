@@ -22,7 +22,7 @@
 CALL {
     MATCH (user:User)
     WHERE user.name = $params.user_name
-    RETURN user { .name } as user
+    RETURN user { name: user.name } as user
 }
 
 RETURN user
@@ -31,7 +31,11 @@ RETURN user
 **Output Cypher params**
 
 ```selection-params
-{}
+{
+    "params": {
+        "user_name": "Dan"
+    }
+}
 ```
 
 ---

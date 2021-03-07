@@ -1,14 +1,4 @@
-import {
-    ArgumentNode,
-    DirectiveNode,
-    FieldNode,
-    ListValueNode,
-    OperationDefinitionNode,
-    SelectionNode,
-    ValueNode,
-    valueFromASTUntyped,
-    StringValueNode,
-} from "graphql";
+import { FieldNode, OperationDefinitionNode } from "graphql";
 import * as neo4j from "neo4j-driver";
 import { createMatchAndParams } from "./translate";
 import { SelectionSet } from "./types";
@@ -51,11 +41,16 @@ class Client {
                 .join(", ")}`
         );
 
+        // put params in a nested object to make passing vars down easier.
+        params = { params: { ...params } };
+
+        console.log(cyphers.join("\n"));
+        console.log("===============");
+        console.log(JSON.stringify(params, null, 2));
+
         if (noExecute) {
             return [cyphers.join("\n"), params];
         }
-
-        console.log(cyphers.join("\n"));
 
         return {} as T;
     }
