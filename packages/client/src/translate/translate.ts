@@ -1,4 +1,4 @@
-import { FieldNode, OperationDefinitionNode } from "graphql";
+import { FieldNode, OperationDefinitionNode, SelectionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
@@ -11,37 +11,54 @@ function translate({
     variables?: Record<string, unknown>;
 }): Translation {
     const document = queryToDocument(query);
-
+    const root = document.definitions[0] as OperationDefinitionNode;
     const cyphers: string[] = [];
     let params: Record<string, unknown> = {};
+    const selections = root.selectionSet.selections.filter(
+        (f) => f.kind === "Field" && ["MATCH"].includes(f.name.value)
+    ) as FieldNode[];
 
-    const firstOperation = document.definitions[0] as OperationDefinitionNode;
+    selections.forEach((field: SelectionNode) => {
+        if (field.kind !== "Field") {
+            return;
+        }
 
-    const matchField = firstOperation.selectionSet.selections.find(
-        (selection) =>
-            selection.kind === "Field" && selection.name.value === "MATCH"
-    ) as FieldNode;
+        if (field.name.value !== "MATCH") {
+            return;
+        }
 
-    const [match, mParams] = createMatchAndParams({ matchField, variables });
-    cyphers.push(match);
-    params = { ...params, ...mParams };
+        const [match, mParams] = createMatchAndParams({
+            matchField: field,
+            variables,
+        });
+        cyphers.push(match);
+        params = { ...params, ...mParams };
+    });
 
-    cyphers.push(
-        `RETURN ${(matchField.selectionSet?.selections as FieldNode[])
-            .map((x) => x.name.value)
-            .join(", ")}`
-    );
+    const returnVariables = {
+        MATCH: selections
+            .filter((x) => x.name.value === "MATCH")
+            .flatMap((x) =>
+                (x.selectionSet?.selections as FieldNode[]).map(
+                    (y) => y.name.value
+                )
+            ),
+    };
 
-    // put params in a nested object to make passing vars down easier.
+    cyphers.push(`RETURN ${returnVariables.MATCH.join(", ")}`);
     params = { params: { ...params } };
 
     return {
         cypher: cyphers.join("\n"),
         params,
         returnVariables: {
-            MATCH: (matchField.selectionSet?.selections as FieldNode[]).map(
-                (x) => x.name.value
-            ),
+            MATCH: selections
+                .filter((x) => x.name.value === "MATCH")
+                .flatMap((x) =>
+                    (x.selectionSet?.selections as FieldNode[]).map(
+                        (y) => y.name.value
+                    )
+                ),
         },
     };
 }

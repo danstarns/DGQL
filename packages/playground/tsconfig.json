@@ -3,11 +3,16 @@
     "sourceRoot": "./",
     "compilerOptions": {
         "outDir": "./dist",
-        "target": "es5",
+        "target": "es6",
         "module": "es6",
         "jsx": "react",
-        "noImplicitAny": true,
+        "noImplicitAny": false,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "lib": [
+            "DOM",
+            "es2019",
+            "ESNext.Array"
+        ],
     },
 }
