@@ -16,6 +16,8 @@ $ npm install schemaless-graphql-neo4j
 
 You can get started with the developer playground [here](https://github.com/danstarns/schemaless-graphql-neo4j/tree/main/packages/playground)
 
+You can also use the code sandbox [here](https://codesandbox.io/s/schemaless-neo4j-graphql-8pjvt)
+
 ![playground](./misc/assets/playground.gif)
 
 ## Quick Start
