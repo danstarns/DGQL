@@ -9,7 +9,7 @@
 ```graphql
 {
     MATCH {
-        node {
+        node @node {
             RETURN {
                 name
             }

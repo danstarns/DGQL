@@ -5,9 +5,11 @@ import { execute } from "./utils";
 
 class Client {
     driver: neo4j.Driver;
+    debug?: boolean;
 
-    constructor(input: { driver: neo4j.Driver }) {
+    constructor(input: { driver: neo4j.Driver; debug?: boolean }) {
         this.driver = input.driver;
+        this.debug = input.debug;
     }
 
     translate({
@@ -31,6 +33,11 @@ class Client {
             query,
             variables,
         });
+
+        if (this.debug) {
+            console.log("==============");
+            console.log(JSON.stringify(translation, null, 2));
+        }
 
         return (execute({
             ...translation,

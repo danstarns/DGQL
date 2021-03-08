@@ -218,7 +218,7 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-#### Filter Relationships
+#### Filter relationships
 
 ```graphql
 {
@@ -242,7 +242,7 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-#### Filter By Relationship Property
+#### Filter by relationship property
 
 ```graphql
 {
@@ -292,6 +292,53 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
+### Pagination
+
+#### Sort
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) {
+            SORT {
+                id(direction: DESC)
+            }
+            RETURN {
+                name
+            }
+        }
+    }
+}
+```
+
+#### Skip
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) @paginate(skip: 10) {
+            RETURN {
+                name
+            }
+        }
+    }
+}
+```
+
+#### Limit
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) @paginate(limit: 10) {
+            RETURN {
+                name
+            }
+        }
+    }
+}
+```
+
 ### Create
 
 > TODO
@@ -303,3 +350,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 ### Delete
 
 > TODO
+
+```
+
+```

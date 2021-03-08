@@ -6,6 +6,7 @@ import {
     valueFromASTUntyped,
 } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
+import createSortAndParams from "./create-sort-and-params";
 import { Direction } from "../types";
 
 function createMatchProjectionAndParams({
@@ -39,6 +40,10 @@ function createMatchProjectionAndParams({
 
         const edgeDirective = value.directives?.find(
             (x) => x.name.value === "edge"
+        ) as DirectiveNode;
+
+        const paginateDirective = value.directives?.find(
+            (x) => x.name.value === "paginate"
         ) as DirectiveNode;
 
         if (edgeDirective) {
@@ -92,6 +97,11 @@ function createMatchProjectionAndParams({
 
             const nodeWhere = ((node.selectionSet?.selections ||
                 []) as FieldNode[]).find((x) => x.name.value === "WHERE") as
+                | FieldNode
+                | undefined;
+
+            const nodeSort = ((node.selectionSet?.selections ||
+                []) as FieldNode[]).find((x) => x.name.value === "SORT") as
                 | FieldNode
                 | undefined;
 
@@ -155,6 +165,17 @@ function createMatchProjectionAndParams({
                 });
             }
 
+            let nodeSortAndParams: [string?, any?] = ["", {}];
+            if (nodeSort) {
+                nodeSortAndParams = createSortAndParams({
+                    varName: node.name.value,
+                    sortField: nodeSort,
+                    chainStr: `${param}_${node.name.value}_where`,
+                    variables,
+                    nestedVersion: true,
+                });
+            }
+
             const whereStrs = [
                 ...(nodeWhereAndParams[0]
                     ? [nodeWhereAndParams[0].replace("WHERE", "")]
@@ -173,24 +194,79 @@ function createMatchProjectionAndParams({
                 ...nestedRelationshipMatchProjectionAndParams[1],
                 ...nodeWhereAndParams[1],
                 ...relationshipWhereAndParams[1],
+                ...nodeSortAndParams[1],
             };
+
+            let sortLimitStr = "";
+            if (paginateDirective) {
+                const skipArgument = paginateDirective.arguments?.find(
+                    (x) => x.name.value === "skip"
+                ) as ArgumentNode;
+
+                const limitArgument = paginateDirective.arguments?.find(
+                    (x) => x.name.value === "limit"
+                ) as ArgumentNode;
+
+                if (skipArgument && !limitArgument) {
+                    const skip = valueFromASTUntyped(
+                        skipArgument.value,
+                        variables
+                    );
+                    sortLimitStr = `[${skip}..]`;
+                }
+
+                if (limitArgument && !skipArgument) {
+                    const limit = valueFromASTUntyped(
+                        limitArgument.value,
+                        variables
+                    );
+                    sortLimitStr = `[..${limit}]`;
+                }
+
+                if (limitArgument && skipArgument) {
+                    const skip = valueFromASTUntyped(
+                        skipArgument.value,
+                        variables
+                    );
+                    const limit = valueFromASTUntyped(
+                        limitArgument.value,
+                        variables
+                    );
+                    sortLimitStr = `[${skip}..${limit}]`;
+                }
+            }
 
             if (
                 nestedNodeMatchProjectionAndParams[0] &&
                 nestedRelationshipMatchProjectionAndParams[0]
             ) {
-                res.strs.push(
-                    [
-                        `${value.name.value}: [ ${pathStr} ${whereStr} | { `,
-                        `${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]},`,
-                        `${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]}`,
-                        `} ]`,
-                    ].join(" ")
-                );
+                const innerPath = [
+                    `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]},`,
+                    `${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]}`,
+                    `} ]${sortLimitStr}`,
+                ].join(" ");
+
+                if (nodeSortAndParams[0]) {
+                    res.strs.push(
+                        `${value.name.value}: apoc.coll.sortMulti(${innerPath}, ${nodeSortAndParams[0]})${sortLimitStr}`
+                    );
+                } else {
+                    res.strs.push(
+                        `${value.name.value}: ${innerPath}${sortLimitStr}`
+                    );
+                }
             } else if (nestedNodeMatchProjectionAndParams[0]) {
-                res.strs.push(
-                    `${value.name.value}: [ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]} } ]`
-                );
+                const innerPath = `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]} } ]`;
+
+                if (nodeSortAndParams[0]) {
+                    res.strs.push(
+                        `${value.name.value}: apoc.coll.sortMulti(${innerPath}, ${nodeSortAndParams[0]})${sortLimitStr}`
+                    );
+                } else {
+                    res.strs.push(
+                        `${value.name.value}: ${innerPath}${sortLimitStr}`
+                    );
+                }
             } else if (nestedRelationshipMatchProjectionAndParams[0]) {
                 res.strs.push(
                     `${value.name.value}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]} } ]`
@@ -233,10 +309,19 @@ function createMatchAndParams({
         const varName = field.name.value;
         const selections = field.selectionSet?.selections as FieldNode[];
         const whereField = selections.find((x) => x.name.value === "WHERE");
+        const sortField = selections.find((x) => x.name.value === "SORT");
         const returnField = selections.find((x) => x.name.value === "RETURN");
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
+        const paginateDirective = field.directives?.find(
+            (x) => x.name.value === "paginate"
+        ) as DirectiveNode;
+
+        // TODO Support top level MATCH for @relationship
+        if (!nodeDirective) {
+            return;
+        }
 
         const labelArg = (nodeDirective?.arguments || [])?.find(
             (x) => x.name.value === "label"
@@ -260,6 +345,17 @@ function createMatchAndParams({
             params = { ...params, ...whereAndParams[1] };
         }
 
+        if (sortField) {
+            const sortAndParams = createSortAndParams({
+                varName,
+                sortField,
+                chainStr: `${varName}_where`,
+                variables,
+            });
+            cyphers.push(sortAndParams[0]);
+            params = { ...params, ...sortAndParams[1] };
+        }
+
         if (returnField) {
             const matchProjectionAndParams = createMatchProjectionAndParams({
                 varName,
@@ -273,6 +369,29 @@ function createMatchAndParams({
             );
         } else {
             cyphers.push(`RETURN ${varName}`);
+        }
+
+        if (paginateDirective) {
+            const skipArgument = paginateDirective.arguments?.find(
+                (x) => x.name.value === "skip"
+            ) as ArgumentNode;
+
+            const limitArgument = paginateDirective.arguments?.find(
+                (x) => x.name.value === "limit"
+            ) as ArgumentNode;
+
+            if (skipArgument) {
+                const skip = valueFromASTUntyped(skipArgument.value, variables);
+                cyphers.push(`SKIP ${skip}`);
+            }
+
+            if (limitArgument) {
+                const limit = valueFromASTUntyped(
+                    limitArgument.value,
+                    variables
+                );
+                cyphers.push(`LIMIT ${limit}`);
+            }
         }
 
         cyphers.push(`}`); // close CALL
