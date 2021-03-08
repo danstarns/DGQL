@@ -20,7 +20,8 @@
         "prepare": "run-s lerna:clean lerna:bootstrap",
         "lerna:clean": "lerna clean -y",
         "playground": "cd ./packages/playground && npm run dev",
-        "test": "cd ./packages/client && npm run test"
+        "test": "cd ./packages/client && npm run test",
+        "dev": "npm run playground"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^4.10.0",
