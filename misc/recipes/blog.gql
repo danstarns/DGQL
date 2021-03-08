@@ -1,0 +1,35 @@
+# See https://github.com/danstarns/neo-push
+{
+    MATCH {
+        blogs @node(label: Blog) {
+            RETURN {
+                name
+                posts @edge(type: HAS_POST, direction: OUT) {
+                    post @node(label: Post) {
+                        RETURN {
+                            title
+                            comments @edge(type: HAS_COMMENT, direction: OUT) {
+                                comment @node(label: Comment) {
+                                    RETURN {
+                                        content
+                                        authors
+                                            @edge(
+                                                type: COMMENTED
+                                                direction: IN
+                                            ) {
+                                            author @node(label: User) {
+                                                RETURN {
+                                                    email
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
