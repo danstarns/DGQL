@@ -1,0 +1,10 @@
+{
+    "extends": [
+        "airbnb-typescript"
+    ],
+    "rules": {
+        "@typescript-eslint/semi": [
+            "error"
+        ]
+    }
+}

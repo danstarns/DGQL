@@ -8,6 +8,12 @@ Turn untyped & dynamic GraphQL queries into Cypher.
 $ npm install schemaless-graphql-neo4j
 ```
 
+### Playground
+
+You can get started with the developer playground [here](https://github.com/danstarns/schemaless-graphql-neo4j/packages/playground)
+
+![playground](./misc/assets/playground.gif)
+
 ## Quick Start
 
 ```js

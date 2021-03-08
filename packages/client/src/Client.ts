@@ -12,10 +12,10 @@ class Client {
 
     translate({
         query,
-        variables,
+        variables = {},
     }: {
         query: Query;
-        variables: Record<string, unknown>;
+        variables?: Record<string, unknown>;
     }): Translation {
         return translate({ query, variables });
     }
