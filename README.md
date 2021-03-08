@@ -334,7 +334,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
             RETURN {
                 posts
                     @edge(type: HAS_POST, direction: OUT)
-                    @paginate(skip: 10) {
+                    @paginate(skip: 1, limit: 10) {
                     post @node {
                         SORT {
                             createdAt(direction: DESC)
