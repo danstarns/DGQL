@@ -154,7 +154,7 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-#### Match and project relationships
+#### Match and project connected nodes
 
 ```graphql
 {
@@ -175,7 +175,7 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-### Match and project relationship properties
+#### Match and project relationship properties
 
 ```graphql
 {
@@ -218,7 +218,7 @@ The lack of schema means no validation or type checking is performed, usually th
 }
 ```
 
-#### Filter relationships
+#### Filter connected nodes
 
 ```graphql
 {
@@ -311,12 +311,12 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-#### Skip
+#### Skip + Limit nodes
 
 ```graphql
 {
     MATCH {
-        user @node(label: User) @paginate(skip: 10) {
+        user @node(label: User) @paginate(skip: 10, limit: 10) {
             RETURN {
                 name
             }
@@ -325,14 +325,25 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-#### Limit
+#### Sort + Skip + Limit connected nodes
 
 ```graphql
 {
     MATCH {
-        user @node(label: User) @paginate(limit: 10) {
+        user @node(label: User) {
             RETURN {
-                name
+                posts
+                    @edge(type: HAS_POST, direction: OUT)
+                    @paginate(skip: 10) {
+                    post @node {
+                        SORT {
+                            createdAt(direction: DESC)
+                        }
+                        RETURN {
+                            title
+                        }
+                    }
+                }
             }
         }
     }
