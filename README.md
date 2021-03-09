@@ -1,82 +1,25 @@
-# schemaless-graphql-neo4j
+# DGQL
+
+~~Dynamic GraphQL~~
+
+~~Dans Dynamic Graph Query Language~~
+
+Dynamic Graph Query Language 👍
+
+## Intro
 
 Turn untyped & dynamic GraphQL queries into Cypher.
 
-> Checkout [recipes](https://github.com/danstarns/schemaless-graphql-neo4j/tree/main/misc/recipes) for a better view on the queries you can write.
+> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) for a better view on the queries you can write.
 
-## Getting Started
+### Navigating
 
-```
-$ npm install schemaless-graphql-neo4j
-```
+This is a monorepo, with the following packages;
 
-⚠ Library not yet published
+1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine for DGQL
+1. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries.
 
-## Playground
-
-You can get started with the developer playground [here](https://github.com/danstarns/schemaless-graphql-neo4j/tree/main/packages/playground)
-
-You can also use the code sandbox [here](https://codesandbox.io/s/schemaless-neo4j-graphql-8pjvt)
-
-![playground](./misc/assets/playground.gif)
-
-## Quick Start
-
-```js
-const { Client } = require("schemaless-graphql-neo4j");
-const neo4j = require("neo4j-driver");
-
-const driver = neo4j.driver(
-    "bolt://localhost:7687",
-    neo4j.auth.basic("neo4j", "password")
-);
-
-const client = new Client({ driver });
-
-async function main() {
-    const query = `
-        {
-            MATCH {
-                user @node(label: User) {
-                    WHERE {
-                        name(equal: "Dan")
-                    }
-                    RETURN {
-                        name
-                        posts @edge(type: HAS_POST, direction: OUT) {
-                            post @node(label: Post) {
-                                RETURN {
-                                    title
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    `;
-
-    const { MATCH } = await client.run({ query });
-
-    console.log(MATCH.user);
-    /*
-        [{
-            name: "Dan",
-            posts: [
-                {
-                    post: {
-                        title: "Checkout schemaless-graphql-neo4j"
-                    }
-                }
-            ]
-        }]
-    */
-}
-
-main();
-```
-
-## What is it ? 🧐
+### What is it ? 🧐
 
 GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher via; picking up on Client Directives that give the query context.
 

@@ -1,11 +1,11 @@
 {
-    "name": "schemaless-graphql-neo4j-playground",
+    "name": "@dgql/playground",
     "main": "index.js",
     "version": "1.0.0",
-    "description": "Playground For Schemaless Neo4j GraphQL",
+    "description": "Developer playground for the DGQL language",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/danstarns/schemaless-graphql-neo4j.git"
+        "url": "git+https://github.com/danstarns/dgql.git"
     },
     "keywords": [],
     "author": "",
@@ -15,9 +15,9 @@
         "dev": "webpack serve"
     },
     "bugs": {
-        "url": "https://github.com/danstarns/schemaless-graphql-neo4j/issues"
+        "url": "https://github.com/danstarns/dgql/issues"
     },
-    "homepage": "https://github.com/danstarns/schemaless-graphql-neo4j#readme",
+    "homepage": "https://github.com/danstarns/dgql#readme",
     "dependencies": {
         "ace-builds": "^1.4.12",
         "codemirror": "^5.59.4",

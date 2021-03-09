@@ -1,16 +1,11 @@
 {
-    "name": "schemaless-graphql-neo4j-monorepo",
+    "name": "dgql-monorepo",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/danstarns/schemaless-graphql-neo4j.git"
+        "url": "git+https://github.com/danstarns/dgql.git"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/danstarns/schemaless-graphql-neo4j/issues"
-    },
-    "homepage": "https://github.com/danstarns/schemaless-graphql-neo4j#readme",
+    "author": "danielstarns@hotmail.com",
+    "license": "MIT",
     "peerDependencies": {
         "graphql": "^15.0.0",
         "neo4j-driver": "^4.2.0"
