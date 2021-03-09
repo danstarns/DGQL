@@ -15,10 +15,6 @@ function createWhereAndParams({
     let params: Record<string, unknown> = {};
     const selections = whereField.selectionSet?.selections as FieldNode[];
 
-    if (selections.length) {
-        strs.push("WHERE");
-    }
-
     selections.forEach((field) => {
         let param: string;
         if (chainStr) {
@@ -27,79 +23,97 @@ function createWhereAndParams({
             param = `${varName}_${field.name.value}`;
         }
 
-        let innerStrs: string[] = [];
+        if (["AND", "OR", "XOR"].includes(field.name.value)) {
+            const logicStrs: string[] = [];
+            const logicSelections = (field as FieldNode).selectionSet
+                ?.selections as FieldNode[];
+
+            logicSelections.forEach((selection, i) => {
+                if (selection.name.value === "WHERE") {
+                    const wAndP = createWhereAndParams({
+                        varName,
+                        chainStr: `${param}${i}`,
+                        variables,
+                        whereField: selection,
+                    });
+                    logicStrs.push(wAndP[0]);
+                    params = { ...params, ...wAndP[1] };
+                }
+            });
+            strs.push(
+                logicStrs.join(` ${field.name.value} `).replace(/WHERE /g, "")
+            );
+        }
 
         (field.arguments as ArgumentNode[]).forEach((arg) => {
             const value = valueFromASTUntyped(arg.value, variables);
             const paramName = `${param}_${arg.name.value}`;
 
             if (arg.name.value === "equal") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} = $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "not") {
-                innerStrs.push(
+                strs.push(
                     `NOT ${varName}.${field.name.value} = $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "gt") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} > $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "gte") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} >= $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "lt") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} < $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "lte") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} <= $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "starts_with") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} STARTS WITH $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "ends_with") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} ENDS WITH $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "contains") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} CONTAINS $params.${paramName}`
                 );
             }
 
             if (arg.name.value === "regex") {
-                innerStrs.push(
+                strs.push(
                     `${varName}.${field.name.value} =~ $params.${paramName}`
                 );
             }
 
             params[paramName] = value;
         });
-
-        strs.push(innerStrs.join(" AND "));
     });
 
-    return [strs.join("\n"), params];
+    return [`WHERE ${strs.join(" AND ")}`, params];
 }
 
 export default createWhereAndParams;
