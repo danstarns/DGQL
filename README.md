@@ -17,7 +17,7 @@ Dynamic Graph Query Language 👍
 This is a monorepo, with the following packages;
 
 1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine for DGQL
-1. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries.
+1. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
 
 ### Prerequisites
 
@@ -64,7 +64,7 @@ RETURN user {
 
 ### Why
 
-**Why don't you just use Cypher?** - If you have a highly specific answer... Cypher may be the right question for you. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Formulating the DGQL query will make returning values from the database more predictable & easier to manage.
+**Why don't you just use Cypher?** - If you have a highly specific answer... Cypher may be the right question for you. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
 
 **Why does it use GraphQL?** - The GraphQL parser is a widely adopted and maintained project, meaning we can lean on its tools and infrastructure. Not only does GraphQL provide a solid foundation but also comes with developers & library authors. Finally; GraphQL directives are extremely useful and enable DGQL to facilitate powerful abstractions behind them.
 
@@ -72,7 +72,7 @@ RETURN user {
 
 ## Usage
 
-### Match
+### `MATCH`
 
 #### Match node
 
@@ -150,28 +150,13 @@ RETURN user {
 }
 ```
 
-### Where
+### `WHERE`
 
 #### Operators
 
-##### equal
+See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/tck-test-files/where/operators.md) for info on operators.
 
-```graphql
-{
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                id(equal: 1)
-            }
-            RETURN {
-                id
-            }
-        }
-    }
-}
-```
-
-#### Filter connected nodes
+#### Where on connected node
 
 ```graphql
 {
@@ -195,7 +180,7 @@ RETURN user {
 }
 ```
 
-#### Filter by relationship property
+#### Where on relationship
 
 ```graphql
 {
@@ -247,7 +232,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 
 ### Pagination
 
-#### Sort
+#### `SORT`
 
 ```graphql
 {
@@ -264,7 +249,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-#### Skip + Limit nodes
+#### `SKIP` + `LIMIT`
 
 ```graphql
 {
@@ -278,7 +263,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-#### Sort + Skip + Limit connected nodes
+#### `SKIP` + `LIMIT` + `LIMIT` on connected nodes
 
 ```graphql
 {
@@ -303,18 +288,14 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-### Create
+### `CREATE`
 
 > TODO
 
-### Update
+### `UPDATE`
 
 > TODO
 
-### Delete
+### `DELETE`
 
 > TODO
-
-```
-
-```
