@@ -263,7 +263,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 }
 ```
 
-#### `SKIP` + `LIMIT` + `LIMIT` on connected nodes
+#### `SKIP` + `LIMIT` + `SORT` on connected nodes
 
 ```graphql
 {
