@@ -1,16 +1,16 @@
 # DGQL
 
+> Turn untyped & dynamic GraphQL queries into Cypher.
+
 ~~Dynamic GraphQL~~
 
-~~Dans Dynamic Graph Query Language~~
+~~Dans Graph Query Language~~
 
 Dynamic Graph Query Language 👍
 
 ## Intro
 
-Turn untyped & dynamic GraphQL queries into Cypher.
-
-> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) for a better view on the queries you can write.
+> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) to peek through granny's cookbook of DGQL queries.
 
 ### Navigating
 
@@ -19,9 +19,13 @@ This is a monorepo, with the following packages;
 1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine for DGQL
 1. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries.
 
-### What is it ? 🧐
+### Prerequisites
 
-GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove them selfs from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language. This implementation fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher via; picking up on Client Directives that give the query context.
+GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
+
+### What
+
+This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
 Given the below;
 
@@ -58,7 +62,13 @@ RETURN user {
 } as user
 ```
 
-The lack of schema means no validation or type checking is performed, usually the expensive part of GraphQL execution. The flip-side to this is that; you can formulate ad-hoc queries using a maybe more familiar language; GraphQL. Using this language enables developers to receive a JSON like structure, similar in-shape to there formulated query, thus making the response more predictable & easier to manage.
+### Why
+
+**Why don't you just use Cypher?** - If you have a highly specific answer... Cypher may be the right question for you. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Formulating the DGQL query will make returning values from the database more predictable & easier to manage.
+
+**Why does it use GraphQL?** - The GraphQL parser is a widely adopted and maintained project, meaning we can lean on its tools and infrastructure. Not only does GraphQL provide a solid foundation but also comes with developers & library authors. Finally; GraphQL directives are extremely useful and enable DGQL to facilitate powerful abstractions behind them.
+
+**Why no Schema?** - This implementation is designed to be lightweight and run anywhere. The lack of schema facilitates this but also means no validation or type checking is performed, usually the expensive part of GraphQL execution.
 
 ## Usage
 
