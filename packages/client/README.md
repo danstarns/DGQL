@@ -31,11 +31,11 @@ async function main() {
                     WHERE {
                         name(equal: "Dan")
                     }
-                    RETURN {
+                    PROJECT {
                         name
                         posts @edge(type: HAS_POST, direction: OUT) {
                             post @node(label: Post) {
-                                RETURN {
+                                PROJECT {
                                     title
                                 }
                             }
@@ -43,12 +43,15 @@ async function main() {
                     }
                 }
             }
+            RETURN {
+                user
+            }
         }
     `;
 
-    const { MATCH } = await client.run({ query });
+    const { ussr } = await client.run({ query });
 
-    console.log(MATCH.user);
+    console.log(user);
     /*
         [{
             name: "Dan",

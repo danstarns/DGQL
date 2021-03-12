@@ -25,7 +25,7 @@ async function execute({
         session.close();
     }
 
-    const matches = returnVariables.MATCH.reduce((res, name) => {
+    return returnVariables.reduce((res, name) => {
         return {
             ...res,
             [name]: result.records
@@ -33,8 +33,6 @@ async function execute({
                 .map((x) => deserialize(x.toObject()[name])),
         };
     }, {});
-
-    return { MATCH: matches };
 }
 
 export default execute;

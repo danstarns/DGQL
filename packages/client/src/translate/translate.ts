@@ -14,11 +14,17 @@ function translate({
     const root = document.definitions[0] as OperationDefinitionNode;
     const cyphers: string[] = [];
     let params: Record<string, unknown> = {};
-    const selections = root.selectionSet.selections.filter(
+    const selections = root.selectionSet.selections;
+    const matches = selections.filter(
         (f) => f.kind === "Field" && ["MATCH"].includes(f.name.value)
     ) as FieldNode[];
+    const returnField = selections.find(
+        (f) => f.kind === "Field" && ["RETURN"].includes(f.name.value)
+    ) as FieldNode;
+    const returnVariables = ((returnField?.selectionSet?.selections ||
+        []) as FieldNode[]).map((s: FieldNode) => s.name.value);
 
-    selections.forEach((field: SelectionNode) => {
+    matches.forEach((field: SelectionNode) => {
         if (field.kind !== "Field") {
             return;
         }
@@ -35,31 +41,16 @@ function translate({
         params = { ...params, ...mParams };
     });
 
-    const returnVariables = {
-        MATCH: selections
-            .filter((x) => x.name.value === "MATCH")
-            .flatMap((x) =>
-                (x.selectionSet?.selections as FieldNode[]).map(
-                    (y) => y.name.value
-                )
-            ),
-    };
+    if (returnField) {
+        cyphers.push(`RETURN ${returnVariables.join(", ")}`);
+    }
 
-    cyphers.push(`RETURN ${returnVariables.MATCH.join(", ")}`);
     params = { params: { ...params } };
 
     return {
         cypher: cyphers.join("\n"),
         params,
-        returnVariables: {
-            MATCH: selections
-                .filter((x) => x.name.value === "MATCH")
-                .flatMap((x) =>
-                    (x.selectionSet?.selections as FieldNode[]).map(
-                        (y) => y.name.value
-                    )
-                ),
-        },
+        returnVariables,
     };
 }
 

@@ -11,12 +11,12 @@ import { Direction } from "../types";
 
 function createMatchProjectionAndParams({
     varName,
-    returnField,
+    projectField,
     chainStr,
     variables,
 }: {
     varName: string;
-    returnField: FieldNode;
+    projectField: FieldNode;
     chainStr?: string;
     variables: Record<string, unknown>;
 }): [string, any] {
@@ -90,8 +90,8 @@ function createMatchProjectionAndParams({
                 : `(${labelStr})`;
             const pathStr = `(${varName})${inStr}${typeStr}${outStr}${toNodeStr}`;
 
-            const nodeReturn = ((node.selectionSet?.selections ||
-                []) as FieldNode[]).find((x) => x.name.value === "RETURN") as
+            const nodeProject = ((node.selectionSet?.selections ||
+                []) as FieldNode[]).find((x) => x.name.value === "PROJECT") as
                 | FieldNode
                 | undefined;
 
@@ -105,10 +105,10 @@ function createMatchProjectionAndParams({
                 | FieldNode
                 | undefined;
 
-            const relationshipReturn =
+            const relationshipProject =
                 relationship &&
                 ((relationship.selectionSet?.selections as FieldNode[]).find(
-                    (x) => x.name.value === "RETURN"
+                    (x) => x.name.value === "PROJECT"
                 ) as FieldNode | undefined);
 
             const relationshipWhere =
@@ -119,10 +119,10 @@ function createMatchProjectionAndParams({
                 ) as FieldNode | undefined);
 
             let nestedNodeMatchProjectionAndParams: [string?, any?] = ["", {}];
-            if (nodeReturn) {
+            if (nodeProject) {
                 nestedNodeMatchProjectionAndParams = createMatchProjectionAndParams(
                     {
-                        returnField: nodeReturn,
+                        projectField: nodeProject,
                         varName: node.name.value,
                         chainStr: `${param}_${node.name.value}`,
                         variables,
@@ -134,10 +134,10 @@ function createMatchProjectionAndParams({
                 "",
                 {},
             ];
-            if (relationshipReturn) {
+            if (relationshipProject) {
                 nestedRelationshipMatchProjectionAndParams = createMatchProjectionAndParams(
                     {
-                        returnField: relationshipReturn,
+                        projectField: relationshipProject,
                         varName: relationship.name.value,
                         chainStr: `${param}_${relationship.name.value}`,
                         variables,
@@ -283,7 +283,7 @@ function createMatchProjectionAndParams({
         return res;
     }
 
-    const { strs, params } = (returnField.selectionSet
+    const { strs, params } = (projectField.selectionSet
         ?.selections as FieldNode[]).reduce(
         (r: Res, v: FieldNode) => reducer(r, v),
         {
@@ -310,7 +310,7 @@ function createMatchAndParams({
         const selections = field.selectionSet?.selections as FieldNode[];
         const whereField = selections.find((x) => x.name.value === "WHERE");
         const sortField = selections.find((x) => x.name.value === "SORT");
-        const returnField = selections.find((x) => x.name.value === "RETURN");
+        const projectField = selections.find((x) => x.name.value === "PROJECT");
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
@@ -356,10 +356,10 @@ function createMatchAndParams({
             params = { ...params, ...sortAndParams[1] };
         }
 
-        if (returnField) {
+        if (projectField) {
             const matchProjectionAndParams = createMatchProjectionAndParams({
                 varName,
-                returnField,
+                projectField,
                 variables,
             });
             params = { ...params, ...matchProjectionAndParams[1] };

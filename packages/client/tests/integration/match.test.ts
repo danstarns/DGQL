@@ -156,7 +156,7 @@ describe("match", () => {
 
             const result = await client.run({ query });
 
-            expect(result?.MATCH?.test1).toEqual([
+            expect(result?.test1).toEqual([
                 { id: id1, nodes: [{ test2: { id: id2 } }] },
             ]);
         } finally {

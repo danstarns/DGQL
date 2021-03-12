@@ -1,10 +1,8 @@
-import { DocumentNode, FieldNode } from "graphql";
+import { DocumentNode } from "graphql";
 
 export type Query = string | DocumentNode;
 
-export type ReturnVariables = {
-    MATCH: string[];
-};
+export type ReturnVariables = string[];
 
 export type Translation = {
     cypher: string;
