@@ -307,7 +307,8 @@ function createMatchAndParams({
 
     (matchField.selectionSet?.selections as FieldNode[]).forEach((field) => {
         const varName = field.name.value;
-        const selections = field.selectionSet?.selections as FieldNode[];
+        const selections = (field.selectionSet?.selections ||
+            []) as FieldNode[];
         const whereField = selections.find((x) => x.name.value === "WHERE");
         const sortField = selections.find((x) => x.name.value === "SORT");
         const projectField = selections.find((x) => x.name.value === "PROJECT");

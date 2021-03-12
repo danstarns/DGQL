@@ -42,6 +42,42 @@ RETURN node
 
 ---
 
+### Match Node With No Fields
+
+**Input GraphQL**
+
+```graphql
+{
+    MATCH {
+        node @node
+    }
+    RETURN {
+        node
+    }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    MATCH (node)
+    RETURN node
+}
+
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
 ### Match Node with label
 
 **Input GraphQL**
