@@ -2,15 +2,15 @@
 {
     MATCH {
         blogs @node(label: Blog) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             title
                             comments @edge(type: HAS_COMMENT, direction: OUT) {
                                 comment @node(label: Comment) {
-                                    RETURN {
+                                    PROJECT {
                                         content
                                         authors
                                             @edge(
@@ -18,7 +18,7 @@
                                                 direction: IN
                                             ) {
                                             author @node(label: User) {
-                                                RETURN {
+                                                PROJECT {
                                                     email
                                                 }
                                             }
@@ -31,5 +31,8 @@
                 }
             }
         }
+    }
+    RETURN {
+        blogs
     }
 }

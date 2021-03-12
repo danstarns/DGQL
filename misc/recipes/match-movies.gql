@@ -5,12 +5,12 @@
             WHERE {
                 title(equal: "Matrix, The")
             }
-            RETURN {
+            PROJECT {
                 title
                 imdbRating
                 genres @edge(type: IN_GENRE, direction: OUT) {
                     genre @node(label: Genre) {
-                        RETURN {
+                        PROJECT {
                             name
                         }
                     }
@@ -18,12 +18,15 @@
                 ratings @edge(type: RATED, direction: IN) {
                     to @node(label: User)
                     rating @relationship {
-                        RETURN {
+                        PROJECT {
                             rating
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        movies
     }
 }

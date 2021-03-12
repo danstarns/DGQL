@@ -36,17 +36,20 @@ Given the below;
             WHERE {
                 name(equal: "Dan")
             }
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             title
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -80,10 +83,13 @@ RETURN user {
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -94,15 +100,19 @@ RETURN user {
 {
     MATCH {
         users @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
         posts @node(label: Post) {
-            RETURN {
+            PROJECT {
                 content
             }
         }
+    }
+    RETURN {
+        users
+        posts
     }
 }
 ```
@@ -113,17 +123,20 @@ RETURN user {
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     node @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             title
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -134,18 +147,21 @@ RETURN user {
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post)
                     properties @relationship {
-                        RETURN {
+                        PROJECT {
                             since
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -154,7 +170,7 @@ RETURN user {
 
 #### Operators
 
-See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/tck-test-files/where/operators.md) for info on operators.
+See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files/where/operators) for info on operators.
 
 #### Where on connected node
 
@@ -162,20 +178,23 @@ See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 id
                 posts @edge(type: HAS_POST, direction: OUT) {
                     node @node(label: Post) {
                         WHERE {
                             content(equal: "Cool")
                         }
-                        RETURN {
+                        PROJECT {
                             content
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -186,11 +205,11 @@ See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 id
                 posts @edge(type: HAS_POST, direction: OUT) {
                     node @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             content
                         }
                     }
@@ -203,6 +222,9 @@ See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/
             }
         }
     }
+    RETURN {
+        user
+    }
 }
 ```
 
@@ -211,7 +233,7 @@ See [TCK](https://github.com/danstarns/DGQL/blob/main/packages/client/tests/tck/
 Use the `$` symbol to use variables and provide `variables` map when calling `translation` or `run`;
 
 ```js
-const { MATCH } = await client.run({ query, variables: { id: "user-id" } }); // OR
+const { user } = await client.run({ query, variables: { id: "user-id" } }); // OR
 const translation = client.translate({ query, variables: { id: "user-id" } }); // OR
 ```
 
@@ -222,10 +244,13 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
             WHERE {
                 id(equal: $id)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -241,10 +266,13 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
             SORT {
                 id(direction: DESC)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -255,10 +283,13 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 {
     MATCH {
         user @node(label: User) @paginate(skip: 10, limit: 10) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -269,7 +300,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 posts
                     @edge(type: HAS_POST, direction: OUT)
                     @paginate(skip: 1, limit: 10) {
@@ -277,13 +308,16 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
                         SORT {
                             createdAt(direction: DESC)
                         }
-                        RETURN {
+                        PROJECT {
                             title
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```

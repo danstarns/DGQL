@@ -2,24 +2,24 @@
 # See https://gist.github.com/danstarns/4ff18b00bb947c3d186603a65a7752d5
 {
     MATCH {
-        node @node(label: Product) {
-            RETURN {
+        product @node(label: Product) {
+            PROJECT {
                 name
                 sizes @edge(type: HAS_SIZE, direction: OUT) {
                     size @node(label: Size) {
-                        RETURN {
+                        PROJECT {
                             name
                         }
                     }
                 }
                 photos @edge(type: HAS_PHOTO, direction: OUT) {
                     photo @node(label: Photo) {
-                        RETURN {
+                        PROJECT {
                             url
                             description
                             color @edge(type: OF_COLOR, direction: OUT) {
                                 color @node(label: Color) {
-                                    RETURN {
+                                    PROJECT {
                                         name
                                     }
                                 }
@@ -29,5 +29,8 @@
                 }
             }
         }
+    }
+    RETURN {
+        product
     }
 }
