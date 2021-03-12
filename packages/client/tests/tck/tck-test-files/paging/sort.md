@@ -13,10 +13,13 @@
             SORT {
                 id(direction: DESC)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -55,10 +58,13 @@ RETURN node
             SORT {
                 id(direction: ASC)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -98,10 +104,13 @@ RETURN node
                 id(direction: DESC)
                 id(direction: ASC)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -137,19 +146,22 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes @edge(type: HAS_NODE, direction: OUT) {
                     nestedNode @node {
                         SORT {
                             id(direction: DESC)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -185,19 +197,22 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes @edge(type: HAS_NODE, direction: OUT) {
                     nestedNode @node {
                         SORT {
                             id(direction: ASC)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -233,19 +248,22 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes @edge(type: HAS_NODE, direction: OUT) {
                     nestedNode @node {
                         SORT {
                             id(direction: DESC)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -281,20 +299,23 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes @edge(type: HAS_NODE, direction: OUT) {
                     nestedNode @node {
                         SORT {
                             id(direction: DESC)
                             id(direction: ASC)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```

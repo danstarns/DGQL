@@ -13,10 +13,13 @@
             WHERE {
                 name(equal: Dan)
             }
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -53,20 +56,23 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
                         WHERE {
                             title(equal: "Beer")
                         }
-                        RETURN {
+                        PROJECT {
                             title
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -109,7 +115,7 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post)
@@ -117,13 +123,16 @@ RETURN user
                         WHERE {
                             since(equal: "1999")
                         }
-                        RETURN {
+                        PROJECT {
                             since
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -166,14 +175,14 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
                         WHERE {
                             title(equal: "Beer")
                         }
-                        RETURN {
+                        PROJECT {
                             title
                         }
                     }
@@ -181,13 +190,16 @@ RETURN user
                         WHERE {
                             since(equal: "1999")
                         }
-                        RETURN {
+                        PROJECT {
                             since
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```

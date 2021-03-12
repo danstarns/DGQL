@@ -10,17 +10,20 @@
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             content
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -63,17 +66,20 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node {
-                        RETURN {
+                        PROJECT {
                             content
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -116,18 +122,21 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post)
                     properties @relationship {
-                        RETURN {
+                        PROJECT {
                             since
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```
@@ -170,22 +179,25 @@ RETURN user
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
                 posts @edge(type: HAS_POST, direction: OUT) {
                     post @node(label: Post) {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                     properties @relationship {
-                        RETURN {
+                        PROJECT {
                             since
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```

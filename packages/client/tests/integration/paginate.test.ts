@@ -34,10 +34,13 @@ describe("paginate", () => {
                             SORT {
                                 id(direction: ASC)
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -53,7 +56,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests).toEqual([{ id: id2 }]);
             } finally {
@@ -82,16 +85,19 @@ describe("paginate", () => {
                 {
                     MATCH {
                         test @node(label: "${label1}") {
-                            RETURN {
+                            PROJECT {
                                 nodes @edge(type: "${type}", direction: OUT) @paginate(skip: 1) {
                                     node @node(label: "${label2}") {
-                                        RETURN {
+                                        PROJECT {
                                             id
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -108,7 +114,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests[0].nodes.length).toEqual(1);
             } finally {
@@ -137,10 +143,13 @@ describe("paginate", () => {
                             SORT {
                                 id(direction: ASC)
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -156,7 +165,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests).toEqual([{ id: id1 }]);
             } finally {
@@ -185,16 +194,19 @@ describe("paginate", () => {
                 {
                     MATCH {
                         test @node(label: "${label1}") {
-                            RETURN {
+                            PROJECT {
                                 nodes @edge(type: "${type}", direction: OUT) @paginate(limit: 1) {
                                     node @node(label: "${label2}") {
-                                        RETURN {
+                                        PROJECT {
                                             id
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -211,7 +223,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests[0].nodes.length).toEqual(1);
             } finally {
@@ -241,10 +253,13 @@ describe("paginate", () => {
                             SORT {
                                 id(direction: ASC)
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -261,7 +276,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests).toEqual([{ id: id2 }, { id: id3 }]);
             } finally {
@@ -291,16 +306,19 @@ describe("paginate", () => {
                 {
                     MATCH {
                         test @node(label: "${label1}") {
-                            RETURN {
+                            PROJECT {
                                 nodes @edge(type: "${type}", direction: OUT) @paginate(skip: 0, limit: 2) {
                                     node @node(label: "${label2}") {
-                                        RETURN {
+                                        PROJECT {
                                             id
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -318,7 +336,7 @@ describe("paginate", () => {
 
                 const result = await client.run({ query });
 
-                const tests = result?.MATCH.test as any[];
+                const tests = result?.test as any[];
 
                 expect(tests[0].nodes.length).toEqual(2);
             } finally {

@@ -10,15 +10,19 @@
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
         post @node(label: Post) {
-            RETURN {
+            PROJECT {
                 content
             }
         }
+    }
+    RETURN {
+        user
+        post
     }
 }
 ```
@@ -57,17 +61,21 @@ RETURN user, post
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
     }
     MATCH {
         post @node(label: Post) {
-            RETURN {
+            PROJECT {
                 content
             }
         }
+    }
+    RETURN {
+        user
+        post
     }
 }
 ```

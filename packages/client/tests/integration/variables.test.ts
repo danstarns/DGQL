@@ -33,10 +33,13 @@ describe("match", () => {
                         WHERE {
                             id(equal: $id)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    test
                 }
             }
         `;
@@ -54,7 +57,7 @@ describe("match", () => {
 
             const result = await client.run({ query, variables: { id: id } });
 
-            expect(result?.MATCH?.test).toEqual([{ id }]);
+            expect(result?.test).toEqual([{ id }]);
         } finally {
             await session.close();
         }
@@ -79,10 +82,13 @@ describe("match", () => {
                         WHERE {
                             id(equal: "${id}")
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    test
                 }
             }
         `;
@@ -100,7 +106,7 @@ describe("match", () => {
 
             const result = await client.run({ query, variables: { label } });
 
-            expect(result?.MATCH?.test).toEqual([{ id }]);
+            expect(result?.test).toEqual([{ id }]);
         } finally {
             await session.close();
         }

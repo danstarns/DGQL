@@ -10,10 +10,13 @@
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -47,10 +50,13 @@ RETURN node
 {
     MATCH {
         user @node(label: User) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        user
     }
 }
 ```

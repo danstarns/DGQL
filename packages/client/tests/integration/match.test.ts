@@ -27,10 +27,13 @@ describe("match", () => {
             {
                 MATCH {
                     test @node(label: "${id}") {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    test
                 }
             }
         `;
@@ -45,7 +48,7 @@ describe("match", () => {
 
             const result = await client.run({ query });
 
-            expect(result?.MATCH?.test).toEqual([{ id }]);
+            expect(result?.test).toEqual([{ id }]);
         } finally {
             await session.close();
         }
@@ -68,15 +71,19 @@ describe("match", () => {
             {
                 MATCH {
                     test1 @node(label: "${id1}") {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                     test2 @node(label: "${id2}") {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    test1
+                    test2
                 }
             }
         `;
@@ -91,8 +98,8 @@ describe("match", () => {
 
             const result = await client.run({ query });
 
-            expect(result?.MATCH?.test1).toEqual([{ id: id1 }]);
-            expect(result?.MATCH?.test2).toEqual([{ id: id2 }]);
+            expect(result?.test1).toEqual([{ id: id1 }]);
+            expect(result?.test2).toEqual([{ id: id2 }]);
         } finally {
             await session.close();
         }
@@ -121,17 +128,20 @@ describe("match", () => {
             {
                 MATCH {
                     test1 @node(label: "${id1}") {
-                        RETURN {
+                        PROJECT {
                             id
                             nodes @edge(type: "${type}", direction: "${direction}") {
                                 test2 @node(label: "${id2}") {
-                                    RETURN {
+                                    PROJECT {
                                         id
                                     }
                                 }
                             }
                         }
                     }
+                }
+                RETURN {
+                    test1
                 }
             }
         `;
@@ -177,18 +187,21 @@ describe("match", () => {
             {
                 MATCH {
                     test1 @node(label: "${id1}") {
-                        RETURN {
+                        PROJECT {
                             id
                             nodes @edge(type: "${type}", direction: "${direction}") {
                                 test2 @node(label: "${id2}")
                                 properties @relationship {
-                                    RETURN {
+                                    PROJECT {
                                         id
                                     }
                                 }
                             }
                         }
                     }
+                }
+                RETURN {
+                    test1
                 }
             }
         `;
@@ -203,7 +216,7 @@ describe("match", () => {
 
             const result = await client.run({ query });
 
-            expect(result?.MATCH?.test1).toEqual([
+            expect(result?.test1).toEqual([
                 { id: id1, nodes: [{ properties: { id: id2 } }] },
             ]);
         } finally {
@@ -234,22 +247,25 @@ describe("match", () => {
             {
                 MATCH {
                     test1 @node(label: "${id1}") {
-                        RETURN {
+                        PROJECT {
                             id
                             nodes @edge(type: "${type}", direction: "${direction}") {
                                 node @node(label: "${id2}") {
-                                    RETURN {
+                                    PROJECT {
                                         id
                                     }
                                 }
                                 properties @relationship {
-                                    RETURN {
+                                    PROJECT {
                                         id
                                     }
                                 }
                             }
                         }
                     }
+                }
+                RETURN {
+                    test1
                 }
             }
         `;
@@ -264,7 +280,7 @@ describe("match", () => {
 
             const result = await client.run({ query });
 
-            expect(result?.MATCH?.test1).toEqual([
+            expect(result?.test1).toEqual([
                 {
                     id: id1,
                     nodes: [{ node: { id: id2 }, properties: { id: id2 } }],

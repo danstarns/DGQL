@@ -7,10 +7,13 @@ describe("queryToDocument", () => {
             {
                 MATCH {
                     node @node(label: "Node") {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    node
                 }
             }
         `;
@@ -25,10 +28,13 @@ describe("queryToDocument", () => {
             {
                 MATCH {
                     node @node(label: "Node") {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
+                }
+                RETURN {
+                    node
                 }
             }
         `;

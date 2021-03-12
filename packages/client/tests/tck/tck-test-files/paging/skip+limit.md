@@ -10,10 +10,13 @@
 {
     MATCH {
         node @node @paginate(skip: 1) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -48,18 +51,21 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes
                     @edge(type: HAS_NODE, direction: OUT)
                     @paginate(skip: 1) {
                     nestedNode @node {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -99,10 +105,13 @@ RETURN node
 {
     MATCH {
         node @node @paginate(limit: 1) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -137,18 +146,21 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes
                     @edge(type: HAS_NODE, direction: OUT)
                     @paginate(limit: 1) {
                     nestedNode @node {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -188,10 +200,13 @@ RETURN node
 {
     MATCH {
         node @node @paginate(skip: 1, limit: 1) {
-            RETURN {
+            PROJECT {
                 name
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -227,18 +242,21 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes
                     @edge(type: HAS_NODE, direction: OUT)
                     @paginate(limit: 1, skip: 1) {
                     nestedNode @node {
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -278,7 +296,7 @@ RETURN node
 {
     MATCH {
         node @node {
-            RETURN {
+            PROJECT {
                 nestedNodes
                     @edge(type: HAS_NODE, direction: OUT)
                     @paginate(limit: 1, skip: 1) {
@@ -286,13 +304,16 @@ RETURN node
                         SORT {
                             id(direction: DESC)
                         }
-                        RETURN {
+                        PROJECT {
                             id
                         }
                     }
                 }
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```

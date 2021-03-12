@@ -13,10 +13,13 @@
             WHERE {
                 id(equal: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -56,10 +59,13 @@ RETURN node
             WHERE {
                 id(not: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -99,10 +105,13 @@ RETURN node
             WHERE {
                 id(gt: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -142,10 +151,13 @@ RETURN node
             WHERE {
                 id(gte: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -185,10 +197,13 @@ RETURN node
             WHERE {
                 id(lt: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -228,10 +243,13 @@ RETURN node
             WHERE {
                 id(lte: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```

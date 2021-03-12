@@ -32,11 +32,14 @@ describe("sort", () => {
                                     SORT {
                                         dt(direction: ${direction})
                                     }
-                                    RETURN {
+                                    PROJECT {
                                         id
                                         dt
                                     }
                                 }
+                            }
+                            RETURN {
+                                test
                             }
                         }
                     `;
@@ -57,7 +60,7 @@ describe("sort", () => {
 
                     const result = await client.run({ query });
 
-                    const tests = result?.MATCH.test as any[];
+                    const tests = result?.test as any[];
 
                     if (direction === "ASC") {
                         expect(tests[0].dt).toEqual(dt1);
@@ -96,13 +99,13 @@ describe("sort", () => {
                         {
                             MATCH {
                                 test @node(label: "${label1}") {
-                                    RETURN {
+                                    PROJECT {
                                         nodes @edge(type: "${relType}", direction: OUT) {
                                             node @node(label: "${label2}") {
                                                 SORT {
                                                     dt(direction: ${direction})
                                                 }
-                                                RETURN {
+                                                PROJECT {
                                                     id
                                                     dt
                                                 }
@@ -110,6 +113,9 @@ describe("sort", () => {
                                         }
                                     }
                                 }
+                            }
+                            RETURN {
+                                test
                             }
                         }
                     `;
@@ -131,7 +137,7 @@ describe("sort", () => {
 
                     const result = await client.run({ query });
 
-                    const nodes = (result?.MATCH.test as any[])[0].nodes;
+                    const nodes = (result?.test as any[])[0].nodes;
 
                     if (direction === "ASC") {
                         expect(nodes[0].node.dt).toEqual(dt1);

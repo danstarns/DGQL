@@ -34,10 +34,13 @@ describe("match", () => {
                             WHERE {
                                 id(equal: ${id})
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -55,7 +58,7 @@ describe("match", () => {
 
                 const result = await client.run({ query });
 
-                expect(result?.MATCH?.test).toEqual([{ id }]);
+                expect(result?.test).toEqual([{ id }]);
             } finally {
                 await session.close();
             }
@@ -91,20 +94,23 @@ describe("match", () => {
                             WHERE {
                                 id(equal: "${id1}")
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                                 nodes @edge(type: "${type}", direction: "OUT") {
                                     node @node(label: "${label2}") {
                                         WHERE {
                                             id(equal: "${id2}")
                                         }
-                                        RETURN {
+                                        PROJECT {
                                             id
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -122,7 +128,7 @@ describe("match", () => {
 
                 const result = await client.run({ query });
 
-                expect(result?.MATCH?.test).toEqual([
+                expect(result?.test).toEqual([
                     { id: id1, nodes: [{ node: { id: id2 } }] },
                 ]);
             } finally {
@@ -158,7 +164,7 @@ describe("match", () => {
                             WHERE {
                                 id(equal: "${id1}")
                             }
-                            RETURN {
+                            PROJECT {
                                 id
                                 nodes @edge(type: "${type}", direction: "OUT") {
                                     node @node(label: "${label2}")
@@ -166,13 +172,16 @@ describe("match", () => {
                                         WHERE {
                                             id(equal: "${id2}")
                                         }
-                                        RETURN {
+                                        PROJECT {
                                             id
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    RETURN {
+                        test
                     }
                 }
             `;
@@ -192,7 +201,7 @@ describe("match", () => {
 
                 const result = await client.run({ query });
 
-                expect(result?.MATCH?.test).toEqual([
+                expect(result?.test).toEqual([
                     { id: id1, nodes: [{ properties: { id: id2 } }] },
                 ]);
             } finally {

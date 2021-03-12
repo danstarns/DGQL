@@ -13,10 +13,13 @@
             WHERE {
                 id(starts_with: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -56,10 +59,13 @@ RETURN node
             WHERE {
                 id(ends_with: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -99,10 +105,13 @@ RETURN node
             WHERE {
                 id(contains: 1)
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -142,10 +151,13 @@ RETURN node
             WHERE {
                 id(regex: ".*")
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```

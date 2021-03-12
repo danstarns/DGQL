@@ -25,10 +25,13 @@
                     }
                 }
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -82,10 +85,13 @@ RETURN node
                     }
                 }
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
@@ -139,10 +145,13 @@ RETURN node
                     }
                 }
             }
-            RETURN {
+            PROJECT {
                 id
             }
         }
+    }
+    RETURN {
+        node
     }
 }
 ```
