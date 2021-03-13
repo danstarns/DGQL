@@ -164,6 +164,59 @@ describe("match", () => {
         }
     });
 
+    test("should match and project nested node (with shorthand)", async () => {
+        const session = driver.session();
+
+        const client = new Client({ driver });
+
+        const id1 = generate({
+            charset: "alphabetic",
+        });
+
+        const id2 = generate({
+            charset: "alphabetic",
+        });
+
+        const type = generate({
+            charset: "alphabetic",
+        });
+
+        const direction = "OUT";
+
+        const query = `
+            {
+                MATCH {
+                    test1 @node(label: "${id1}") {
+                        PROJECT {
+                            id
+                            nodes @edge(type: "${type}", direction: "${direction}") @node(label: "${id2}") {
+                                id
+                            }
+                        }
+                    }
+                }
+                RETURN {
+                    test1
+                }
+            }
+        `;
+
+        try {
+            await session.run(
+                `
+                CREATE (:${id1} {id: $id1})-[:${type}]->(:${id2} {id: $id2})
+            `,
+                { id1, id2 }
+            );
+
+            const result = await client.run({ query });
+
+            expect(result?.test1).toEqual([{ id: id1, nodes: [{ id: id2 }] }]);
+        } finally {
+            await session.close();
+        }
+    });
+
     test("should match and project multi nested nodes", async () => {
         const session = driver.session();
 

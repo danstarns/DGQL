@@ -33,12 +33,8 @@ async function main() {
                     }
                     PROJECT {
                         name
-                        posts @edge(type: HAS_POST, direction: OUT) {
-                            post @node(label: Post) {
-                                PROJECT {
-                                    title
-                                }
-                            }
+                        posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+                            title
                         }
                     }
                 }
@@ -57,9 +53,7 @@ async function main() {
             name: "Dan",
             posts: [
                 {
-                    post: {
-                        title: "Checkout @dgql/client"
-                    }
+                    title: "Checkout @dgql/client"
                 }
             ]
         }]

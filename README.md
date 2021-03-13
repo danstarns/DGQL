@@ -38,12 +38,8 @@ Given the below;
             }
             PROJECT {
                 name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post) {
-                        PROJECT {
-                            title
-                        }
-                    }
+                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+                    title
                 }
             }
         }
@@ -61,7 +57,7 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
-    posts: [ (user)-[:HAS_POST]->(posts:Post) | { post: { title: posts.title } } ]
+    posts: [ (user)-[:HAS_POST]->(posts:Post) | { title: posts.title } ]
 } as user
 ```
 
@@ -82,11 +78,7 @@ RETURN user {
 ```graphql
 {
     MATCH {
-        user @node(label: User) {
-            PROJECT {
-                id
-            }
-        }
+        user @node(label: User)
     }
     RETURN {
         user
@@ -94,7 +86,7 @@ RETURN user {
 }
 ```
 
-#### Match many nodes
+#### Match & project
 
 ```graphql
 {
@@ -104,20 +96,14 @@ RETURN user {
                 name
             }
         }
-        posts @node(label: Post) {
-            PROJECT {
-                content
-            }
-        }
     }
     RETURN {
         users
-        posts
     }
 }
 ```
 
-#### Match and project connected nodes
+#### Match and project edge node
 
 ```graphql
 {
@@ -125,12 +111,8 @@ RETURN user {
         user @node(label: User) {
             PROJECT {
                 name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    node @node(label: Post) {
-                        PROJECT {
-                            title
-                        }
-                    }
+                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+                    title
                 }
             }
         }
@@ -141,7 +123,7 @@ RETURN user {
 }
 ```
 
-#### Match many nodes on an edge
+#### Match and project many nodes on an edge
 
 ```graphql
 {
@@ -180,7 +162,7 @@ RETURN user {
 }
 ```
 
-#### Match and project relationship properties
+#### Match and project edge properties
 
 ```graphql
 {
@@ -211,7 +193,7 @@ RETURN user {
 
 See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files/where/operators) for info on operators.
 
-#### Where on connected node
+#### Where on edge node
 
 ```graphql
 {
@@ -238,7 +220,7 @@ See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/
 }
 ```
 
-#### Where on relationship
+#### Where on edge relationship
 
 ```graphql
 {
@@ -283,9 +265,6 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
             WHERE {
                 id(equal: $id)
             }
-            PROJECT {
-                name
-            }
         }
     }
     RETURN {
@@ -305,9 +284,6 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
             SORT {
                 id(direction: DESC)
             }
-            PROJECT {
-                name
-            }
         }
     }
     RETURN {
@@ -321,11 +297,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 ```graphql
 {
     MATCH {
-        user @node(label: User) @paginate(skip: 10, limit: 10) {
-            PROJECT {
-                name
-            }
-        }
+        user @node(label: User) @paginate(skip: 10, limit: 10)
     }
     RETURN {
         user

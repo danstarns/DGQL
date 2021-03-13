@@ -4,28 +4,16 @@
         blogs @node(label: Blog) {
             PROJECT {
                 name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post) {
-                        PROJECT {
-                            title
-                            comments @edge(type: HAS_COMMENT, direction: OUT) {
-                                comment @node(label: Comment) {
-                                    PROJECT {
-                                        content
-                                        authors
-                                            @edge(
-                                                type: COMMENTED
-                                                direction: IN
-                                            ) {
-                                            author @node(label: User) {
-                                                PROJECT {
-                                                    email
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+                    title
+                    comments
+                        @edge(type: HAS_COMMENT, direction: OUT)
+                        @node(label: Comment) {
+                        content
+                        authors
+                            @edge(type: COMMENTED, direction: IN)
+                            @node(label: User) {
+                            email
                         }
                     }
                 }

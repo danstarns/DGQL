@@ -50,6 +50,11 @@ function createMatchProjectionAndParams({
             (x) => x.name.value === "paginate"
         ) as DirectiveNode;
 
+        const skipLimit = createSkipLimitStr({
+            paginateDirective,
+            variables,
+        });
+
         if (!edgeDirective && !nodeDirective) {
             res.strs.push(`${key}: ${varName}.${key}`);
 
@@ -57,8 +62,10 @@ function createMatchProjectionAndParams({
         }
 
         if (edgeDirective) {
-            const nodes = selections.filter((x) =>
-                (x.directives || []).find((d) => d.name.value === "node")
+            const nodes = selections.filter(
+                (x) =>
+                    (x.directives || []).some((d) => d.name.value === "node") &&
+                    !(x.directives || []).some((d) => d.name.value === "edge")
             ) as FieldNode[];
 
             const relationship = selections.find((x) =>
@@ -77,7 +84,50 @@ function createMatchProjectionAndParams({
                 ) as ArgumentNode).value,
                 variables
             ) as Direction;
+            const inStr = direction === "IN" ? "<-" : "-";
+            const outStr = direction === "OUT" ? "->" : "-";
+            const typeStr = `[${
+                relationship ? `${relationship.name.value}` : ""
+            }:${type}]`;
+
             let projectionRows: string[] = [];
+
+            if (nodeDirective) {
+                if (nodes.length) {
+                    throw new Error("Cannot do that"); // TODO
+                }
+
+                const refName = value.name.value;
+                const labelArg = (nodeDirective?.arguments || []).find(
+                    (x) => x.name.value === "label"
+                ) as ArgumentNode;
+                const label = labelArg
+                    ? valueFromASTUntyped(labelArg.value, variables)
+                    : (undefined as string | undefined);
+
+                const pathStr = `(${varName})${inStr}${typeStr}${outStr}(${refName}${
+                    label ? `:${label}` : ""
+                })`;
+
+                const nodeMAndP = createMatchProjectionAndParams({
+                    projectField: value,
+                    varName: key,
+                    chainStr: param,
+                    variables,
+                });
+                res.params = {
+                    ...res.params,
+                    ...nodeMAndP[1],
+                };
+
+                const innerPath = `[ ${pathStr} | ${
+                    nodeMAndP[0] || key
+                } ]${skipLimit}`;
+
+                res.strs.push(`${key}: ${innerPath}`);
+
+                return res;
+            }
 
             let relW = "";
             let relMP = "";
@@ -229,12 +279,6 @@ function createMatchProjectionAndParams({
                 projectionRows.push(nodeProjectionStrs.join(" "));
             });
 
-            const inStr = direction === "IN" ? "<-" : "-";
-            const outStr = direction === "OUT" ? "->" : "-";
-            const typeStr = `[${
-                relationship ? `${relationship.name.value}` : ""
-            }:${type}]`;
-
             if (nodes.length === 1) {
                 const whereStrs = [nodeW, relW].filter(Boolean);
                 let whereStr = whereStrs.length
@@ -245,11 +289,6 @@ function createMatchProjectionAndParams({
                 const pathStr = `(${varName})${inStr}${typeStr}${outStr}(${refName}${
                     label ? `:${label}` : ""
                 })`;
-
-                const skipLimit = createSkipLimitStr({
-                    paginateDirective,
-                    variables,
-                });
 
                 if (nodeMP && relMP) {
                     const innerPath = [

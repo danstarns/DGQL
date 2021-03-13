@@ -8,12 +8,10 @@
             PROJECT {
                 title
                 imdbRating
-                genres @edge(type: IN_GENRE, direction: OUT) {
-                    genre @node(label: Genre) {
-                        PROJECT {
-                            name
-                        }
-                    }
+                genres
+                    @edge(type: IN_GENRE, direction: OUT)
+                    @node(label: Genre) {
+                    name
                 }
                 ratings @edge(type: RATED, direction: IN) {
                     to @node(label: User)

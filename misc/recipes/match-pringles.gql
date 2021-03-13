@@ -5,26 +5,16 @@
         product @node(label: Product) {
             PROJECT {
                 name
-                sizes @edge(type: HAS_SIZE, direction: OUT) {
-                    size @node(label: Size) {
-                        PROJECT {
-                            name
-                        }
-                    }
+                sizes @edge(type: HAS_SIZE, direction: OUT) @node(label: Size) {
+                    name
                 }
-                photos @edge(type: HAS_PHOTO, direction: OUT) {
-                    photo @node(label: Photo) {
-                        PROJECT {
-                            url
-                            description
-                            color @edge(type: OF_COLOR, direction: OUT) {
-                                color @node(label: Color) {
-                                    PROJECT {
-                                        name
-                                    }
-                                }
-                            }
-                        }
+                photos @edge(type: HAS_PHOTO, direction: OUT) @node {
+                    url
+                    description
+                    color
+                        @edge(type: OF_COLOR, direction: OUT)
+                        @node(label: Color) {
+                        name
                     }
                 }
             }
