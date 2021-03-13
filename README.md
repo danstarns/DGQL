@@ -10,7 +10,7 @@ Dynamic Graph Query Language 👍
 
 ## Intro
 
-> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) to peek through a cookbook of DGQL queries.
+> Take a look at the DGQL [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) section!
 
 ### Navigating
 
@@ -37,6 +37,7 @@ Given the below GraphQL Query;
                 name(equal: "Dan")
             }
             PROJECT {
+                id
                 name
                 posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
                     title
@@ -57,6 +58,7 @@ MATCH (user:User)
 WHERE user.name = "Dan"
 RETURN user {
     .id,
+    .name,
     posts: [ (user)-[:HAS_POST]->(posts:Post) | { title: posts.title } ]
 } as user
 ```
@@ -66,6 +68,7 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
 ```json
 {
     "user": {
+        "id": "user-id-01",
         "name": "Dan",
         "posts": [{ "title": "Checkout DGQL!" }]
     }
