@@ -61,6 +61,17 @@ RETURN user {
 } as user
 ```
 
+using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute and receive an object like;
+
+```json
+{
+    "user": {
+        "name": "Dan",
+        "posts": [{ "title": "Checkout DGQL!" }]
+    }
+}
+```
+
 ### Why
 
 **Why don't you just use Cypher?** - If you have a highly specific answer... Cypher may be the right question for you. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
