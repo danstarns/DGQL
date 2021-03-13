@@ -57,9 +57,9 @@ function createMatchProjectionAndParams({
         }
 
         if (edgeDirective) {
-            const node = selections.find((x) =>
+            const nodes = selections.filter((x) =>
                 (x.directives || []).find((d) => d.name.value === "node")
-            ) as FieldNode;
+            ) as FieldNode[];
 
             const relationship = selections.find((x) =>
                 (x.directives || []).find(
@@ -77,154 +77,231 @@ function createMatchProjectionAndParams({
                 ) as ArgumentNode).value,
                 variables
             ) as Direction;
+            let projectionRows: string[] = [];
 
-            const nodeDirective = (node.directives || []).find(
-                (x) => x.name.value === "node"
-            );
-            const labelArg = (nodeDirective?.arguments || []).find(
-                (x) => x.name.value === "label"
-            ) as ArgumentNode;
+            let relW = "";
+            let relMP = "";
+            if (relationship) {
+                const relSelections = (relationship?.selectionSet?.selections ||
+                    []) as FieldNode[];
+                const relProject = relSelections.find(
+                    (x) => x.name.value === "PROJECT"
+                );
+                const relWhere = relSelections.find(
+                    (x) => x.name.value === "WHERE"
+                );
 
-            const label = labelArg
-                ? valueFromASTUntyped(labelArg.value, variables)
-                : (undefined as string | undefined);
+                if (relProject) {
+                    const relMPAndP = createMatchProjectionAndParams({
+                        projectField: relProject,
+                        varName: relationship.name.value,
+                        chainStr: `${param}_${relationship.name.value}`,
+                        variables,
+                    });
+                    if (relMPAndP[0]) {
+                        relMP = relMPAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...relMPAndP[1],
+                        };
+                    }
+                }
 
-            const inStr = direction === "IN" ? "<-" : "-";
-
-            const outStr = direction === "OUT" ? "->" : "-";
-
-            const typeStr = `[${
-                relationship ? relationship.name.value : ""
-            }:${type}]`;
-
-            const labelStr = label ? `:${label}` : "";
-
-            const toNodeStr = node
-                ? `(${node.name.value}${labelStr})`
-                : `(${labelStr})`;
-
-            const pathStr = `(${varName})${inStr}${typeStr}${outStr}${toNodeStr}`;
-
-            const nodeSelections = (node.selectionSet?.selections ||
-                []) as FieldNode[];
-            const nodeProject = nodeSelections.find(
-                (x) => x.name.value === "PROJECT"
-            );
-            const nodeWhere = nodeSelections.find(
-                (x) => x.name.value === "WHERE"
-            );
-            const nodeSort = nodeSelections.find(
-                (x) => x.name.value === "SORT"
-            );
-
-            const relSelections = (relationship?.selectionSet?.selections ||
-                []) as FieldNode[];
-            const relProject = relSelections.find(
-                (x) => x.name.value === "PROJECT"
-            );
-            const relWhere = relSelections.find(
-                (x) => x.name.value === "WHERE"
-            );
-
-            let nodeMAndP: [string?, any?] = ["", {}];
-            if (nodeProject) {
-                nodeMAndP = createMatchProjectionAndParams({
-                    projectField: nodeProject,
-                    varName: node.name.value,
-                    chainStr: `${param}_${node.name.value}`,
-                    variables,
-                });
+                if (relWhere) {
+                    const relWAndP = createWhereAndParams({
+                        varName: relationship.name.value,
+                        whereField: relWhere,
+                        chainStr: `${param}_${relationship.name.value}_where`,
+                        variables,
+                        noWhere: true,
+                    });
+                    if (relWAndP[0]) {
+                        relW = relWAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...relWAndP[1],
+                        };
+                    }
+                }
+            }
+            if (relMP) {
+                projectionRows.push(`${relationship.name.value}: ${relMP}`);
             }
 
-            let relMAndP: [string?, any?] = ["", {}];
-            if (relProject) {
-                relMAndP = createMatchProjectionAndParams({
-                    projectField: relProject,
-                    varName: relationship.name.value,
-                    chainStr: `${param}_${relationship.name.value}`,
-                    variables,
-                });
-            }
+            let nodeLabels: string[] = [];
+            let nodeMP = "";
+            let nodeW = "";
+            let nodeS = "";
 
-            let nodeWAndP: [string?, any?] = ["", {}];
-            if (nodeWhere) {
-                nodeWAndP = createWhereAndParams({
-                    varName: node.name.value,
-                    whereField: nodeWhere,
-                    chainStr: `${param}_${node.name.value}_where`,
-                    variables,
-                });
-            }
+            nodes.forEach((node) => {
+                const nodeDirective = node.directives?.find(
+                    (x) => x.name.value === "node"
+                );
+                const labelArg = (nodeDirective?.arguments || []).find(
+                    (x) => x.name.value === "label"
+                ) as ArgumentNode;
+                const label = labelArg
+                    ? valueFromASTUntyped(labelArg.value, variables)
+                    : (undefined as string | undefined);
+                if (label) {
+                    nodeLabels.push(label);
+                }
 
-            let relWAndP: [string?, any?] = ["", {}];
-            if (relWhere) {
-                relWAndP = createWhereAndParams({
-                    varName: relationship.name.value,
-                    whereField: relWhere,
-                    chainStr: `${param}_${relationship.name.value}_where`,
-                    variables,
-                });
-            }
+                const nodeSelections = (node.selectionSet?.selections ||
+                    []) as FieldNode[];
+                const nodeProject = nodeSelections.find(
+                    (x) => x.name.value === "PROJECT"
+                );
+                const nodeWhere = nodeSelections.find(
+                    (x) => x.name.value === "WHERE"
+                );
+                const nodeSort = nodeSelections.find(
+                    (x) => x.name.value === "SORT"
+                );
 
-            let nodeSAndP: [string?, any?] = ["", {}];
-            if (nodeSort) {
-                nodeSAndP = createSortAndParams({
-                    varName: node.name.value,
-                    sortField: nodeSort,
-                    chainStr: `${param}_${node.name.value}_where`,
-                    variables,
-                    nestedVersion: true,
-                });
-            }
+                const varName = nodes.length > 1 ? param : node.name.value;
+                const chainStr = `${param}_${node.name.value}`;
 
-            const wheres = [
-                ...(nodeWAndP[0] ? [nodeWAndP[0].replace("WHERE", "")] : []),
-                ...(relWAndP[0] ? [relWAndP[0].replace("WHERE", "")] : []),
-            ];
-            let whereStr = wheres.length ? `WHERE ${wheres.join(" AND ")}` : "";
+                if (nodeProject) {
+                    const nodeMAndP = createMatchProjectionAndParams({
+                        projectField: nodeProject,
+                        varName,
+                        chainStr,
+                        variables,
+                    });
+                    if (nodeMAndP[0]) {
+                        nodeMP = nodeMAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...nodeMAndP[1],
+                        };
+                    }
+                }
 
-            res.params = {
-                ...res.params,
-                ...nodeMAndP[1],
-                ...relMAndP[1],
-                ...nodeWAndP[1],
-                ...relWAndP[1],
-                ...nodeSAndP[1],
-            };
+                if (nodeWhere) {
+                    const nodeWAndP = createWhereAndParams({
+                        varName,
+                        whereField: nodeWhere,
+                        chainStr: `${chainStr}_where`,
+                        variables,
+                        noWhere: true,
+                    });
+                    if (nodeWAndP[0]) {
+                        nodeW = nodeWAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...nodeWAndP[1],
+                        };
+                    }
+                }
 
-            const skipLimit = createSkipLimitStr({
-                paginateDirective,
-                variables,
+                if (nodeSort) {
+                    const nodeSAndP = createSortAndParams({
+                        varName,
+                        sortField: nodeSort,
+                        variables,
+                        nestedVersion: true,
+                    });
+                    if (nodeSAndP[0]) {
+                        nodeS = nodeSAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...nodeSAndP[1],
+                        };
+                    }
+                }
+
+                const whereLabel = label
+                    ? `'${label}' IN labels(${param})`
+                    : "";
+
+                const nodeProjectionStrs = [
+                    `${node.name.value}: head([`,
+                    `${param} IN [${param}]`,
+                    `WHERE ${[whereLabel, nodeW]
+                        .filter(Boolean)
+                        .join(" AND ")}`,
+                    "|",
+                    `${nodeMP || param}`,
+                    `])`,
+                ];
+
+                projectionRows.push(nodeProjectionStrs.join(" "));
             });
 
-            if (nodeMAndP[0] && relMAndP[0]) {
-                const innerPath = [
-                    `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nodeMAndP[0]},`,
-                    `${relationship.name.value}: ${relMAndP[0]}`,
-                    `} ]${skipLimit}`,
-                ].join(" ");
+            const inStr = direction === "IN" ? "<-" : "-";
+            const outStr = direction === "OUT" ? "->" : "-";
+            const typeStr = `[${
+                relationship ? `${relationship.name.value}` : ""
+            }:${type}]`;
 
-                if (nodeSAndP[0]) {
-                    res.strs.push(
-                        `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeSAndP[0]})${skipLimit}`
-                    );
-                } else {
-                    res.strs.push(`${key}: ${innerPath}${skipLimit}`);
-                }
-            } else if (nodeMAndP[0]) {
-                const innerPath = `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nodeMAndP[0]} } ]`;
+            if (nodes.length === 1) {
+                const whereStrs = [nodeW, relW].filter(Boolean);
+                let whereStr = whereStrs.length
+                    ? `WHERE ${whereStrs.join(" AND ")}`
+                    : "";
+                const refName = nodes[0].name.value;
+                const label = nodeLabels[0];
+                const pathStr = `(${varName})${inStr}${typeStr}${outStr}(${refName}${
+                    label ? `:${label}` : ""
+                })`;
 
-                if (nodeSAndP[0]) {
+                const skipLimit = createSkipLimitStr({
+                    paginateDirective,
+                    variables,
+                });
+
+                if (nodeMP && relMP) {
+                    const innerPath = [
+                        `[ ${pathStr} ${whereStr} | { ${refName}: ${nodeMP},`,
+                        `${relationship.name.value}: ${relMP}`,
+                        `} ]${skipLimit}`,
+                    ].join(" ");
+
+                    if (nodeS) {
+                        res.strs.push(
+                            `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeS})${skipLimit}`
+                        );
+                    } else {
+                        res.strs.push(`${key}: ${innerPath}${skipLimit}`);
+                    }
+                } else if (nodeMP) {
+                    const innerPath = `[ ${pathStr} ${whereStr} | { ${refName}: ${nodeMP} } ]`;
+
+                    if (nodeS) {
+                        res.strs.push(
+                            `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeS})${skipLimit}`
+                        );
+                    } else {
+                        res.strs.push(`${key}: ${innerPath}${skipLimit}`);
+                    }
+                } else if (relMP) {
                     res.strs.push(
-                        `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeSAndP[0]})${skipLimit}`
+                        `${key}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${relMP} } ]`
                     );
-                } else {
-                    res.strs.push(`${key}: ${innerPath}${skipLimit}`);
                 }
-            } else if (relMAndP[0]) {
+
+                return res;
+            }
+
+            if (nodes.length > 1) {
+                const whereLabels = nodeLabels.length
+                    ? `${nodeLabels
+                          .map((l) => `'${l}' IN labels(${param})`)
+                          .join(" OR ")}`
+                    : "";
+                const whereStrs = [whereLabels, relW].filter(Boolean);
+                let whereStr = whereStrs.length
+                    ? `WHERE ${whereStrs.join(" AND ")}`
+                    : "";
+                const pathStr = `(${varName})${inStr}${typeStr}${outStr}(${param})`;
                 res.strs.push(
-                    `${key}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${relMAndP[0]} } ]`
+                    `${key}: [ ${pathStr} ${whereStr} | { ${projectionRows.join(
+                        ",\n"
+                    )} } ]`
                 );
+
+                return res;
             }
         }
 
@@ -298,7 +375,6 @@ function createMatchAndParams({
             const sortAndParams = createSortAndParams({
                 varName,
                 sortField,
-                chainStr: `${varName}_where`,
                 variables,
             });
             cyphers.push(sortAndParams[0]);

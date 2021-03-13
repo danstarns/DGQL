@@ -164,6 +164,80 @@ describe("match", () => {
         }
     });
 
+    test("should match and project multi nested nodes", async () => {
+        const session = driver.session();
+
+        const client = new Client({ driver });
+
+        const id1 = generate({
+            charset: "alphabetic",
+        });
+
+        const id2 = generate({
+            charset: "alphabetic",
+        });
+        const id3 = generate({
+            charset: "alphabetic",
+        });
+
+        const type = generate({
+            charset: "alphabetic",
+        });
+
+        const direction = "OUT";
+
+        const query = `
+            {
+                MATCH {
+                    users @node(label: "${id1}") {
+                        PROJECT {
+                            id
+                            content @edge(type: "${type}", direction: "${direction}") {
+                                photo @node(label: "${id2}") {
+                                    PROJECT {
+                                        id
+                                    }
+                                }
+                                video @node(label: "${id3}") {
+                                    PROJECT {
+                                        id
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                RETURN {
+                    users
+                }
+            }
+        `;
+
+        try {
+            await session.run(
+                `
+                CREATE (user:${id1} {id: $id1})
+                CREATE (photo:${id2} {id: $id2})
+                CREATE (video:${id3} {id: $id3})
+                MERGE (user)-[:${type}]->(photo)
+                MERGE (user)-[:${type}]->(video)
+            `,
+                { id1, id2, id3 }
+            );
+
+            const result = await client.run({ query });
+            const user = result.users[0];
+            expect(user.id).toEqual(id1);
+            const photo = user?.content.find((x) => x.photo);
+            expect(photo.photo.id).toEqual(id2);
+            const video = user?.content.find((x) => x.video);
+            expect(video.video.id).toEqual(id3);
+        } finally {
+            await session.close();
+        }
+    });
+
     test("should match and project nested relationship property", async () => {
         const session = driver.session();
 

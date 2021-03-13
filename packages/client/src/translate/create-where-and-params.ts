@@ -5,11 +5,13 @@ function createWhereAndParams({
     whereField,
     chainStr,
     variables,
+    noWhere,
 }: {
     varName: string;
     whereField: FieldNode;
     chainStr?: string;
     variables: Record<string, unknown>;
+    noWhere?: boolean;
 }): [string, Record<string, unknown>] {
     const strs: string[] = [];
     let params: Record<string, unknown> = {};
@@ -35,14 +37,13 @@ function createWhereAndParams({
                         chainStr: `${param}${i}`,
                         variables,
                         whereField: selection,
+                        noWhere: true,
                     });
                     logicStrs.push(wAndP[0]);
                     params = { ...params, ...wAndP[1] };
                 }
             });
-            strs.push(
-                logicStrs.join(` ${field.name.value} `).replace(/WHERE /g, "")
-            );
+            strs.push(logicStrs.join(` ${field.name.value} `));
         }
 
         (field.arguments as ArgumentNode[]).forEach((arg) => {
@@ -113,7 +114,7 @@ function createWhereAndParams({
         });
     });
 
-    return [`WHERE ${strs.join(" AND ")}`, params];
+    return [`${!noWhere ? "WHERE " : " "}${strs.join(" AND ")}`, params];
 }
 
 export default createWhereAndParams;

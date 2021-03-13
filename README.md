@@ -141,6 +141,45 @@ RETURN user {
 }
 ```
 
+#### Match many nodes on an edge
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) {
+            PROJECT {
+                name
+                content @edge(type: HAS_CONTENT, direction: OUT) {
+                    photo @node(label: Photo) {
+                        PROJECT {
+                            size
+                            type
+                            base64
+                        }
+                    }
+                    video @node(label: Video) {
+                        PROJECT {
+                            thumbnail
+                            length
+                            url
+                        }
+                    }
+                    post @node(label: Post) {
+                        PROJECT {
+                            title
+                            content
+                        }
+                    }
+                }
+            }
+        }
+    }
+    RETURN {
+        user
+    }
+}
+```
+
 #### Match and project relationship properties
 
 ```graphql

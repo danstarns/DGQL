@@ -3,7 +3,7 @@ import { generate } from "randomstring";
 import neo4j from "./neo4j";
 import { Client } from "../../src";
 
-describe("match", () => {
+describe("variables", () => {
     let driver: Driver;
 
     beforeAll(async () => {

@@ -3,13 +3,11 @@ import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 function createSortAndParams({
     varName,
     sortField,
-    chainStr,
     variables,
     nestedVersion,
 }: {
     varName: string;
     sortField: FieldNode;
-    chainStr?: string;
     variables: Record<string, unknown>;
     nestedVersion?: boolean;
 }): [string, Record<string, unknown>] {
