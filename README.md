@@ -27,7 +27,7 @@ GraphQL can be separated into two sections; language & execution. To truly under
 
 This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
-Given the below;
+Given the below GraphQL Query;
 
 ```graphql
 {
@@ -61,7 +61,7 @@ RETURN user {
 } as user
 ```
 
-using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute and receive an object like;
+using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like;
 
 ```json
 {
