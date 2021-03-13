@@ -8,6 +8,7 @@ import {
 import createWhereAndParams from "./create-where-and-params";
 import createSortAndParams from "./create-sort-and-params";
 import { Direction } from "../types";
+import createSkipLimitStr from "./create-skip-limit-str";
 
 function createMatchProjectionAndParams({
     varName,
@@ -26,13 +27,16 @@ function createMatchProjectionAndParams({
     }
 
     function reducer(res: Res, value: FieldNode): Res {
+        const key = value.name.value;
         let param: string;
 
         if (chainStr) {
-            param = `${chainStr}_${value.name.value}`;
+            param = `${chainStr}_${key}`;
         } else {
-            param = `${varName}_${value.name.value}`;
+            param = `${varName}_${key}`;
         }
+
+        const selections = value.selectionSet?.selections as FieldNode[];
 
         const nodeDirective = value.directives?.find(
             (x) => x.name.value === "node"
@@ -46,29 +50,35 @@ function createMatchProjectionAndParams({
             (x) => x.name.value === "paginate"
         ) as DirectiveNode;
 
+        if (!edgeDirective && !nodeDirective) {
+            res.strs.push(`${key}: ${varName}.${key}`);
+
+            return res;
+        }
+
         if (edgeDirective) {
-            const node = (value.selectionSet
-                ?.selections as FieldNode[]).find((x) =>
-                x.directives?.find((d) => d.name.value === "node")
+            const node = selections.find((x) =>
+                (x.directives || []).find((d) => d.name.value === "node")
             ) as FieldNode;
 
-            const relationship = (value.selectionSet
-                ?.selections as FieldNode[]).find((x) =>
-                x.directives?.find((d) => d.name.value === "relationship")
+            const relationship = selections.find((x) =>
+                (x.directives || []).find(
+                    (d) => d.name.value === "relationship"
+                )
             ) as FieldNode;
 
-            const type = ((edgeDirective.arguments?.find(
+            const type = (((edgeDirective.arguments || []).find(
                 (x) => x.name.value === "type"
             ) as ArgumentNode).value as StringValueNode).value;
 
             const direction: Direction = valueFromASTUntyped(
-                (edgeDirective.arguments?.find(
+                ((edgeDirective.arguments || []).find(
                     (x) => x.name.value === "direction"
                 ) as ArgumentNode).value,
                 variables
             ) as Direction;
 
-            const nodeDirective = node.directives?.find(
+            const nodeDirective = (node.directives || []).find(
                 (x) => x.name.value === "node"
             );
             const labelArg = (nodeDirective?.arguments || []).find(
@@ -80,74 +90,65 @@ function createMatchProjectionAndParams({
                 : (undefined as string | undefined);
 
             const inStr = direction === "IN" ? "<-" : "-";
+
             const outStr = direction === "OUT" ? "->" : "-";
+
             const typeStr = `[${
                 relationship ? relationship.name.value : ""
             }:${type}]`;
+
             const labelStr = label ? `:${label}` : "";
+
             const toNodeStr = node
                 ? `(${node.name.value}${labelStr})`
                 : `(${labelStr})`;
+
             const pathStr = `(${varName})${inStr}${typeStr}${outStr}${toNodeStr}`;
 
-            const nodeProject = ((node.selectionSet?.selections ||
-                []) as FieldNode[]).find((x) => x.name.value === "PROJECT") as
-                | FieldNode
-                | undefined;
+            const nodeSelections = (node.selectionSet?.selections ||
+                []) as FieldNode[];
+            const nodeProject = nodeSelections.find(
+                (x) => x.name.value === "PROJECT"
+            );
+            const nodeWhere = nodeSelections.find(
+                (x) => x.name.value === "WHERE"
+            );
+            const nodeSort = nodeSelections.find(
+                (x) => x.name.value === "SORT"
+            );
 
-            const nodeWhere = ((node.selectionSet?.selections ||
-                []) as FieldNode[]).find((x) => x.name.value === "WHERE") as
-                | FieldNode
-                | undefined;
+            const relSelections = (relationship?.selectionSet?.selections ||
+                []) as FieldNode[];
+            const relProject = relSelections.find(
+                (x) => x.name.value === "PROJECT"
+            );
+            const relWhere = relSelections.find(
+                (x) => x.name.value === "WHERE"
+            );
 
-            const nodeSort = ((node.selectionSet?.selections ||
-                []) as FieldNode[]).find((x) => x.name.value === "SORT") as
-                | FieldNode
-                | undefined;
-
-            const relationshipProject =
-                relationship &&
-                ((relationship.selectionSet?.selections as FieldNode[]).find(
-                    (x) => x.name.value === "PROJECT"
-                ) as FieldNode | undefined);
-
-            const relationshipWhere =
-                relationship &&
-                (((relationship.selectionSet?.selections ||
-                    []) as FieldNode[]).find(
-                    (x) => x.name.value === "WHERE"
-                ) as FieldNode | undefined);
-
-            let nestedNodeMatchProjectionAndParams: [string?, any?] = ["", {}];
+            let nodeMAndP: [string?, any?] = ["", {}];
             if (nodeProject) {
-                nestedNodeMatchProjectionAndParams = createMatchProjectionAndParams(
-                    {
-                        projectField: nodeProject,
-                        varName: node.name.value,
-                        chainStr: `${param}_${node.name.value}`,
-                        variables,
-                    }
-                );
+                nodeMAndP = createMatchProjectionAndParams({
+                    projectField: nodeProject,
+                    varName: node.name.value,
+                    chainStr: `${param}_${node.name.value}`,
+                    variables,
+                });
             }
 
-            let nestedRelationshipMatchProjectionAndParams: [string?, any?] = [
-                "",
-                {},
-            ];
-            if (relationshipProject) {
-                nestedRelationshipMatchProjectionAndParams = createMatchProjectionAndParams(
-                    {
-                        projectField: relationshipProject,
-                        varName: relationship.name.value,
-                        chainStr: `${param}_${relationship.name.value}`,
-                        variables,
-                    }
-                );
+            let relMAndP: [string?, any?] = ["", {}];
+            if (relProject) {
+                relMAndP = createMatchProjectionAndParams({
+                    projectField: relProject,
+                    varName: relationship.name.value,
+                    chainStr: `${param}_${relationship.name.value}`,
+                    variables,
+                });
             }
 
-            let nodeWhereAndParams: [string?, any?] = ["", {}];
+            let nodeWAndP: [string?, any?] = ["", {}];
             if (nodeWhere) {
-                nodeWhereAndParams = createWhereAndParams({
+                nodeWAndP = createWhereAndParams({
                     varName: node.name.value,
                     whereField: nodeWhere,
                     chainStr: `${param}_${node.name.value}_where`,
@@ -155,19 +156,19 @@ function createMatchProjectionAndParams({
                 });
             }
 
-            let relationshipWhereAndParams: [string?, any?] = ["", {}];
-            if (relationshipWhere) {
-                relationshipWhereAndParams = createWhereAndParams({
+            let relWAndP: [string?, any?] = ["", {}];
+            if (relWhere) {
+                relWAndP = createWhereAndParams({
                     varName: relationship.name.value,
-                    whereField: relationshipWhere,
+                    whereField: relWhere,
                     chainStr: `${param}_${relationship.name.value}_where`,
                     variables,
                 });
             }
 
-            let nodeSortAndParams: [string?, any?] = ["", {}];
+            let nodeSAndP: [string?, any?] = ["", {}];
             if (nodeSort) {
-                nodeSortAndParams = createSortAndParams({
+                nodeSAndP = createSortAndParams({
                     varName: node.name.value,
                     sortField: nodeSort,
                     chainStr: `${param}_${node.name.value}_where`,
@@ -176,108 +177,55 @@ function createMatchProjectionAndParams({
                 });
             }
 
-            const whereStrs = [
-                ...(nodeWhereAndParams[0]
-                    ? [nodeWhereAndParams[0].replace("WHERE", "")]
-                    : []),
-                ...(relationshipWhereAndParams[0]
-                    ? [relationshipWhereAndParams[0].replace("WHERE", "")]
-                    : []),
+            const wheres = [
+                ...(nodeWAndP[0] ? [nodeWAndP[0].replace("WHERE", "")] : []),
+                ...(relWAndP[0] ? [relWAndP[0].replace("WHERE", "")] : []),
             ];
-            let whereStr = whereStrs.length
-                ? `WHERE ${whereStrs.join(" AND ")}`
-                : "";
+            let whereStr = wheres.length ? `WHERE ${wheres.join(" AND ")}` : "";
 
             res.params = {
                 ...res.params,
-                ...nestedNodeMatchProjectionAndParams[1],
-                ...nestedRelationshipMatchProjectionAndParams[1],
-                ...nodeWhereAndParams[1],
-                ...relationshipWhereAndParams[1],
-                ...nodeSortAndParams[1],
+                ...nodeMAndP[1],
+                ...relMAndP[1],
+                ...nodeWAndP[1],
+                ...relWAndP[1],
+                ...nodeSAndP[1],
             };
 
-            let sortLimitStr = "";
-            if (paginateDirective) {
-                const skipArgument = paginateDirective.arguments?.find(
-                    (x) => x.name.value === "skip"
-                ) as ArgumentNode;
+            const skipLimit = createSkipLimitStr({
+                paginateDirective,
+                variables,
+            });
 
-                const limitArgument = paginateDirective.arguments?.find(
-                    (x) => x.name.value === "limit"
-                ) as ArgumentNode;
-
-                if (skipArgument && !limitArgument) {
-                    const skip = valueFromASTUntyped(
-                        skipArgument.value,
-                        variables
-                    );
-                    sortLimitStr = `[${skip}..]`;
-                }
-
-                if (limitArgument && !skipArgument) {
-                    const limit = valueFromASTUntyped(
-                        limitArgument.value,
-                        variables
-                    );
-                    sortLimitStr = `[..${limit}]`;
-                }
-
-                if (limitArgument && skipArgument) {
-                    const skip = valueFromASTUntyped(
-                        skipArgument.value,
-                        variables
-                    );
-                    const limit = valueFromASTUntyped(
-                        limitArgument.value,
-                        variables
-                    );
-                    sortLimitStr = `[${skip}..${limit}]`;
-                }
-            }
-
-            if (
-                nestedNodeMatchProjectionAndParams[0] &&
-                nestedRelationshipMatchProjectionAndParams[0]
-            ) {
+            if (nodeMAndP[0] && relMAndP[0]) {
                 const innerPath = [
-                    `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]},`,
-                    `${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]}`,
-                    `} ]${sortLimitStr}`,
+                    `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nodeMAndP[0]},`,
+                    `${relationship.name.value}: ${relMAndP[0]}`,
+                    `} ]${skipLimit}`,
                 ].join(" ");
 
-                if (nodeSortAndParams[0]) {
+                if (nodeSAndP[0]) {
                     res.strs.push(
-                        `${value.name.value}: apoc.coll.sortMulti(${innerPath}, ${nodeSortAndParams[0]})${sortLimitStr}`
+                        `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeSAndP[0]})${skipLimit}`
                     );
                 } else {
-                    res.strs.push(
-                        `${value.name.value}: ${innerPath}${sortLimitStr}`
-                    );
+                    res.strs.push(`${key}: ${innerPath}${skipLimit}`);
                 }
-            } else if (nestedNodeMatchProjectionAndParams[0]) {
-                const innerPath = `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nestedNodeMatchProjectionAndParams[0]} } ]`;
+            } else if (nodeMAndP[0]) {
+                const innerPath = `[ ${pathStr} ${whereStr} | { ${node.name.value}: ${nodeMAndP[0]} } ]`;
 
-                if (nodeSortAndParams[0]) {
+                if (nodeSAndP[0]) {
                     res.strs.push(
-                        `${value.name.value}: apoc.coll.sortMulti(${innerPath}, ${nodeSortAndParams[0]})${sortLimitStr}`
+                        `${key}: apoc.coll.sortMulti(${innerPath}, ${nodeSAndP[0]})${skipLimit}`
                     );
                 } else {
-                    res.strs.push(
-                        `${value.name.value}: ${innerPath}${sortLimitStr}`
-                    );
+                    res.strs.push(`${key}: ${innerPath}${skipLimit}`);
                 }
-            } else if (nestedRelationshipMatchProjectionAndParams[0]) {
+            } else if (relMAndP[0]) {
                 res.strs.push(
-                    `${value.name.value}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${nestedRelationshipMatchProjectionAndParams[0]} } ]`
+                    `${key}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${relMAndP[0]} } ]`
                 );
             }
-        }
-
-        if (!edgeDirective && !nodeDirective) {
-            res.strs.push(
-                `${value.name.value}: ${varName}.${value.name.value}`
-            );
         }
 
         return res;
