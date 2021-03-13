@@ -10,7 +10,7 @@ Dynamic Graph Query Language 👍
 
 ## Intro
 
-> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) to peek through granny's cookbook of DGQL queries.
+> Checkout [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) to peek through a cookbook of DGQL queries.
 
 ### Navigating
 
