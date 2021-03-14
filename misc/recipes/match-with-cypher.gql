@@ -13,6 +13,9 @@
                         """
                     ) {
                     title
+                    actors @edge(type: ACTED_IN, direction: IN) @node {
+                        name
+                    }
                 }
             }
         }

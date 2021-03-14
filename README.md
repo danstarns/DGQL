@@ -85,6 +85,63 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
 
 ## Usage
 
+### `@cypher`
+
+Sometimes you may have a highly specific question, Cypher could better help you ask. Use the `@cypher` directive, in a projection, to break the flow, and execute custom cypher.
+
+```graphql
+{
+    MATCH {
+        movies @node(label: Movie) {
+            PROJECT {
+                title
+                similar
+                    @cypher(
+                        arguments: { first: 3 }
+                        statement: """
+                        MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
+                        WITH rec, COUNT(*) AS score
+                        RETURN rec ORDER BY score DESC LIMIT $first
+                        """
+                    ) {
+                    title
+                    actors @edge(type: ACTED_IN, direction: IN) @node {
+                        name
+                    }
+                }
+            }
+        }
+    }
+    RETURN {
+        movies
+    }
+}
+```
+
+### Variables
+
+Use the `$` symbol to use variables and provide `variables` map when calling `translation` or `run`;
+
+```js
+const { user } = await client.run({ query, variables: { id: "user-id" } }); // OR
+const translation = client.translate({ query, variables: { id: "user-id" } }); // OR
+```
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) {
+            WHERE {
+                id(equal: $id)
+            }
+        }
+    }
+    RETURN {
+        user
+    }
+}
+```
+
 ### `MATCH`
 
 #### Match node
@@ -201,36 +258,6 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
 }
 ```
 
-### `@cypher`
-
-Sometimes you may have a highly specific question, Cypher could better help you ask. Use the `@cypher` directive, in a projection, to break the flow, and execute custom cypher.
-
-```graphql
-{
-    MATCH {
-        movies @node(label: Movie) {
-            PROJECT {
-                title
-                similar
-                    @cypher(
-                        arguments: { first: 3 }
-                        statement: """
-                        MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
-                        WITH rec, COUNT(*) AS score
-                        RETURN rec ORDER BY score DESC LIMIT $first
-                        """
-                    ) {
-                    title
-                }
-            }
-        }
-    }
-    RETURN {
-        movies
-    }
-}
-```
-
 ### `WHERE`
 
 #### Operators
@@ -305,30 +332,6 @@ See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/
                         }
                     }
                 }
-            }
-        }
-    }
-    RETURN {
-        user
-    }
-}
-```
-
-### Variables
-
-Use the `$` symbol to use variables and provide `variables` map when calling `translation` or `run`;
-
-```js
-const { user } = await client.run({ query, variables: { id: "user-id" } }); // OR
-const translation = client.translate({ query, variables: { id: "user-id" } }); // OR
-```
-
-```graphql
-{
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                id(equal: $id)
             }
         }
     }
