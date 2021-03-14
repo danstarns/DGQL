@@ -29,7 +29,7 @@
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id STARTS WITH $params.node_where_id_starts_with
+    WHERE node.id STARTS WITH $params.node_where_id0_starts_with
     RETURN node { id: node.id } AS node
 }
 
@@ -41,7 +41,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_starts_with": 1
+        "node_where_id0_starts_with": 1
     }
 }
 ```
@@ -75,7 +75,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id ENDS WITH $params.node_where_id_ends_with
+    WHERE node.id ENDS WITH $params.node_where_id0_ends_with
     RETURN node { id: node.id } AS node
 }
 
@@ -87,7 +87,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_ends_with": 1
+        "node_where_id0_ends_with": 1
     }
 }
 ```
@@ -121,7 +121,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id CONTAINS $params.node_where_id_contains
+    WHERE node.id CONTAINS $params.node_where_id0_contains
     RETURN node { id: node.id } AS node
 }
 
@@ -133,7 +133,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_contains": 1
+        "node_where_id0_contains": 1
     }
 }
 ```
@@ -167,7 +167,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id =~ $params.node_where_id_regex
+    WHERE node.id =~ $params.node_where_id0_regex
     RETURN node { id: node.id } AS node
 }
 
@@ -179,7 +179,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_regex": ".*"
+        "node_where_id0_regex": ".*"
     }
 }
 ```

@@ -373,7 +373,7 @@ CALL {
             (user)-[:HAS_CONTENT]->(user_content) WHERE 'Photo' IN labels(user_content) OR 'Video' IN labels(user_content) | {
                 photo: head([
                         user_content IN [user_content]
-                        WHERE 'Photo' IN labels(user_content) AND user_content.id = $params.user_content_photo_where_id_equal |
+                        WHERE 'Photo' IN labels(user_content) AND user_content.id = $params.user_content_photo_where_id0_equal |
                         {
                             id: user_content.id,
                             size: user_content.size,
@@ -383,7 +383,7 @@ CALL {
                     ]),
                 video: head([
                         user_content IN [user_content]
-                        WHERE 'Video' IN labels(user_content) AND user_content.id = $params.user_content_video_where_id_equal |
+                        WHERE 'Video' IN labels(user_content) AND user_content.id = $params.user_content_video_where_id0_equal |
                         {
                             id: user_content.id,
                             length: user_content.length,
@@ -404,8 +404,8 @@ RETURN user
 ```params
 {
     "params": {
-        "user_content_photo_where_id_equal": "photo-id",
-        "user_content_video_where_id_equal": "video-id"
+        "user_content_photo_where_id0_equal": "photo-id",
+        "user_content_video_where_id0_equal": "video-id"
     }
 }
 ```
@@ -555,7 +555,7 @@ CALL {
     RETURN user {
         name: user.name,
         content: [
-            (user)-[properties:HAS_CONTENT]->(user_content) WHERE 'Photo' IN labels(user_content) OR 'Video' IN labels(user_content) AND properties.since > $params.user_content_properties_where_since_gt | {
+            (user)-[properties:HAS_CONTENT]->(user_content) WHERE 'Photo' IN labels(user_content) OR 'Video' IN labels(user_content) AND properties.since > $params.user_content_properties_where_since0_gt | {
                 properties: { since: properties.since },
                 photo: head([
                         user_content IN [user_content]
@@ -590,7 +590,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_content_properties_where_since_gt": "1999"
+        "user_content_properties_where_since0_gt": "1999"
     }
 }
 ```

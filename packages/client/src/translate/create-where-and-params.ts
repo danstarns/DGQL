@@ -16,8 +16,15 @@ function createWhereAndParams({
     const strs: string[] = [];
     let params: Record<string, unknown> = {};
     const selections = whereField.selectionSet?.selections as FieldNode[];
+    const edges = selections.filter((x) => x.name.value === "EDGE");
+    const logical = selections.filter((x) =>
+        ["AND", "OR", "XOR"].includes(x.name.value)
+    );
+    const field = selections.filter(
+        (x) => !["AND", "OR", "XOR", "EDGE"].includes(x.name.value)
+    );
 
-    selections.forEach((field) => {
+    const getParam = (field: FieldNode) => {
         let param: string;
         if (chainStr) {
             param = `${chainStr}_${field.name.value}`;
@@ -25,26 +32,38 @@ function createWhereAndParams({
             param = `${varName}_${field.name.value}`;
         }
 
-        if (["AND", "OR", "XOR"].includes(field.name.value)) {
-            const logicStrs: string[] = [];
-            const logicSelections = (field as FieldNode).selectionSet
-                ?.selections as FieldNode[];
+        return param;
+    };
 
-            logicSelections.forEach((selection, i) => {
-                if (selection.name.value === "WHERE") {
-                    const wAndP = createWhereAndParams({
-                        varName,
-                        chainStr: `${param}${i}`,
-                        variables,
-                        whereField: selection,
-                        noWhere: true,
-                    });
-                    logicStrs.push(wAndP[0]);
-                    params = { ...params, ...wAndP[1] };
-                }
-            });
-            strs.push(logicStrs.join(` ${field.name.value} `));
-        }
+    edges.forEach((edge, index) => {
+        const param = `${getParam(edge)}${index}`;
+    });
+
+    logical.forEach((logic, index) => {
+        const param = `${getParam(logic)}${index}`;
+
+        const logicStrs: string[] = [];
+        const logicSelections = (logic as FieldNode).selectionSet
+            ?.selections as FieldNode[];
+
+        logicSelections.forEach((selection, i) => {
+            if (selection.name.value === "WHERE") {
+                const wAndP = createWhereAndParams({
+                    varName,
+                    chainStr: `${param}${i}`,
+                    variables,
+                    whereField: selection,
+                    noWhere: true,
+                });
+                logicStrs.push(wAndP[0]);
+                params = { ...params, ...wAndP[1] };
+            }
+        });
+        strs.push(logicStrs.join(` ${logic.name.value} `));
+    });
+
+    field.forEach((field, index) => {
+        const param = `${getParam(field)}${index}`;
 
         (field.arguments as ArgumentNode[]).forEach((arg) => {
             const value = valueFromASTUntyped(arg.value, variables);

@@ -29,7 +29,7 @@
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id = $params.node_where_id_equal
+    WHERE node.id = $params.node_where_id0_equal
     RETURN node { id: node.id } AS node
 }
 
@@ -41,7 +41,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_equal": 1
+        "node_where_id0_equal": 1
     }
 }
 ```
@@ -75,7 +75,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE NOT node.id = $params.node_where_id_not
+    WHERE NOT node.id = $params.node_where_id0_not
     RETURN node { id: node.id } AS node
 }
 
@@ -87,7 +87,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_not": 1
+        "node_where_id0_not": 1
     }
 }
 ```
@@ -121,7 +121,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id > $params.node_where_id_gt
+    WHERE node.id > $params.node_where_id0_gt
     RETURN node { id: node.id } AS node
 }
 
@@ -133,7 +133,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_gt": 1
+        "node_where_id0_gt": 1
     }
 }
 ```
@@ -167,7 +167,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id >= $params.node_where_id_gte
+    WHERE node.id >= $params.node_where_id0_gte
     RETURN node { id: node.id } AS node
 }
 
@@ -179,7 +179,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_gte": 1
+        "node_where_id0_gte": 1
     }
 }
 ```
@@ -213,7 +213,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id < $params.node_where_id_lt
+    WHERE node.id < $params.node_where_id0_lt
     RETURN node { id: node.id } AS node
 }
 
@@ -225,7 +225,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_lt": 1
+        "node_where_id0_lt": 1
     }
 }
 ```
@@ -259,7 +259,7 @@ RETURN node
 ```cypher
 CALL {
     MATCH (node)
-    WHERE node.id <= $params.node_where_id_lte
+    WHERE node.id <= $params.node_where_id0_lte
     RETURN node { id: node.id } AS node
 }
 
@@ -271,7 +271,7 @@ RETURN node
 ```params
 {
     "params": {
-        "node_where_id_lte": 1
+        "node_where_id0_lte": 1
     }
 }
 ```

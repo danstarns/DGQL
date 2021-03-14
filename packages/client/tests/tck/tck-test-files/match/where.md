@@ -29,7 +29,7 @@
 ```cypher
 CALL {
     MATCH (user:User)
-    WHERE user.name = $params.user_where_name_equal
+    WHERE user.name = $params.user_where_name0_equal
     RETURN user { name: user.name } AS user
 }
 
@@ -41,7 +41,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_where_name_equal": "Dan"
+        "user_where_name0_equal": "Dan"
     }
 }
 ```
@@ -85,7 +85,7 @@ CALL {
     RETURN user {
         name: user.name,
         posts: [
-            (user)-[:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title_equal | {
+            (user)-[:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title0_equal | {
                 post: { title: post.title }
             }
         ]
@@ -100,7 +100,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_posts_post_where_title_equal": "Beer"
+        "user_posts_post_where_title0_equal": "Beer"
     }
 }
 ```
@@ -145,7 +145,7 @@ CALL {
     RETURN user {
         name: user.name,
         posts: [
-            (user)-[properties:HAS_POST]->(post:Post) WHERE properties.since = $params.user_posts_properties_where_since_equal | {
+            (user)-[properties:HAS_POST]->(post:Post) WHERE properties.since = $params.user_posts_properties_where_since0_equal | {
                 properties: { since: properties.since }
             }
         ]
@@ -160,7 +160,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_posts_properties_where_since_equal": "1999"
+        "user_posts_properties_where_since0_equal": "1999"
     }
 }
 ```
@@ -212,7 +212,7 @@ CALL {
     RETURN user {
         name: user.name,
         posts: [
-            (user)-[properties:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title_equal AND properties.since = $params.user_posts_properties_where_since_equal | {
+            (user)-[properties:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title0_equal AND properties.since = $params.user_posts_properties_where_since0_equal | {
                 post: { title: post.title },
                 properties: { since: properties.since }
             }
@@ -228,8 +228,8 @@ RETURN user
 ```params
 {
     "params": {
-        "user_posts_properties_where_since_equal": "1999",
-        "user_posts_post_where_title_equal": "Beer"
+        "user_posts_properties_where_since0_equal": "1999",
+        "user_posts_post_where_title0_equal": "Beer"
     }
 }
 ```
