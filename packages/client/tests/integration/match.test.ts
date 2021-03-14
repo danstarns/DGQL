@@ -417,4 +417,58 @@ describe("match", () => {
             await session.close();
         }
     });
+
+    describe("edge", () => {
+        test("should find nodes with where on edge node", async () => {
+            const session = driver.session();
+
+            const client = new Client({ driver });
+
+            const id1 = generate({
+                charset: "alphabetic",
+            });
+            const id2 = generate({
+                charset: "alphabetic",
+            });
+
+            const query = `
+                {
+                    MATCH {
+                        nodes @node {
+                            WHERE {
+                                EDGE(type: HAS_NODE, direction: OUT) {
+                                    NODE {
+                                        id(equal: "${id2}")
+                                    }
+                                }
+                            }
+                            PROJECT {
+                                id
+                            }
+                        }
+                    }
+                    RETURN {
+                        nodes
+                    }
+                }
+            `;
+
+            try {
+                await session.run(
+                    `
+                    CREATE (first {id: $id1})
+                    CREATE (second {id: $id2})
+                    MERGE (first)-[:HAS_NODE]->(second)
+                `,
+                    { id1, id2 }
+                );
+
+                const result = await client.run({ query });
+
+                expect(result?.nodes).toEqual([{ id: id1 }]);
+            } finally {
+                await session.close();
+            }
+        });
+    });
 });

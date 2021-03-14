@@ -207,7 +207,28 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
 
 See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files/where/operators) for info on operators.
 
-#### Where on edge node
+#### Where on node edge
+
+```graphql
+{
+    MATCH {
+        posts @node(label: Post) {
+            WHERE {
+                EDGE(type: HAS_POST, direction: OUT) {
+                    NODE(label: User) {
+                        name(equal: "Dan")
+                    }
+                }
+            }
+        }
+    }
+    RETURN {
+        posts
+    }
+}
+```
+
+#### Where on projection edge node
 
 ```graphql
 {
@@ -234,7 +255,7 @@ See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/
 }
 ```
 
-#### Where on edge relationship
+#### Where on projection edge relationship
 
 ```graphql
 {

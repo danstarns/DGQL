@@ -1,4 +1,7 @@
 import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
+import { Direction } from "../types";
+
+const predicateFunctions = ["all", "any", "exists", "none", "single"];
 
 function createWhereAndParams({
     varName,
@@ -37,6 +40,95 @@ function createWhereAndParams({
 
     edges.forEach((edge, index) => {
         const param = `${getParam(edge)}${index}`;
+
+        const typeArg = edge.arguments?.find((x) => x.name.value === "type");
+
+        const directionArg = edge.arguments?.find(
+            (x) => x.name.value === "direction"
+        );
+
+        const type = typeArg
+            ? valueFromASTUntyped(typeArg.value, variables)
+            : undefined;
+
+        const direction = (directionArg
+            ? valueFromASTUntyped(directionArg.value, variables)
+            : undefined) as Direction | undefined;
+
+        const edgeSelections = (edge?.selectionSet?.selections ||
+            []) as FieldNode[];
+
+        const predicateFunDirec = edge.directives?.find((x) =>
+            predicateFunctions.includes(x.name.value)
+        );
+
+        const predicateFuncName = predicateFunDirec?.name?.value;
+        const node = edgeSelections.find((x) => x.name.value === "NODE");
+        const labelArg = node?.arguments?.find((x) => x.name.value === "label");
+
+        let label = labelArg
+            ? valueFromASTUntyped(labelArg.value, variables)
+            : undefined;
+
+        const nodeDirective = edge.directives?.find(
+            (x) => x.name.value === "node"
+        );
+        if (nodeDirective) {
+            const labelArg = nodeDirective?.arguments?.find(
+                (x) => x.name.value === "label"
+            );
+            label = labelArg
+                ? valueFromASTUntyped(labelArg.value, variables)
+                : undefined;
+        }
+
+        const nodeParam = `${param}_node`;
+        const inStr = direction === "IN" ? "<-" : "-";
+        const outStr = direction === "OUT" ? "->" : "-";
+        const labelStr = label ? `:${label}` : "";
+        const typeStr = `[${type ? `:${type}` : ""}]`;
+
+        const innerStrs: string[] = [
+            `EXISTS((${varName})${inStr}${typeStr}${outStr}(${labelStr}))`,
+        ];
+
+        if (!edgeSelections.length) {
+            if (predicateFuncName === "exists") {
+                strs.push(innerStrs.join(""));
+                return;
+            }
+
+            return;
+        }
+
+        if (predicateFuncName === "exists") {
+            strs.push(innerStrs.join(""));
+            return;
+        }
+
+        if (node?.selectionSet?.selections) {
+            const nWAndP = createWhereAndParams({
+                varName: nodeParam,
+                chainStr: nodeParam,
+                whereField: node,
+                variables,
+                noWhere: true,
+            });
+
+            if (nWAndP[0]) {
+                const path = `[(${varName})${inStr}${typeStr}${outStr}(${nodeParam}${labelStr}) | ${nodeParam}]`;
+                innerStrs.push(
+                    `${(
+                        predicateFuncName || "ALL"
+                    )?.toUpperCase()}(${nodeParam} IN ${path} WHERE ${
+                        nWAndP[0]
+                    })`
+                );
+                params = { ...params, ...nWAndP[1] };
+            }
+        }
+
+        strs.push(innerStrs.join(" AND "));
     });
 
     logical.forEach((logic, index) => {
