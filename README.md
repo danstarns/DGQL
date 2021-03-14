@@ -214,7 +214,7 @@ See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/
     MATCH {
         posts @node(label: Post) {
             WHERE {
-                EDGE(type: HAS_POST, direction: OUT) {
+                EDGE(type: HAS_POST, direction: IN) {
                     NODE(label: User) {
                         name(equal: "Dan")
                     }
