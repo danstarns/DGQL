@@ -36,24 +36,81 @@ function createMatchProjectionAndParams({
             param = `${varName}_${key}`;
         }
 
-        const selections = value.selectionSet?.selections as FieldNode[];
+        const selections = (value.selectionSet?.selections ||
+            []) as FieldNode[];
+
+        const cypherDirective = value.directives?.find(
+            (x) => x.name.value === "cypher"
+        );
 
         const nodeDirective = value.directives?.find(
             (x) => x.name.value === "node"
-        ) as DirectiveNode;
+        );
 
         const edgeDirective = value.directives?.find(
             (x) => x.name.value === "edge"
-        ) as DirectiveNode;
+        );
 
         const paginateDirective = value.directives?.find(
             (x) => x.name.value === "paginate"
-        ) as DirectiveNode;
+        );
 
         const skipLimit = createSkipLimitStr({
             paginateDirective,
             variables,
         });
+
+        if (cypherDirective) {
+            const statementArg = cypherDirective.arguments?.find(
+                (x) => x.name.value === "statement"
+            ) as ArgumentNode;
+            const argumentsArg = cypherDirective.arguments?.find(
+                (x) => x.name.value === "arguments"
+            ) as ArgumentNode;
+
+            const statement = (statementArg
+                ? valueFromASTUntyped(statementArg.value, variables)
+                : undefined) as string | undefined;
+            const args = (argumentsArg
+                ? valueFromASTUntyped(argumentsArg.value, variables)
+                : {}) as Record<string, unknown>;
+
+            const apocParams = Object.entries(args).reduce(
+                (r: { strs: string[]; params: any }, entry) => {
+                    const argName = `${param}_cypher_arguments_${entry[0]}`;
+
+                    return {
+                        strs: [...r.strs, `${entry[0]}: $params.${argName}`],
+                        params: { ...r.params, [argName]: entry[1] },
+                    };
+                },
+                { strs: [], params: {} }
+            ) as { strs: string[]; params: any };
+            res.params = { ...res.params, ...apocParams.params };
+
+            apocParams.strs.push(`this: ${varName}`);
+            const paramsStr = `{ ${apocParams.strs.join(", ")} }`;
+
+            if (selections.length) {
+                const cpAndP = createMatchProjectionAndParams({
+                    projectField: value,
+                    varName: param,
+                    variables,
+                    chainStr: `${param}_cypher`,
+                });
+                res.params = { ...res.params, ...cpAndP[1] };
+
+                res.strs.push(
+                    `${key}: [${param} IN apoc.cypher.runFirstColumn("${statement}", ${paramsStr}, true) | ${param} ${cpAndP[0]}]`
+                );
+            } else {
+                res.strs.push(
+                    `${key}: apoc.cypher.runFirstColumnSingle("${statement}", ${paramsStr})`
+                );
+            }
+
+            return res;
+        }
 
         if (!edgeDirective && !nodeDirective) {
             res.strs.push(`${key}: ${varName}.${key}`);
@@ -379,82 +436,138 @@ function createMatchAndParams({
         const nodeDirective = field.directives?.find(
             (x) => x.name.value === "node"
         ) as DirectiveNode;
+        const cypherDirective = field.directives?.find(
+            (x) => x.name.value === "cypher"
+        ) as DirectiveNode;
         const paginateDirective = field.directives?.find(
             (x) => x.name.value === "paginate"
         ) as DirectiveNode;
 
-        // TODO Support top level MATCH for @relationship
-        if (!nodeDirective) {
-            return;
-        }
-
-        const labelArg = (nodeDirective?.arguments || [])?.find(
-            (x) => x.name.value === "label"
-        ) as ArgumentNode;
-
-        const label = labelArg
-            ? valueFromASTUntyped(labelArg.value, variables)
-            : (undefined as string | undefined);
-
         cyphers.push(`CALL {`);
-        cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
 
-        if (whereField) {
-            const whereAndParams = createWhereAndParams({
-                varName,
-                whereField,
-                chainStr: `${varName}_where`,
-                variables,
-            });
-            cyphers.push(whereAndParams[0]);
-            params = { ...params, ...whereAndParams[1] };
-        }
-
-        if (sortField) {
-            const sortAndParams = createSortAndParams({
-                varName,
-                sortField,
-                variables,
-            });
-            cyphers.push(sortAndParams[0]);
-            params = { ...params, ...sortAndParams[1] };
-        }
-
-        if (projectField) {
-            const matchProjectionAndParams = createMatchProjectionAndParams({
-                varName,
-                projectField,
-                variables,
-            });
-            params = { ...params, ...matchProjectionAndParams[1] };
-
-            cyphers.push(
-                `RETURN ${varName} ${matchProjectionAndParams[0]} AS ${varName}`
-            );
-        } else {
-            cyphers.push(`RETURN ${varName}`);
-        }
-
-        if (paginateDirective) {
-            const skipArgument = paginateDirective.arguments?.find(
-                (x) => x.name.value === "skip"
+        if (cypherDirective) {
+            const statementArg = cypherDirective.arguments?.find(
+                (x) => x.name.value === "statement"
+            ) as ArgumentNode;
+            const argumentsArg = cypherDirective.arguments?.find(
+                (x) => x.name.value === "arguments"
             ) as ArgumentNode;
 
-            const limitArgument = paginateDirective.arguments?.find(
-                (x) => x.name.value === "limit"
+            const statement = (statementArg
+                ? valueFromASTUntyped(statementArg.value, variables)
+                : undefined) as string | undefined;
+            const args = (argumentsArg
+                ? valueFromASTUntyped(argumentsArg.value, variables)
+                : {}) as Record<string, unknown>;
+
+            const apocParams = Object.entries(args).reduce(
+                (r: { strs: string[]; params: any }, entry) => {
+                    const argName = `${varName}_cypher_arguments_${entry[0]}`;
+
+                    return {
+                        strs: [...r.strs, `${entry[0]}: $params.${argName}`],
+                        params: { ...r.params, [argName]: entry[1] },
+                    };
+                },
+                { strs: [], params: {} }
+            ) as { strs: string[]; params: any };
+            params = { ...params, ...apocParams.params };
+
+            const paramsStr = apocParams.strs.length
+                ? `{ ${apocParams.strs.join(", ")} }`
+                : "{}";
+
+            if (selections.length) {
+                const cpAndP = createMatchProjectionAndParams({
+                    projectField: field,
+                    varName,
+                    variables,
+                });
+                params = { ...params, ...cpAndP[1] };
+
+                cyphers.push(
+                    `RETURN head([${varName} IN apoc.cypher.runFirstColumn("${statement}", ${paramsStr}, true)  | ${varName} ${cpAndP[0]}]) AS ${varName}`
+                );
+            } else {
+                cyphers.push(
+                    `RETURN apoc.cypher.runFirstColumnSingle("${statement}", ${paramsStr}) AS ${varName}`
+                );
+            }
+        } else if (!nodeDirective) {
+            throw new Error("@node required");
+        } else if (nodeDirective) {
+            const labelArg = (nodeDirective?.arguments || [])?.find(
+                (x) => x.name.value === "label"
             ) as ArgumentNode;
 
-            if (skipArgument) {
-                const skip = valueFromASTUntyped(skipArgument.value, variables);
-                cyphers.push(`SKIP ${skip}`);
+            const label = labelArg
+                ? valueFromASTUntyped(labelArg.value, variables)
+                : (undefined as string | undefined);
+
+            cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
+
+            if (whereField) {
+                const whereAndParams = createWhereAndParams({
+                    varName,
+                    whereField,
+                    chainStr: `${varName}_where`,
+                    variables,
+                });
+                cyphers.push(whereAndParams[0]);
+                params = { ...params, ...whereAndParams[1] };
             }
 
-            if (limitArgument) {
-                const limit = valueFromASTUntyped(
-                    limitArgument.value,
-                    variables
+            if (sortField) {
+                const sortAndParams = createSortAndParams({
+                    varName,
+                    sortField,
+                    variables,
+                });
+                cyphers.push(sortAndParams[0]);
+                params = { ...params, ...sortAndParams[1] };
+            }
+
+            if (projectField) {
+                const matchProjectionAndParams = createMatchProjectionAndParams(
+                    {
+                        varName,
+                        projectField,
+                        variables,
+                    }
                 );
-                cyphers.push(`LIMIT ${limit}`);
+                params = { ...params, ...matchProjectionAndParams[1] };
+
+                cyphers.push(
+                    `RETURN ${varName} ${matchProjectionAndParams[0]} AS ${varName}`
+                );
+            } else {
+                cyphers.push(`RETURN ${varName}`);
+            }
+
+            if (paginateDirective) {
+                const skipArgument = paginateDirective.arguments?.find(
+                    (x) => x.name.value === "skip"
+                ) as ArgumentNode;
+
+                const limitArgument = paginateDirective.arguments?.find(
+                    (x) => x.name.value === "limit"
+                ) as ArgumentNode;
+
+                if (skipArgument) {
+                    const skip = valueFromASTUntyped(
+                        skipArgument.value,
+                        variables
+                    );
+                    cyphers.push(`SKIP ${skip}`);
+                }
+
+                if (limitArgument) {
+                    const limit = valueFromASTUntyped(
+                        limitArgument.value,
+                        variables
+                    );
+                    cyphers.push(`LIMIT ${limit}`);
+                }
             }
         }
 

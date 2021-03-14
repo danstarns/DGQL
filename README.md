@@ -77,7 +77,7 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
 
 ### Why
 
-**Why don't you just use Cypher?** - If you have a highly specific answer... Cypher may be the right question for you. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
+**Why don't you just use Cypher?** - If you are looking for a highly specific answer... Cypher may be the correct tool. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
 
 **Why does it use GraphQL?** - The GraphQL parser is a widely adopted and maintained project, meaning we can lean on its tools and infrastructure. Not only does GraphQL provide a solid foundation but also comes with developers & library authors. Finally; GraphQL directives are extremely useful and enable DGQL to facilitate powerful abstractions behind them.
 
@@ -197,6 +197,36 @@ using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) 
     }
     RETURN {
         user
+    }
+}
+```
+
+### `@cypher`
+
+Sometimes you may have a highly specific question, Cypher could better help you ask. Use the `@cypher` directive, in a projection, to break the flow, and execute custom cypher.
+
+```graphql
+{
+    MATCH {
+        movies @node(label: Movie) {
+            PROJECT {
+                title
+                similar
+                    @cypher(
+                        arguments: { first: 3 }
+                        statement: """
+                        MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
+                        WITH rec, COUNT(*) AS score
+                        RETURN rec ORDER BY score DESC LIMIT $first
+                        """
+                    ) {
+                    title
+                }
+            }
+        }
+    }
+    RETURN {
+        movies
     }
 }
 ```
