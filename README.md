@@ -14,7 +14,7 @@ Dynamic Graph Query Language 👍
 
 ### Documentation
 
-You can find the [documentation here](https://github.com/danstarns/DGQL/tree/main/docs)
+You can find the [documentation here](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
 
 ### Prerequisites
 
