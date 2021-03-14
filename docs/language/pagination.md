@@ -2,7 +2,7 @@
 
 ## Intro
 
-Use to skip limit and sort node and edges.
+Use to skip, limit and sort node and or there edges.
 
 ## Usage
 

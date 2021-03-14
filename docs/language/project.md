@@ -2,7 +2,7 @@
 
 ## Intro
 
-Maybe you have called [`MATCH`](./match) and want to select properties on the matched node or relationship; `PROJECT` is the tool for you.
+Maybe you have called [`MATCH`](./match.md) and want to select properties on the matched node or relationship; `PROJECT` is the tool for you.
 
 Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT` it into a usable, JSON like, structure - Perfect for application use.
 

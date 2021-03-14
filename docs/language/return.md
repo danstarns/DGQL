@@ -2,7 +2,7 @@
 
 ## Intro
 
-Maybe you have called [`MATCH`](./match) and want to return the value. Use the `RETURN` keyword, and reference all the top level keys inside your statements.
+Maybe you have called [`MATCH`](./match.md) and want to return the value. Use the `RETURN` keyword, and reference all the top level keys inside your statements.
 
 ### Usage
 

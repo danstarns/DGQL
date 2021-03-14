@@ -12,15 +12,15 @@ Use in correlation with cyphers `MATCH` statement. The most Basic of `MATCH` is;
 }
 ```
 
-> Matching a node and not returning is pretty pointless so checkout [`RETURN`](./return).
+> Matching a node and not returning is pretty pointless so checkout [`RETURN`](./return.md).
 
-Given the most basic example, above, your just matching and holding a reference to the `raw` node object from the Neo4j Javascript Driver. You can however, [`PROJECT`](./project) values out of the node, easy for application use.
+Given the most basic example, above, your just matching and holding a reference to the `raw` node object from the Neo4j Javascript Driver. You can however, [`PROJECT`](./project.md) values out of the node, easy for application use.
 
 ## Usage
 
 ### `MATCH` & `PROJECT` & `RETURN`
 
-> [`PROJECT`](./project) & [`RETURN`](./return)
+> [`PROJECT`](./project.md) & [`RETURN`](./return.md)
 
 ```graphql
 {
