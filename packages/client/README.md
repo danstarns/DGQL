@@ -62,3 +62,29 @@ async function main() {
 
 main();
 ```
+
+## Usage
+
+### Variables
+
+Use the `$` symbol to use variables and provide `variables` map when calling `translation` or `run`;
+
+```js
+const { user } = await client.run({ query, variables: { id: "user-id" } }); // OR
+const translation = client.translate({ query, variables: { id: "user-id" } }); // OR
+```
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) {
+            WHERE {
+                id(equal: $id)
+            }
+        }
+    }
+    RETURN {
+        user
+    }
+}
+```
