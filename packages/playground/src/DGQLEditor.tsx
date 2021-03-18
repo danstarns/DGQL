@@ -79,7 +79,7 @@ function DGQLEditor({
 
     return (
         <Editor
-            height="80vh"
+            height="100vh"
             theme="vs-dark"
             defaultLanguage="graphql"
             beforeMount={beforeMount}

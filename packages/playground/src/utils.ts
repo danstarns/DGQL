@@ -19,7 +19,7 @@ interface PrettierOptions {
 
 export function prettify(
     query: string,
-    options: PrettierOptions = { printWidth: 80, tabWidth: 2, useTabs: false }
+    options: PrettierOptions = { printWidth: 55, tabWidth: 2, useTabs: false }
 ) {
     return prettier.format(query, {
         ...options,

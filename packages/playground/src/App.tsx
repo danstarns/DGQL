@@ -190,7 +190,7 @@ function App() {
                                         </div>
                                         <Card.Body>
                                             <Editor
-                                                height="80vh"
+                                                height="100vh"
                                                 theme="vs-dark"
                                                 defaultLanguage="json"
                                                 value={JSON.stringify(
