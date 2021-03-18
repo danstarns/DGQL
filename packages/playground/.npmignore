@@ -1,0 +1,7 @@
+public
+src
+.env
+.gitignore
+tsconfig.json
+node_modules
+*.tgz

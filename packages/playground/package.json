@@ -7,9 +7,15 @@
         "type": "git",
         "url": "git+https://github.com/danstarns/dgql.git"
     },
+    "neo4jDesktop": {
+        "apiVersion": "^1.4.0",
+        "permissions": [
+            "allGraphs"
+        ]
+    },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "MIT",
     "scripts": {
         "build": "webpack --config webpack.config.js",
         "dev": "webpack serve"

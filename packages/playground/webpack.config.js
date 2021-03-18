@@ -49,7 +49,7 @@ module.exports = {
     },
     output: {
         filename: "[name].js",
-        path: path.resolve(__dirname, "web-dist"),
+        path: path.resolve(__dirname, "dist"),
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -62,7 +62,7 @@ module.exports = {
         }),
     ],
     devServer: {
-        contentBase: path.join(__dirname, "web-dist"),
+        contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: Number(process.env.DEV_SERVER_PORT || 4000),
     },
