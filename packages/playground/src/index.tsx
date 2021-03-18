@@ -4,6 +4,7 @@ import App from "./App";
 import "./index.css";
 import { Neo4jProvider } from "use-neo4j";
 import { Neo4jScheme } from "use-neo4j/dist/neo4j-config.interface";
+import * as HistoryContext from "./HistoryContext";
 
 const defaults = {
     NEO_SCHEME: "bolt" as Neo4jScheme,
@@ -24,7 +25,9 @@ function Wrapper() {
             password={defaults.NEO_PASSWORD}
             database={defaults.NEO_DATABASE}
         >
-            <App />
+            <HistoryContext.Provider>
+                <App />
+            </HistoryContext.Provider>
         </Neo4jProvider>
     );
 }

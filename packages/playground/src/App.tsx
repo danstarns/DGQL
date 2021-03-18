@@ -1,17 +1,25 @@
 import React, { useCallback, useContext, useRef, useState } from "react";
-import { Client } from "../../client/src";
-import { Button, Card, Spinner, Alert, Row, Col } from "react-bootstrap";
+import { Client, Translation } from "../../client/src";
+import { Button, Card, Spinner, Alert, Row, Col, Modal } from "react-bootstrap";
 import DGQLEditor from "./DGQLEditor";
 import Editor from "@monaco-editor/react";
 import { Neo4jContext } from "use-neo4j";
 import { Neo4jContextState } from "use-neo4j/dist/neo4j.context";
+import * as HistoryContext from "./HistoryContext";
+import HistoryModal from "./HistoryModal";
+import { HistoryItem, Sample } from "./types";
+import SamplesModal from "./SamplesModal";
+import { prettify } from "./utils";
 
 function App() {
+    const history = useContext(HistoryContext.Context);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [response, setResponse] = useState<any>();
     const [cypher, setCypher] = useState("");
     const [queryParams, setQueryParams] = useState("{}");
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [showSamplesModal, setShowSamplesModal] = useState(false);
     const { driver } = useContext<Neo4jContextState>(Neo4jContext);
     const editorRef = useRef<typeof Editor>();
 
@@ -36,6 +44,10 @@ function App() {
 
             const translation = client.translate(options);
 
+            history.addHistoryItem({
+                dgql: options.query,
+                params: options.variables,
+            });
             setCypher(translation.cypher);
             setResponse(await client.run(options));
             setError("");
@@ -46,112 +58,178 @@ function App() {
             session.close();
         }
 
-        setLoading(false);
+        setTimeout(() => {
+            setLoading(false);
+        }, 600);
     }, [driver, queryParams]);
 
+    const handelHistoryAdd = useCallback((historyItem: HistoryItem) => {
+        // @ts-ignore
+        editorRef.current.setValue(historyItem.dgql);
+        setQueryParams(JSON.stringify(historyItem.params, null, 2));
+        setShowHistoryModal(false);
+    }, []);
+
+    const handelSampleAdd = useCallback((sample: Sample) => {
+        // @ts-ignore
+        editorRef.current.setValue(sample.sample);
+        setShowSamplesModal(false);
+    }, []);
+
     return (
-        <div>
-            <Card className="m-2 p-2">
-                <Button variant="primary" block={true} onClick={submit}>
-                    Submit
-                </Button>
-            </Card>
-
-            {loading && (
-                <Card className="m-2">
-                    <Spinner animation="border" className="mx-auto"></Spinner>
-                </Card>
-            )}
-
-            {error && (
-                <Card className="m-2">
-                    <Alert variant="danger">{error}</Alert>
-                </Card>
-            )}
+        <>
+            <Modal show={showHistoryModal} onHide={setShowHistoryModal}>
+                <HistoryModal
+                    onClose={() => setShowHistoryModal(false)}
+                    onSelect={(h: HistoryItem) => handelHistoryAdd(h)}
+                ></HistoryModal>
+            </Modal>
+            <Modal show={showSamplesModal} onHide={setShowSamplesModal}>
+                <SamplesModal
+                    onClose={() => setShowSamplesModal(false)}
+                    onSelect={(s: Sample) => handelSampleAdd(s)}
+                ></SamplesModal>
+            </Modal>
 
             <div className="pl-3 pr-3">
-                <Row className="pl-3 pr-3">
-                    <Col sm={6} className="p-3">
-                        <Row>
-                            <Col sm={12} className="mb-3">
-                                <Card bg={"light"}>
-                                    <div className="p-3">
-                                        <h3>DGQL Query</h3>
-                                    </div>
-                                    <Card.Body>
-                                        <DGQLEditor
-                                            onMount={handleEditorDidMount}
-                                        ></DGQLEditor>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col sm={12} className="mt-3">
-                                <Card bg={"light"}>
-                                    <div className="p-3">
-                                        <h3>DGQL Params</h3>
-                                    </div>
-                                    <Card.Body>
-                                        <Editor
-                                            height="30vh"
-                                            theme="vs-dark"
-                                            defaultLanguage="json"
-                                            options={{ fontSize: "30" }}
-                                            value={queryParams}
-                                            onChange={(v) => setQueryParams(v)}
-                                        />
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col sm={6} className="p-3">
-                        <Row>
-                            <Col sm={12} className="mb-3">
-                                <Card bg={"light"}>
-                                    <div className="p-3">
-                                        <h3>Response</h3>
-                                    </div>
-                                    <Card.Body>
-                                        <Editor
-                                            height="80vh"
-                                            theme="vs-dark"
-                                            defaultLanguage="json"
-                                            value={JSON.stringify(
-                                                response,
-                                                null,
-                                                2
-                                            )}
-                                            options={{
-                                                fontSize: "23",
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col sm={12} className="mt-3">
-                                <Card bg={"light"}>
-                                    <div className="p-3">
-                                        <h3>Cypher Query</h3>
-                                    </div>
-                                    <Card.Body>
-                                        <Editor
-                                            height="30vh"
-                                            theme="vs-dark"
-                                            value={cypher}
-                                            options={{
-                                                fontSize: "23",
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
+                <Card className="m-3 p-3 d-flex align-items-start flex-row">
+                    <Button variant="primary" onClick={submit}>
+                        Submit
+                    </Button>
+
+                    <Button
+                        variant="outline-warning"
+                        className="ml-3"
+                        onClick={() => setShowHistoryModal(true)}
+                    >
+                        History
+                    </Button>
+
+                    <Button
+                        variant="outline-info"
+                        className="ml-3"
+                        onClick={() => setShowSamplesModal(true)}
+                    >
+                        Samples
+                    </Button>
+                    <Button
+                        variant="outline-secondary"
+                        className="ml-3"
+                        onClick={() => {
+                            // @ts-ignore
+                            editorRef.current.setValue(
+                                // @ts-ignore
+                                prettify(editorRef.current.getValue())
+                            );
+                        }}
+                    >
+                        Pretty
+                    </Button>
+                </Card>
+
+                {(loading || error) && (
+                    <Card className="m-3 p-3 d-flex align-items-center">
+                        {loading && (
+                            <Spinner
+                                className="m-0 p-0"
+                                animation="border"
+                            ></Spinner>
+                        )}
+
+                        {error && !loading && (
+                            <Alert className="m-0 p-3" variant="danger">
+                                {error}
+                            </Alert>
+                        )}
+                    </Card>
+                )}
+
+                <div className="pl-3 pr-3">
+                    <Row className="pl-3 pr-3">
+                        <Col sm={6} className="p-3">
+                            <Row>
+                                <Col sm={12} className="mb-3">
+                                    <Card bg={"light"}>
+                                        <div className="p-3">
+                                            <h3>DGQL Query</h3>
+                                        </div>
+                                        <Card.Body>
+                                            <DGQLEditor
+                                                onMount={handleEditorDidMount}
+                                            ></DGQLEditor>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                                <Col sm={12} className="mt-3">
+                                    <Card bg={"light"}>
+                                        <div className="p-3">
+                                            <h3>DGQL Params</h3>
+                                        </div>
+                                        <Card.Body>
+                                            <Editor
+                                                height="30vh"
+                                                theme="vs-dark"
+                                                defaultLanguage="json"
+                                                options={{ fontSize: "18" }}
+                                                value={queryParams}
+                                                onChange={(v) =>
+                                                    setQueryParams(v)
+                                                }
+                                            />
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col sm={6} className="p-3">
+                            <Row>
+                                <Col sm={12} className="mb-3">
+                                    <Card bg={"light"}>
+                                        <div className="p-3">
+                                            <h3>Response</h3>
+                                        </div>
+                                        <Card.Body>
+                                            <Editor
+                                                height="80vh"
+                                                theme="vs-dark"
+                                                defaultLanguage="json"
+                                                value={JSON.stringify(
+                                                    response,
+                                                    null,
+                                                    2
+                                                )}
+                                                options={{
+                                                    fontSize: "18",
+                                                    readOnly: true,
+                                                }}
+                                            />
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                                <Col sm={12} className="mt-3">
+                                    <Card bg={"light"}>
+                                        <div className="p-3">
+                                            <h3>Cypher Query</h3>
+                                        </div>
+                                        <Card.Body>
+                                            <Editor
+                                                height="30vh"
+                                                theme="vs-dark"
+                                                value={cypher}
+                                                options={{
+                                                    fontSize: "18",
+                                                    readOnly: true,
+                                                }}
+                                            />
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

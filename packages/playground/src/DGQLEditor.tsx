@@ -15,12 +15,26 @@ function createDependencyProposals(range, monaco: Monaco) {
     ];
 }
 
+function createRootSuggestions(range, monaco: Monaco) {
+    // returning a static list of proposals, not even looking at the prefix (filtering is done by the Monaco editor),
+    // here you could do a server side lookup
+    return [
+        {
+            label: "MATCH",
+            kind: monaco.languages.CompletionItemKind.Field,
+            documentation: "MATCH",
+            insertText: "MATCH {}",
+            range: range,
+        },
+    ];
+}
+
 function DGQLEditor({
     onMount,
 }: {
     onMount: (editor: typeof Editor, monaco: Monaco) => void;
 }) {
-    function beforeMount(monaco) {
+    function beforeMount(monaco: Monaco) {
         monaco.languages.registerCompletionItemProvider("graphql", {
             provideCompletionItems: (model, position) => {
                 // find out if we are completing a property in the 'dependencies' object.
@@ -31,11 +45,6 @@ function DGQLEditor({
                     endColumn: position.column,
                 });
 
-                const match = textUntilPosition.match(/MATCH\s*\{\s*?$/);
-                if (!match) {
-                    return { suggestions: [] };
-                }
-
                 const word = model.getWordUntilPosition(position);
                 const range = {
                     startLineNumber: position.lineNumber,
@@ -44,9 +53,26 @@ function DGQLEditor({
                     endColumn: word.endColumn,
                 };
 
-                return {
-                    suggestions: createDependencyProposals(range, monaco),
-                };
+                console.log(textUntilPosition);
+                const isInMatch = textUntilPosition.match(
+                    /MATCH[\s\S]*{[\s\S]*$/
+                );
+                const atTop = textUntilPosition.match(
+                    /[\s\S]*{[\s\S]*(MATCH[\s\S]*{[\s\S]*})?[\s\S]*[^MATCH[\s\S]*[{][\s\S]*]+$/
+                );
+                if (atTop && !isInMatch) {
+                    return {
+                        suggestions: createRootSuggestions(range, monaco),
+                    };
+                }
+
+                if (isInMatch && !atTop) {
+                    return {
+                        suggestions: createDependencyProposals(range, monaco),
+                    };
+                }
+
+                return { suggestions: [] };
             },
         });
     }
@@ -58,7 +84,7 @@ function DGQLEditor({
             defaultLanguage="graphql"
             beforeMount={beforeMount}
             onMount={onMount}
-            options={{ fontSize: "23", tabSize: 2 }}
+            options={{ fontSize: "18", tabSize: 2 }}
         />
     );
 }
