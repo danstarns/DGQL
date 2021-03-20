@@ -1,7 +1,6 @@
 import { Node } from "../classes";
-import { NodeInput } from "../types";
 
-function node(input?: NodeInput) {
+function node(input?: { label?: string }) {
     return new Node(input);
 }
 
