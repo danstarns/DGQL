@@ -55,24 +55,24 @@ const { Builder, node, property, edge } = require("@dgql/builder");
 
 const builder = new Builder();
 
-const match = builder.match({
-    user: builder
-        .node({ label: "User" })
-        .where({ name: "Dan" })
-        .project({
-            id: property(),
-            name: property(),
-            posts: edge({
-                type: "HAS_POST",
-                direction: "OUT",
-                node: node({ label: "Post" }),
-            }).project({
-                title: property(),
+const [dgql, params] = builder
+    .match({
+        user: node({ label: "User" })
+            .where({ name: "Dan" })
+            .project({
+                id: property(),
+                name: property(),
+                posts: edge({
+                    type: "HAS_POST",
+                    direction: "OUT",
+                    node: node({ label: "Post" }),
+                }).project({
+                    title: property(),
+                }),
             }),
-        }),
-});
-
-builder.return({ user: match.user });
+    })
+    .return(["user"])
+    .build();
 ```
 
 The following Cypher is produced;
