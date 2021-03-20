@@ -1,11 +1,3 @@
-export interface NodeInput {
-    label?: string;
-}
-
-export interface NodeProjectInput {
-    [k: string]: unknown;
-}
-
 export interface EdgeProjectInput {
     [k: string]: unknown;
 }

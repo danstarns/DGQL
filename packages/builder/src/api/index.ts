@@ -1,2 +1,3 @@
-export { default as property } from "./property.ts";
-export { default as node } from "./node.ts";
+export { default as property } from "./property";
+export { default as node } from "./node";
+export { default as edge } from "./edge";

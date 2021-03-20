@@ -1,4 +1,10 @@
-import { NodeProjectInput, NodeInput } from "../types";
+interface NodeProjectInput {
+    [k: string]: unknown;
+}
+
+interface NodeInput {
+    label?: string;
+}
 
 class Node {
     label?: string;

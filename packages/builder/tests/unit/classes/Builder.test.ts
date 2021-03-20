@@ -7,16 +7,6 @@ describe("Builder", () => {
     });
 
     describe("methods", () => {
-        describe("node", () => {
-            test("should return an instance of Node", () => {
-                const builder = new Builder();
-
-                const node = builder.node();
-
-                expect(node).toBeInstanceOf(Node);
-            });
-        });
-
         describe("match", () => {
             test("should have method", () => {
                 const builder = new Builder();
