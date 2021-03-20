@@ -24,7 +24,7 @@ GraphQL can be separated into two sections; language & execution. To truly under
 
 This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
-Given the below GraphQL Query;
+Given the below [DGQL Query]();
 
 ```graphql
 {
@@ -48,7 +48,38 @@ Given the below GraphQL Query;
 }
 ```
 
-the following Cypher is produced;
+Or equivalent [DGQL Builder](./packages/builder);
+
+```js
+const { DGQLBuilder, node, property, edge } = require("@dgql/builder");
+
+const builder = new DGQLBuilder();
+
+const match = builder.match({
+    user: builder
+        .node({ label: "User" })
+        .where({ name: "Dan" })
+        .project({
+            id: property(),
+            name: property(),
+            posts: edge({
+                type: "HAS_POST",
+                direction: "OUT",
+                node: node({ label: "Post" }),
+            }).project({
+                title: property(),
+            }),
+        }),
+});
+
+builder.return({
+    user: match.user,
+});
+
+const [cypher, params] = builder.translate();
+```
+
+The following Cypher is produced;
 
 ```cypher
 MATCH (user:User)
@@ -60,7 +91,7 @@ RETURN user {
 } as user
 ```
 
-using the [Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like;
+Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like;
 
 ```json
 {

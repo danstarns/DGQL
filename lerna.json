@@ -1,5 +1,5 @@
 {
-    "packages": ["packages/client", "packages/playground"],
+    "packages": ["packages/client", "packages/playground", "packages/builder"],
     "version": "independent",
     "command": {
         "bootstrap": {

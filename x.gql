@@ -1,0 +1,22 @@
+{
+    MATCH {
+        movies @node(label: Movie) {
+            PROJECT {
+                title
+                similar(first: 3)
+                    @cypher(
+                        statement: """
+                        MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
+                        WITH rec, COUNT(*) AS score
+                        RETURN rec ORDER BY score DESC LIMIT $first
+                        """
+                    ) {
+                    title
+                }
+            }
+        }
+    }
+    RETURN {
+        movies
+    }
+}
