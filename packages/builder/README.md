@@ -13,9 +13,9 @@ $ npm install @dgql/builder
 ## Quick Start
 
 ```js
-const { DGQLBuilder, node, property, edge } = require("@dgql/builder");
+const { Builder, node, property, edge } = require("@dgql/builder");
 
-const builder = new DGQLBuilder();
+const builder = new Builder();
 
 const match = builder.match({
     user: builder
@@ -34,22 +34,30 @@ const match = builder.match({
         }),
 });
 
-builder.return({
-    user: match.user,
-});
+builder.return({ user: match.user });
 
-const [cypher, params] = builder.translate();
+const [dgql, params] = builder.build();
 
-console.log(cypher);
+console.log(dgql);
 /*
-       [{
-           id: "id-01",
-           name: "Dan",
-           posts: [
-               {
-                   title: "Checkout @dgql/client"
-               }
-           ]
-       }]
+    {
+        MATCH {
+            user @node(label: User) {
+                WHERE {
+                    name(equal: "Dan")
+                }
+                PROJECT {
+                    id
+                    name
+                    posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+                        title
+                    }
+                }
+            }
+        }
+        RETURN {
+            user
+        }
+    }
 */
 ```

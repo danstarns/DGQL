@@ -51,9 +51,9 @@ Given the below [DGQL Query]();
 Or equivalent [DGQL Builder](./packages/builder);
 
 ```js
-const { DGQLBuilder, node, property, edge } = require("@dgql/builder");
+const { Builder, node, property, edge } = require("@dgql/builder");
 
-const builder = new DGQLBuilder();
+const builder = new Builder();
 
 const match = builder.match({
     user: builder
@@ -72,11 +72,7 @@ const match = builder.match({
         }),
 });
 
-builder.return({
-    user: match.user,
-});
-
-const [cypher, params] = builder.translate();
+builder.return({ user: match.user });
 ```
 
 The following Cypher is produced;
@@ -180,5 +176,8 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 
 Use the pre-made tools to develop with DGQL.
 
-1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine for DGQL
-1. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
+1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine & Executable Client for DGQL Queries
+
+2. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
+
+3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
