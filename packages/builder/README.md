@@ -66,7 +66,7 @@ console.log(dgql);
 
 ### Recipes
 
-Showing how to create each Query from [DGQL Recipes](../recipes) using the Builder.
+Showing how to create each Query from [DGQL Recipes](https://github.com/danstarns/DGQL/tree/main/misc/recipes) using the Builder.
 
 #### Match Blog
 
