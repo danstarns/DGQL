@@ -1,3 +1,5 @@
+import Property from "./Property";
+
 interface NodeProjectInput {
     [k: string]: unknown;
 }
@@ -6,9 +8,14 @@ interface NodeInput {
     label?: string;
 }
 
+interface NodeSort {
+    [k: string]: Property;
+}
+
 interface NodePagination {
     skip?: number;
     limit?: number;
+    sort?: NodeSort;
 }
 
 class Node {

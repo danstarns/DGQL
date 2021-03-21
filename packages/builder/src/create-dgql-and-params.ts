@@ -125,7 +125,7 @@ function createMatchSelectionNodesAndParams({
                     }
 
                     if (entry[1].paginationInput) {
-                        const { skip, limit } = entry[1].paginationInput;
+                        const { skip, limit, sort } = entry[1].paginationInput;
 
                         const directive: DirectiveNode = {
                             kind: "Directive",
@@ -159,7 +159,55 @@ function createMatchSelectionNodesAndParams({
                             (directive.arguments as ArgumentNode[]).push(arg);
                         }
 
-                        (field.directives as DirectiveNode[]).push(directive);
+                        if (directive.arguments?.length) {
+                            (field.directives as DirectiveNode[]).push(
+                                directive
+                            );
+                        }
+
+                        if (sort) {
+                            const selection: SelectionNode = {
+                                kind: "Field",
+                                name: { kind: "Name", value: "SORT" },
+                                selectionSet: {
+                                    kind: "SelectionSet",
+                                    selections: Object.entries(sort)
+                                        .filter((p) => p[1] instanceof Property)
+                                        .map((p) => {
+                                            const field: FieldNode = {
+                                                kind: "Field",
+                                                name: {
+                                                    kind: "Name",
+                                                    value: p[0],
+                                                },
+                                                arguments: [],
+                                            };
+
+                                            if (p[1].direction) {
+                                                const arg: ArgumentNode = {
+                                                    kind: "Argument",
+                                                    name: {
+                                                        kind: "Name",
+                                                        value: "direction",
+                                                    },
+                                                    value: {
+                                                        kind: "EnumValue",
+                                                        value: p[1].direction,
+                                                    },
+                                                };
+
+                                                (field.arguments as ArgumentNode[]).push(
+                                                    arg
+                                                );
+                                            }
+
+                                            return field;
+                                        }),
+                                },
+                            };
+
+                            selections.push(selection);
+                        }
                     }
 
                     if (entry[1].projectInput) {
