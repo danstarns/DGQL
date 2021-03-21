@@ -6,6 +6,7 @@ import {
     valueFromASTUntyped,
 } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
+import createWhereFromDirectiveAndParams from "./create-where-from-directive-and-params";
 import createSortAndParams from "./create-sort-and-params";
 import { Direction } from "../types";
 import createSkipLimitStr from "./create-skip-limit-str";
@@ -45,6 +46,10 @@ function createMatchProjectionAndParams({
 
         const nodeDirective = value.directives?.find(
             (x) => x.name.value === "node"
+        );
+
+        const whereDirective = value.directives?.find(
+            (x) => x.name.value === "where"
         );
 
         const edgeDirective = value.directives?.find(
@@ -177,7 +182,24 @@ function createMatchProjectionAndParams({
                     ...nodeMAndP[1],
                 };
 
-                const innerPath = `[ ${pathStr} | ${
+                let nW: string | undefined = undefined;
+                if (whereDirective) {
+                    const nodeWAndP = createWhereFromDirectiveAndParams({
+                        varName: refName,
+                        whereDirective,
+                        chainStr: `${param}_where`,
+                        variables,
+                    });
+                    if (nodeWAndP[0]) {
+                        nW = nodeWAndP[0];
+                        res.params = {
+                            ...res.params,
+                            ...nodeWAndP[1],
+                        };
+                    }
+                }
+
+                const innerPath = `[ ${pathStr} ${nW ? `WHERE ${nW}` : ""} | ${
                     nodeMAndP[0] || key
                 } ]${skipLimit}`;
 

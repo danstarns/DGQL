@@ -52,6 +52,61 @@ RETURN user
 
 ---
 
+### Match Node & Project Connection Node (with shorthand project and shorthand where)
+
+**Input GraphQL**
+
+```graphql
+{
+    MATCH {
+        user @node(label: User) {
+            PROJECT {
+                name
+                posts
+                    @edge(type: HAS_POST, direction: OUT)
+                    @node(label: Post)
+                    @where(id: "id") {
+                    content
+                }
+            }
+        }
+    }
+    RETURN {
+        user
+    }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    MATCH (user:User)
+    RETURN user {
+        name: user.name,
+        posts: [
+            (user)-[:HAS_POST]->(posts:Post) WHERE posts.id = $params.user_posts_where_id | {
+                content: posts.content
+            }
+        ]
+    } AS user
+}
+
+RETURN user
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+        "user_posts_where_id": "id"
+    }
+}
+```
+
+---
+
 ### Match Node & Project Connection Node + Paginate (with shorthand)
 
 **Input GraphQL**
