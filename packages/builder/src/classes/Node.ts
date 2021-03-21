@@ -1,7 +1,7 @@
 import Property from "./Property";
 
 interface NodeProjectInput {
-    [k: string]: unknown;
+    [k: string]: Property;
 }
 
 interface NodeInput {

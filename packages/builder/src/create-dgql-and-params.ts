@@ -211,16 +211,34 @@ function createMatchSelectionNodesAndParams({
                     }
 
                     if (entry[1].projectInput) {
-                        selections = Object.entries(entry[1].projectInput).map(
-                            (e) => {
+                        const projectionSelections = Object.entries(
+                            entry[1].projectInput
+                        )
+                            .filter((x) => x[1] instanceof Property)
+                            .map((e) => {
                                 const selection: SelectionNode = {
                                     kind: "Field",
                                     name: { kind: "Name", value: e[0] },
                                 };
 
                                 return selection;
-                            }
-                        );
+                            });
+
+                        if (projectionSelections.length) {
+                            const projectionSelection: SelectionNode = {
+                                kind: "Field",
+                                name: {
+                                    kind: "Name",
+                                    value: "PROJECT",
+                                },
+                                selectionSet: {
+                                    kind: "SelectionSet",
+                                    selections: projectionSelections,
+                                },
+                            };
+
+                            selections.push(projectionSelection);
+                        }
                     }
 
                     if (selections.length) {
