@@ -82,5 +82,54 @@ describe("match/projection", () => {
 
             expect(params).toEqual({});
         });
+
+        test("should project an edge node with where", () => {
+            const builder = new Builder();
+
+            const [dgql, params] = builder
+                .match({
+                    node: node({ label: "Node" }).project({
+                        id: property(),
+                        nodes: edge({
+                            type: "HAS_NODE",
+                            direction: "OUT",
+                            node: node({ label: "Node" }).where({
+                                id: property({ equal: "id" }),
+                            }),
+                        }).project({ id: property() }),
+                    }),
+                })
+                .return(["node"])
+                .build();
+
+            expect(print(parse(dgql))).toEqual(
+                print(
+                    parse(`
+                        {
+                            MATCH {
+                                node @node(label: Node) {
+                                    PROJECT {
+                                        id
+                                        nodes 
+                                        @edge(type: HAS_NODE, direction: OUT) 
+                                        @node(label: Node) 
+                                        @where(id: $match_node_nodes_where_id) {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                            RETURN {
+                                node
+                            }
+                        }
+                    `)
+                )
+            );
+
+            expect(params).toEqual({
+                match_node_nodes_where_id: "id",
+            });
+        });
     });
 });

@@ -96,6 +96,50 @@ function createWhereSelectionAndParams({
     return [whereSelection, params];
 }
 
+function createWhereDirectiveAndParams({
+    whereInput,
+    parentName,
+}: {
+    whereInput: WhereInput;
+    parentName: string;
+}): [DirectiveNode, any] {
+    const params = {};
+
+    const directive: DirectiveNode = {
+        kind: "Directive",
+        name: {
+            kind: "Name",
+            value: "where",
+        },
+        arguments: Object.entries(whereInput)
+            .filter((e) => e[1] instanceof Property)
+            .map((wI) => {
+                const paramName = `${parentName}_${wI[0]}`;
+
+                const arg: ArgumentNode = {
+                    kind: "Argument",
+                    name: {
+                        kind: "Name",
+                        value: wI[0],
+                    },
+                    value: {
+                        kind: "Variable",
+                        name: {
+                            kind: "Name",
+                            value: paramName,
+                        },
+                    },
+                };
+
+                params[paramName] = wI[0];
+
+                return arg;
+            }),
+    };
+
+    return [directive, params];
+}
+
 function createPaginationDirectiveNode({
     paginationInput,
 }: {
@@ -186,8 +230,10 @@ function createSortSelectionNode({
 
 function createProjectionSelectionAndParams({
     projectInput,
+    parentName,
 }: {
     projectInput: NodeProjectInput;
+    parentName: string;
 }): [FieldNode, any] {
     let params = {};
 
@@ -271,12 +317,24 @@ function createProjectionSelectionAndParams({
                     if (value.projectInput) {
                         const [sel, p] = createProjectionSelectionAndParams({
                             projectInput: value.projectInput as NodeProjectInput,
+                            parentName: `${parentName}_${key}`,
                         });
 
                         params = { ...params, ...p };
                         // @ts-ignore
                         selection.selectionSet?.selections = sel.selectionSet
                             ?.selections as FieldNode[];
+                    }
+
+                    if (value.node.whereInput) {
+                        const [whereDirec, p] = createWhereDirectiveAndParams({
+                            whereInput: value.node.whereInput,
+                            parentName: `${parentName}_${key}_where`,
+                        });
+                        params = { ...params, ...p };
+                        (selection.directives as DirectiveNode[]).push(
+                            whereDirec
+                        );
                     }
                 }
 
@@ -380,6 +438,7 @@ function createMatchSelectionNodesAndParams({
                             projectionSelection,
                             p,
                         ] = createProjectionSelectionAndParams({
+                            parentName: `match_${entry[0]}`,
                             projectInput: entry[1].projectInput,
                         });
                         params = { ...params, ...p };
