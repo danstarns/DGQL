@@ -55,10 +55,10 @@ const { Builder, node, property, edge } = require("@dgql/builder");
 
 const builder = new Builder();
 
-const [dgql, params] = builder
+const [dgql, variables] = builder
     .match({
         user: node({ label: "User" })
-            .where({ name: "Dan" })
+            .where({ name: property({ equal: "Dan" }) })
             .project({
                 id: property(),
                 name: property(),
