@@ -12,6 +12,12 @@ Dynamic Graph Query Language 👍
 
 > Take a look at the DGQL [recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes) section!
 
+1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine & Executable Client for DGQL Queries
+
+2. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
+
+3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
+
 ### Documentation
 
 You can find the [documentation here](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
@@ -24,7 +30,7 @@ GraphQL can be separated into two sections; language & execution. To truly under
 
 This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
-Given the below [DGQL Query]();
+Given the below DGQL Query;
 
 ```graphql
 {
@@ -111,6 +117,8 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ### Retrieve large subgraphs
 
+> 💡 See this query with the Builder [here](https://github.com/danstarns/DGQL/tree/main/packages/builder#match-blog)
+
 ```graphql
 {
     MATCH {
@@ -171,13 +179,3 @@ Sometimes you may have a highly specific question, Cypher could better help you 
     }
 }
 ```
-
-### Developer tooling
-
-Use the pre-made tools to develop with DGQL.
-
-1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine & Executable Client for DGQL Queries
-
-2. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
-
-3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
