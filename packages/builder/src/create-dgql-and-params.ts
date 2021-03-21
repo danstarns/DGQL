@@ -5,6 +5,7 @@ import {
     print,
     SelectionSetNode,
     ArgumentNode,
+    DirectiveNode,
 } from "graphql";
 import { Node, Property } from "./classes";
 
@@ -121,6 +122,44 @@ function createMatchSelectionNodesAndParams({
                         };
 
                         selections.push(whereSelection);
+                    }
+
+                    if (entry[1].paginationInput) {
+                        const { skip, limit } = entry[1].paginationInput;
+
+                        const directive: DirectiveNode = {
+                            kind: "Directive",
+                            name: { kind: "Name", value: "pagination" },
+                            arguments: [],
+                        };
+
+                        if (typeof skip === "number") {
+                            const arg: ArgumentNode = {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "skip" },
+                                value: {
+                                    kind: "IntValue",
+                                    value: skip.toString(),
+                                },
+                            };
+
+                            (directive.arguments as ArgumentNode[]).push(arg);
+                        }
+
+                        if (typeof limit === "number") {
+                            const arg: ArgumentNode = {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "limit" },
+                                value: {
+                                    kind: "IntValue",
+                                    value: limit.toString(),
+                                },
+                            };
+
+                            (directive.arguments as ArgumentNode[]).push(arg);
+                        }
+
+                        (field.directives as DirectiveNode[]).push(directive);
                     }
 
                     if (entry[1].projectInput) {

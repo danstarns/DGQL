@@ -1,5 +1,5 @@
 import { Builder, node } from "../../../src";
-import { lexicographicSortSchema, parse, print } from "graphql";
+import { parse, print } from "graphql";
 
 describe("match", () => {
     test("should match and return a node", () => {

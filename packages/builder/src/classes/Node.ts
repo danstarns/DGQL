@@ -6,10 +6,16 @@ interface NodeInput {
     label?: string;
 }
 
+interface NodePagination {
+    skip?: number;
+    limit?: number;
+}
+
 class Node {
     label?: string;
     whereInput?: Record<string, unknown>;
     projectInput?: NodeProjectInput;
+    paginationInput?: NodePagination;
 
     constructor(input: NodeInput = {}) {
         this.label = input.label;
@@ -23,6 +29,12 @@ class Node {
 
     project(input: NodeProjectInput): Node {
         this.projectInput = input;
+
+        return this;
+    }
+
+    pagination(input: NodePagination): Node {
+        this.paginationInput = input;
 
         return this;
     }
