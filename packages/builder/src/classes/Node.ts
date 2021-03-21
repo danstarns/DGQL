@@ -12,6 +12,10 @@ interface NodeSort {
     [k: string]: Property;
 }
 
+export interface WhereInput {
+    [k: string]: Property;
+}
+
 interface NodePagination {
     skip?: number;
     limit?: number;
@@ -20,7 +24,7 @@ interface NodePagination {
 
 class Node {
     label?: string;
-    whereInput?: Record<string, unknown>;
+    whereInput?: WhereInput;
     projectInput?: NodeProjectInput;
     paginationInput?: NodePagination;
 
@@ -28,7 +32,7 @@ class Node {
         this.label = input.label;
     }
 
-    where(input: Record<string, unknown>): Node {
+    where(input: WhereInput): Node {
         this.whereInput = input;
 
         return this;

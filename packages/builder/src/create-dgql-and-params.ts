@@ -7,7 +7,7 @@ import {
     ArgumentNode,
     DirectiveNode,
 } from "graphql";
-import { Node, Property } from "./classes";
+import { Node, Property, WhereInput } from "./classes";
 
 function createReturnSelection(returnStrings: string[]): SelectionNode {
     return {
@@ -31,12 +31,69 @@ function createReturnSelection(returnStrings: string[]): SelectionNode {
     };
 }
 
+function createWhereSelectionAndParams({
+    whereInput,
+    parentName,
+}: {
+    whereInput: WhereInput;
+    parentName: string;
+}): [SelectionNode, any] {
+    const params = {};
+
+    const whereSelection: SelectionNode = {
+        kind: "Field",
+        name: { kind: "Name", value: "WHERE" },
+        selectionSet: {
+            kind: "SelectionSet",
+            selections: Object.entries(whereInput)
+                .filter((e) => e[1] instanceof Property)
+                .map((e) => {
+                    const field: FieldNode = {
+                        kind: "Field",
+                        name: { kind: "Name", value: e[0] },
+                    };
+                    const property = e[1] as Property;
+                    const args: ArgumentNode[] = [];
+
+                    if (property.equal !== undefined) {
+                        let paramName = `${parentName}_${e[0]}_equal`;
+
+                        params[paramName] = property.equal;
+
+                        args.push({
+                            kind: "Argument",
+                            name: {
+                                kind: "Name",
+                                value: "equal",
+                            },
+                            value: {
+                                kind: "Variable",
+                                name: {
+                                    kind: "Name",
+                                    value: paramName,
+                                },
+                            },
+                        });
+                    }
+
+                    if (args.length) {
+                        (field.arguments as ArgumentNode[]) = args;
+                    }
+
+                    return field;
+                }),
+        },
+    };
+
+    return [whereSelection, params];
+}
+
 function createMatchSelectionNodesAndParams({
     matches,
 }: {
     matches: { [k: string]: Node }[];
 }): [SelectionNode[], any] {
-    const params = {};
+    let params = {};
 
     const matchSelectionNodes: SelectionNode[] = matches.map((match) => {
         const selection: SelectionNode = {
@@ -76,51 +133,15 @@ function createMatchSelectionNodesAndParams({
                     let selections: SelectionNode[] = [];
 
                     if (entry[1].whereInput) {
-                        const whereSelection: SelectionNode = {
-                            kind: "Field",
-                            name: { kind: "Name", value: "WHERE" },
-                            selectionSet: {
-                                kind: "SelectionSet",
-                                selections: Object.entries(entry[1].whereInput)
-                                    .filter((e) => e[1] instanceof Property)
-                                    .map((e) => {
-                                        const field: FieldNode = {
-                                            kind: "Field",
-                                            name: { kind: "Name", value: e[0] },
-                                        };
-                                        const property = e[1] as Property;
-                                        const args: ArgumentNode[] = [];
+                        const [
+                            whereSelection,
+                            p,
+                        ] = createWhereSelectionAndParams({
+                            parentName: `match_${entry[0]}`,
+                            whereInput: entry[1].whereInput,
+                        });
 
-                                        if (property.equal !== undefined) {
-                                            let paramName = `match_${entry[0]}_${e[0]}_equal`;
-
-                                            params[paramName] = property.equal;
-
-                                            args.push({
-                                                kind: "Argument",
-                                                name: {
-                                                    kind: "Name",
-                                                    value: "equal",
-                                                },
-                                                value: {
-                                                    kind: "Variable",
-                                                    name: {
-                                                        kind: "Name",
-                                                        value: paramName,
-                                                    },
-                                                },
-                                            });
-                                        }
-
-                                        if (args.length) {
-                                            (field.arguments as ArgumentNode[]) = args;
-                                        }
-
-                                        return field;
-                                    }),
-                            },
-                        };
-
+                        params = { ...params, ...p };
                         selections.push(whereSelection);
                     }
 
