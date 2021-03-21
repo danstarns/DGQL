@@ -8,7 +8,7 @@ interface NodeInput {
     label?: string;
 }
 
-interface NodeSort {
+export interface NodeSort {
     [k: string]: Property;
 }
 
@@ -16,7 +16,7 @@ export interface WhereInput {
     [k: string]: Property;
 }
 
-interface NodePagination {
+export interface NodePagination {
     skip?: number;
     limit?: number;
     sort?: NodeSort;

@@ -7,7 +7,13 @@ import {
     ArgumentNode,
     DirectiveNode,
 } from "graphql";
-import { Node, Property, WhereInput } from "./classes";
+import {
+    Node,
+    Property,
+    WhereInput,
+    NodePagination,
+    NodeSort,
+} from "./classes";
 
 function createReturnSelection(returnStrings: string[]): SelectionNode {
     return {
@@ -88,6 +94,94 @@ function createWhereSelectionAndParams({
     return [whereSelection, params];
 }
 
+function createPaginationDirectiveNode({
+    paginationInput,
+}: {
+    paginationInput: NodePagination;
+}): DirectiveNode {
+    const { skip, limit } = paginationInput;
+
+    const directive: DirectiveNode = {
+        kind: "Directive",
+        name: { kind: "Name", value: "pagination" },
+        arguments: [],
+    };
+
+    if (typeof skip === "number") {
+        const arg: ArgumentNode = {
+            kind: "Argument",
+            name: { kind: "Name", value: "skip" },
+            value: {
+                kind: "IntValue",
+                value: skip.toString(),
+            },
+        };
+
+        (directive.arguments as ArgumentNode[]).push(arg);
+    }
+
+    if (typeof limit === "number") {
+        const arg: ArgumentNode = {
+            kind: "Argument",
+            name: { kind: "Name", value: "limit" },
+            value: {
+                kind: "IntValue",
+                value: limit.toString(),
+            },
+        };
+
+        (directive.arguments as ArgumentNode[]).push(arg);
+    }
+
+    return directive;
+}
+
+function createSortSelectionNode({
+    sortInput,
+}: {
+    sortInput: NodeSort;
+}): SelectionNode {
+    const selection: SelectionNode = {
+        kind: "Field",
+        name: { kind: "Name", value: "SORT" },
+        selectionSet: {
+            kind: "SelectionSet",
+            selections: Object.entries(sortInput)
+                .filter((p) => p[1] instanceof Property)
+                .map((p) => {
+                    const field: FieldNode = {
+                        kind: "Field",
+                        name: {
+                            kind: "Name",
+                            value: p[0],
+                        },
+                        arguments: [],
+                    };
+
+                    if (p[1].direction) {
+                        const arg: ArgumentNode = {
+                            kind: "Argument",
+                            name: {
+                                kind: "Name",
+                                value: "direction",
+                            },
+                            value: {
+                                kind: "EnumValue",
+                                value: p[1].direction,
+                            },
+                        };
+
+                        (field.arguments as ArgumentNode[]).push(arg);
+                    }
+
+                    return field;
+                }),
+        },
+    };
+
+    return selection;
+}
+
 function createMatchSelectionNodesAndParams({
     matches,
 }: {
@@ -146,39 +240,9 @@ function createMatchSelectionNodesAndParams({
                     }
 
                     if (entry[1].paginationInput) {
-                        const { skip, limit, sort } = entry[1].paginationInput;
-
-                        const directive: DirectiveNode = {
-                            kind: "Directive",
-                            name: { kind: "Name", value: "pagination" },
-                            arguments: [],
-                        };
-
-                        if (typeof skip === "number") {
-                            const arg: ArgumentNode = {
-                                kind: "Argument",
-                                name: { kind: "Name", value: "skip" },
-                                value: {
-                                    kind: "IntValue",
-                                    value: skip.toString(),
-                                },
-                            };
-
-                            (directive.arguments as ArgumentNode[]).push(arg);
-                        }
-
-                        if (typeof limit === "number") {
-                            const arg: ArgumentNode = {
-                                kind: "Argument",
-                                name: { kind: "Name", value: "limit" },
-                                value: {
-                                    kind: "IntValue",
-                                    value: limit.toString(),
-                                },
-                            };
-
-                            (directive.arguments as ArgumentNode[]).push(arg);
-                        }
+                        const directive = createPaginationDirectiveNode({
+                            paginationInput: entry[1].paginationInput,
+                        });
 
                         if (directive.arguments?.length) {
                             (field.directives as DirectiveNode[]).push(
@@ -186,46 +250,10 @@ function createMatchSelectionNodesAndParams({
                             );
                         }
 
-                        if (sort) {
-                            const selection: SelectionNode = {
-                                kind: "Field",
-                                name: { kind: "Name", value: "SORT" },
-                                selectionSet: {
-                                    kind: "SelectionSet",
-                                    selections: Object.entries(sort)
-                                        .filter((p) => p[1] instanceof Property)
-                                        .map((p) => {
-                                            const field: FieldNode = {
-                                                kind: "Field",
-                                                name: {
-                                                    kind: "Name",
-                                                    value: p[0],
-                                                },
-                                                arguments: [],
-                                            };
-
-                                            if (p[1].direction) {
-                                                const arg: ArgumentNode = {
-                                                    kind: "Argument",
-                                                    name: {
-                                                        kind: "Name",
-                                                        value: "direction",
-                                                    },
-                                                    value: {
-                                                        kind: "EnumValue",
-                                                        value: p[1].direction,
-                                                    },
-                                                };
-
-                                                (field.arguments as ArgumentNode[]).push(
-                                                    arg
-                                                );
-                                            }
-
-                                            return field;
-                                        }),
-                                },
-                            };
+                        if (entry[1].paginationInput?.sort) {
+                            const selection = createSortSelectionNode({
+                                sortInput: entry[1].paginationInput.sort,
+                            });
 
                             selections.push(selection);
                         }
