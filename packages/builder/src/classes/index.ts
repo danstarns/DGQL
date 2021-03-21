@@ -1,4 +1,10 @@
 export { default as Builder } from "./Builder";
-export { default as Node, WhereInput, NodePagination, NodeSort } from "./Node";
+export {
+    default as Node,
+    WhereInput,
+    NodePagination,
+    NodeSort,
+    NodeProjectInput,
+} from "./Node";
 export { default as Property } from "./Property";
 export { default as Edge } from "./Edge";

@@ -13,6 +13,7 @@ import {
     WhereInput,
     NodePagination,
     NodeSort,
+    NodeProjectInput,
 } from "./classes";
 
 function createReturnSelection(returnStrings: string[]): SelectionNode {
@@ -182,6 +183,38 @@ function createSortSelectionNode({
     return selection;
 }
 
+function createProjectionSelectionAndParams({
+    projectInput,
+}: {
+    projectInput: NodeProjectInput;
+}): [SelectionNode, any] {
+    const params = {};
+    const projectionSelections = Object.entries(projectInput)
+        .filter((x) => x[1] instanceof Property)
+        .map((e) => {
+            const selection: SelectionNode = {
+                kind: "Field",
+                name: { kind: "Name", value: e[0] },
+            };
+
+            return selection;
+        });
+
+    const projectionSelection: SelectionNode = {
+        kind: "Field",
+        name: {
+            kind: "Name",
+            value: "PROJECT",
+        },
+        selectionSet: {
+            kind: "SelectionSet",
+            selections: projectionSelections,
+        },
+    };
+
+    return [projectionSelection, params];
+}
+
 function createMatchSelectionNodesAndParams({
     matches,
 }: {
@@ -234,7 +267,6 @@ function createMatchSelectionNodesAndParams({
                             parentName: `match_${entry[0]}`,
                             whereInput: entry[1].whereInput,
                         });
-
                         params = { ...params, ...p };
                         selections.push(whereSelection);
                     }
@@ -260,34 +292,14 @@ function createMatchSelectionNodesAndParams({
                     }
 
                     if (entry[1].projectInput) {
-                        const projectionSelections = Object.entries(
-                            entry[1].projectInput
-                        )
-                            .filter((x) => x[1] instanceof Property)
-                            .map((e) => {
-                                const selection: SelectionNode = {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: e[0] },
-                                };
-
-                                return selection;
-                            });
-
-                        if (projectionSelections.length) {
-                            const projectionSelection: SelectionNode = {
-                                kind: "Field",
-                                name: {
-                                    kind: "Name",
-                                    value: "PROJECT",
-                                },
-                                selectionSet: {
-                                    kind: "SelectionSet",
-                                    selections: projectionSelections,
-                                },
-                            };
-
-                            selections.push(projectionSelection);
-                        }
+                        const [
+                            projectionSelection,
+                            p,
+                        ] = createProjectionSelectionAndParams({
+                            projectInput: entry[1].projectInput,
+                        });
+                        params = { ...params, ...p };
+                        selections.push(projectionSelection);
                     }
 
                     if (selections.length) {

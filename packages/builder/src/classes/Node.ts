@@ -1,6 +1,6 @@
 import Property from "./Property";
 
-interface NodeProjectInput {
+export interface NodeProjectInput {
     [k: string]: Property;
 }
 
