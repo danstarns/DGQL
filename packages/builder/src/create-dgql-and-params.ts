@@ -11,7 +11,7 @@ import {
     Node,
     Property,
     WhereInput,
-    NodePagination,
+    NodePaginate,
     NodeSort,
     NodeProjectInput,
     Edge,
@@ -141,15 +141,15 @@ function createWhereDirectiveAndParams({
 }
 
 function createPaginationDirectiveNode({
-    paginationInput,
+    paginateInput,
 }: {
-    paginationInput: NodePagination;
+    paginateInput: NodePaginate;
 }): DirectiveNode {
-    const { skip, limit } = paginationInput;
+    const { skip, limit } = paginateInput;
 
     const directive: DirectiveNode = {
         kind: "Directive",
-        name: { kind: "Name", value: "pagination" },
+        name: { kind: "Name", value: "paginate" },
         arguments: [],
     };
 
@@ -413,9 +413,9 @@ function createMatchSelectionNodesAndParams({
                         selections.push(whereSelection);
                     }
 
-                    if (entry[1].paginationInput) {
+                    if (entry[1].paginateInput) {
                         const directive = createPaginationDirectiveNode({
-                            paginationInput: entry[1].paginationInput,
+                            paginateInput: entry[1].paginateInput,
                         });
 
                         if (directive.arguments?.length) {
@@ -424,9 +424,9 @@ function createMatchSelectionNodesAndParams({
                             );
                         }
 
-                        if (entry[1].paginationInput?.sort) {
+                        if (entry[1].paginateInput?.sort) {
                             const selection = createSortSelectionNode({
-                                sortInput: entry[1].paginationInput.sort,
+                                sortInput: entry[1].paginateInput.sort,
                             });
 
                             selections.push(selection);

@@ -2,7 +2,7 @@ export { default as Builder } from "./Builder";
 export {
     default as Node,
     WhereInput,
-    NodePagination,
+    NodePaginate,
     NodeSort,
     NodeProjectInput,
 } from "./Node";

@@ -17,7 +17,7 @@ export interface WhereInput {
     [k: string]: Property;
 }
 
-export interface NodePagination {
+export interface NodePaginate {
     skip?: number;
     limit?: number;
     sort?: NodeSort;
@@ -27,7 +27,7 @@ class Node {
     label?: string;
     whereInput?: WhereInput;
     projectInput?: NodeProjectInput;
-    paginationInput?: NodePagination;
+    paginateInput?: NodePaginate;
 
     constructor(input: NodeInput = {}) {
         this.label = input.label;
@@ -45,8 +45,8 @@ class Node {
         return this;
     }
 
-    pagination(input: NodePagination): Node {
-        this.paginationInput = input;
+    paginate(input: NodePaginate): Node {
+        this.paginateInput = input;
 
         return this;
     }

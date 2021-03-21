@@ -1,14 +1,14 @@
 import { Builder, node, property } from "../../../src";
 import { parse, print } from "graphql";
 
-describe("match/pagination", () => {
+describe("match/paginate", () => {
     describe("limit", () => {
         test("should match and limit a node", () => {
             const builder = new Builder();
 
             const [dgql, params] = builder
                 .match({
-                    node: node({ label: "Node" }).pagination({ limit: 10 }),
+                    node: node({ label: "Node" }).paginate({ limit: 10 }),
                 })
                 .return(["node"])
                 .build();
@@ -18,7 +18,7 @@ describe("match/pagination", () => {
                     parse(`
                         {
                             MATCH {
-                                node @node(label: Node) @pagination(limit: 10)
+                                node @node(label: Node) @paginate(limit: 10)
                             }
                             RETURN {
                                 node
@@ -38,7 +38,7 @@ describe("match/pagination", () => {
 
             const [dgql, params] = builder
                 .match({
-                    node: node({ label: "Node" }).pagination({ skip: 10 }),
+                    node: node({ label: "Node" }).paginate({ skip: 10 }),
                 })
                 .return(["node"])
                 .build();
@@ -48,7 +48,7 @@ describe("match/pagination", () => {
                     parse(`
                         {
                             MATCH {
-                                node @node(label: Node) @pagination(skip: 10)
+                                node @node(label: Node) @paginate(skip: 10)
                             }
                             RETURN {
                                 node
@@ -68,7 +68,7 @@ describe("match/pagination", () => {
 
             const [dgql, params] = builder
                 .match({
-                    node: node({ label: "Node" }).pagination({
+                    node: node({ label: "Node" }).paginate({
                         sort: { id: property({ direction: "DESC" }) },
                     }),
                 })
