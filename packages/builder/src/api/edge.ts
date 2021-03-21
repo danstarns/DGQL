@@ -1,5 +1,4 @@
-import { Edge } from "../classes";
-import { EdgeInput } from "../types";
+import { Edge, EdgeInput } from "../classes";
 
 function edge(input: EdgeInput) {
     return new Edge(input);

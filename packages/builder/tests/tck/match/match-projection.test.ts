@@ -1,40 +1,86 @@
-import { Builder, node, property } from "../../../src";
+import { Builder, edge, node, property } from "../../../src";
 import { parse, print } from "graphql";
 
 describe("match/projection", () => {
-    test("should match and project many node property", () => {
-        const builder = new Builder();
+    describe("property", () => {
+        test("should match and project many node property", () => {
+            const builder = new Builder();
 
-        const [dgql, params] = builder
-            .match({
-                node: node({ label: "Node" }).project({
-                    id: property(),
-                    name: property(),
-                }),
-            })
-            .return(["node"])
-            .build();
+            const [dgql, params] = builder
+                .match({
+                    node: node({ label: "Node" }).project({
+                        id: property(),
+                        name: property(),
+                    }),
+                })
+                .return(["node"])
+                .build();
 
-        expect(print(parse(dgql))).toEqual(
-            print(
-                parse(`
-                    {
-                        MATCH {
-                            node @node(label: Node) {
-                                PROJECT {
-                                    id
-                                    name
+            expect(print(parse(dgql))).toEqual(
+                print(
+                    parse(`
+                        {
+                            MATCH {
+                                node @node(label: Node) {
+                                    PROJECT {
+                                        id
+                                        name
+                                    }
                                 }
                             }
+                            RETURN {
+                                node
+                            }
                         }
-                        RETURN {
-                            node
-                        }
-                    }
-                `)
-            )
-        );
+                    `)
+                )
+            );
 
-        expect(params).toEqual({});
+            expect(params).toEqual({});
+        });
+    });
+
+    describe("edge", () => {
+        test("should project an edge node", () => {
+            const builder = new Builder();
+
+            const [dgql, params] = builder
+                .match({
+                    node: node({ label: "Node" }).project({
+                        id: property(),
+                        nodes: edge({
+                            type: "HAS_NODE",
+                            direction: "OUT",
+                            node: node({ label: "Node" }),
+                        }).project({ id: property() }),
+                    }),
+                })
+                .return(["node"])
+                .build();
+
+            expect(print(parse(dgql))).toEqual(
+                print(
+                    parse(`
+                        {
+                            MATCH {
+                                node @node(label: Node) {
+                                    PROJECT {
+                                        id
+                                        nodes @edge(type: HAS_NODE, direction: OUT) @node(label: Node) {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                            RETURN {
+                                node
+                            }
+                        }
+                    `)
+                )
+            );
+
+            expect(params).toEqual({});
+        });
     });
 });

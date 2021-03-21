@@ -1,7 +1,8 @@
 import Property from "./Property";
+import Edge from "./Edge";
 
 export interface NodeProjectInput {
-    [k: string]: Property;
+    [k: string]: Property | Edge;
 }
 
 interface NodeInput {
