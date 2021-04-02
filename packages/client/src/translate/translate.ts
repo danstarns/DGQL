@@ -4,54 +4,63 @@ import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
 
 function translate({
-    query,
-    variables = {},
+  query,
+  variables = {},
 }: {
-    query: Query;
-    variables?: Record<string, unknown>;
+  query: Query;
+  variables?: Record<string, unknown>;
 }): Translation {
-    const document = queryToDocument(query);
-    const root = document.definitions[0] as OperationDefinitionNode;
-    const cyphers: string[] = [];
-    let params: Record<string, unknown> = {};
-    const selections = root.selectionSet.selections;
-    const matches = selections.filter(
-        (f) => f.kind === "Field" && ["MATCH"].includes(f.name.value)
-    ) as FieldNode[];
-    const returnField = selections.find(
-        (f) => f.kind === "Field" && ["RETURN"].includes(f.name.value)
-    ) as FieldNode;
-    const returnVariables = ((returnField?.selectionSet?.selections ||
-        []) as FieldNode[]).map((s: FieldNode) => s.name.value);
+  const cyphers: string[] = [];
+  let params: Record<string, unknown> = {};
 
-    matches.forEach((field: SelectionNode) => {
-        if (field.kind !== "Field") {
-            return;
-        }
+  const document = queryToDocument(query);
+  const root = document.definitions[0] as OperationDefinitionNode;
+  const selections = root.selectionSet.selections;
 
-        if (field.name.value !== "MATCH") {
-            return;
-        }
+  let returnSelection: FieldNode | undefined;
 
-        const [match, mParams] = createMatchAndParams({
-            matchField: field,
-            variables,
-        });
-        cyphers.push(match);
-        params = { ...params, ...mParams };
-    });
-
-    if (returnField) {
-        cyphers.push(`RETURN ${returnVariables.join(", ")}`);
+  selections.forEach((selection) => {
+    if (selection.kind !== "Field") {
+      throw new Error("Fields are only supported here");
     }
 
-    params = { params: { ...params } };
+    const validSelections = ["MATCH", "CREATE", "RETURN"];
+    if (!validSelections.includes(selection.name.value)) {
+      throw new Error(`Invalid selection: ${selection.name.value}`);
+    }
 
-    return {
-        cypher: cyphers.join("\n"),
-        params,
-        returnVariables,
-    };
+    if (selection.name.value === "RETURN") {
+      returnSelection = selection;
+
+      return;
+    }
+
+    if (selection.name.value === "MATCH") {
+      const [match, mParams] = createMatchAndParams({
+        matchField: selection,
+        variables,
+      });
+      cyphers.push(match);
+      params = { ...params, ...mParams };
+
+      return;
+    }
+  });
+
+  let returnVariables: string[] = [];
+  if (returnSelection) {
+    returnVariables = ((returnSelection.selectionSet?.selections ||
+      []) as FieldNode[]).map((s: FieldNode) => s.name.value);
+    cyphers.push(`RETURN ${returnVariables.join(", ")}`);
+  }
+
+  params = { params: { ...params } };
+
+  return {
+    cypher: cyphers.join("\n"),
+    params,
+    returnVariables,
+  };
 }
 
 export default translate;
