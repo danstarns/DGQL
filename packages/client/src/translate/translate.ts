@@ -2,6 +2,7 @@ import { FieldNode, OperationDefinitionNode, SelectionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
+import createCreateAndParams from "./create-create-and-params";
 
 function translate({
   query,
@@ -37,6 +38,17 @@ function translate({
 
     if (selection.name.value === "MATCH") {
       const [match, mParams] = createMatchAndParams({
+        matchField: selection,
+        variables,
+      });
+      cyphers.push(match);
+      params = { ...params, ...mParams };
+
+      return;
+    }
+
+    if (selection.name.value === "CREATE") {
+      const [match, mParams] = createCreateAndParams({
         matchField: selection,
         variables,
       });
