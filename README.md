@@ -16,7 +16,7 @@ Dynamic Graph Query Language 👍
 
 2. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
 
-3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Developer playground to issue DGQL queries
+3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Graph app Developer playground to issue DGQL queries
 
 ### Documentation
 
@@ -34,23 +34,23 @@ Given the below DGQL Query;
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                name(equal: "Dan")
-            }
-            PROJECT {
-                id
-                name
-                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
-                    title
-                }
-            }
+  MATCH {
+    user @node(label: User) {
+      WHERE {
+        name(equal: "Dan")
+      }
+      PROJECT {
+        id
+        name
+        posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+          title
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -62,23 +62,23 @@ const { Builder, node, property, edge } = require("@dgql/builder");
 const builder = new Builder();
 
 const [dgql, variables] = builder
-    .match({
-        user: node({ label: "User" })
-            .where({ name: property({ equal: "Dan" }) })
-            .project({
-                id: property(),
-                name: property(),
-                posts: edge({
-                    type: "HAS_POST",
-                    direction: "OUT",
-                    node: node({ label: "Post" }),
-                }).project({
-                    title: property(),
-                }),
-            }),
-    })
-    .return(["user"])
-    .build();
+  .match({
+    user: node({ label: "User" })
+      .where({ name: property({ equal: "Dan" }) })
+      .project({
+        id: property(),
+        name: property(),
+        posts: edge({
+          type: "HAS_POST",
+          direction: "OUT",
+          node: node({ label: "Post" }),
+        }).project({
+          title: property(),
+        }),
+      }),
+  })
+  .return(["user"])
+  .build();
 ```
 
 The following Cypher is produced;
@@ -97,11 +97,11 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ```json
 {
-    "user": {
-        "id": "user-id-01",
-        "name": "Dan",
-        "posts": [{ "title": "Checkout DGQL!" }]
-    }
+  "user": {
+    "id": "user-id-01",
+    "name": "Dan",
+    "posts": [{ "title": "Checkout DGQL!" }]
+  }
 }
 ```
 
@@ -121,29 +121,27 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ```graphql
 {
-    MATCH {
-        blogs @node(label: Blog) {
-            PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
-                    title
-                    comments
-                        @edge(type: HAS_COMMENT, direction: OUT)
-                        @node(label: Comment) {
-                        content
-                        authors
-                            @edge(type: COMMENTED, direction: IN)
-                            @node(label: User) {
-                            email
-                        }
-                    }
-                }
+  MATCH {
+    blogs @node(label: Blog) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+          title
+          comments
+            @edge(type: HAS_COMMENT, direction: OUT)
+            @node(label: Comment) {
+            content
+            authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
+              email
             }
+          }
         }
+      }
     }
-    RETURN {
-        blogs
-    }
+  }
+  RETURN {
+    blogs
+  }
 }
 ```
 
@@ -153,29 +151,84 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 
 ```graphql
 {
-    MATCH {
-        movies @node(label: Movie) {
-            PROJECT {
-                title
-                similar
-                    @cypher(
-                        arguments: { first: 3 }
-                        statement: """
-                        MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
-                        WITH rec, COUNT(*) AS score
-                        RETURN rec ORDER BY score DESC LIMIT $first
-                        """
-                    ) {
-                    title
-                    actors @edge(type: ACTED_IN, direction: IN) @node {
-                        name
-                    }
-                }
-            }
+  MATCH {
+    movies @node(label: Movie) {
+      PROJECT {
+        title
+        similar
+          @cypher(
+            arguments: { first: 3 }
+            statement: """
+            MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
+            WITH rec, COUNT(*) AS score
+            RETURN rec ORDER BY score DESC LIMIT $first
+            """
+          ) {
+          title
+          actors @edge(type: ACTED_IN, direction: IN) @node {
+            name
+          }
         }
+      }
     }
-    RETURN {
-        movies
+  }
+  RETURN {
+    movies
+  }
+}
+```
+
+### Build large subgraphs
+
+[![Image from Gyazo](https://i.gyazo.com/238741dc134077fdadfacb638c80225e.png)](https://gyazo.com/238741dc134077fdadfacb638c80225e)
+
+```graphql
+{
+  CREATE {
+    product @node(label: Product) {
+      SET {
+        id(value: "pringles_product_id")
+        name(value: "Pringles")
+      }
+      CREATE @edge(type: HAS_PHOTO, direction: OUT) {
+        NODE(label: Photo) {
+          SET {
+            id(value: "green_photo_id")
+            url(value: "green_photo_url.com")
+            name(value: "Green photo")
+          }
+          CONNECT @edge(type: HAS_COLOR, direction: OUT) {
+            NODE(label: Color) {
+              WHERE {
+                name(equal: "Green")
+              }
+            }
+          }
+        }
+      }
+      CREATE @edge(type: HAS_PHOTO, direction: OUT) {
+        NODE(label: Photo) {
+          SET {
+            id(value: "red_photo_id")
+            url(value: "red_photo_url.com")
+            name(value: "Red photo")
+          }
+          CONNECT @edge(type: HAS_COLOR, direction: OUT) {
+            NODE(label: Color) {
+              WHERE {
+                name(equal: "Red")
+              }
+            }
+          }
+        }
+      }
+      PROJECT {
+        id
+      }
     }
+  }
+  RETURN {
+    product
+  }
 }
 ```
