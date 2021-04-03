@@ -1,36 +1,36 @@
-import Node from "./Node";
 import createDGQLAndParams from "../create-dgql-and-params";
-interface MatchInput {
-    [k: string]: Node;
-}
+import type { MatchInput, CreateInput, Operation } from "../types";
 
 class Builder {
-    matches: MatchInput[];
+  operations: Operation[];
+  returnInput?: string[];
 
-    returnInput?: string[];
+  constructor() {
+    this.operations = [];
+  }
 
-    constructor() {
-        this.matches = [];
-    }
+  match(input: MatchInput): Builder {
+    this.operations.push({ kind: "MATCH", input });
+    return this;
+  }
 
-    match(input: MatchInput): Builder {
-        this.matches.push(input);
+  create(input: CreateInput): Builder {
+    this.operations.push({ kind: "CREATE", input });
+    return this;
+  }
 
-        return this;
-    }
+  return(input: string[]): Builder {
+    this.returnInput = input;
 
-    return(input: string[]): Builder {
-        this.returnInput = input;
+    return this;
+  }
 
-        return this;
-    }
-
-    build(): [string, Record<string, unknown>] {
-        return createDGQLAndParams({
-            matches: this.matches || [],
-            returnStrings: this.returnInput || [],
-        });
-    }
+  build(): [string, Record<string, unknown>] {
+    return createDGQLAndParams({
+      operations: this.operations,
+      returnStrings: this.returnInput || [],
+    });
+  }
 }
 
 export default Builder;
