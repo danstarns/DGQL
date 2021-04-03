@@ -1,18 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es6",     
     "module": "commonjs", 
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
+    "strict": true,       
+    "esModuleInterop": true,       
+    "skipLibCheck": true, 
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "../",
     "lib": [
       "es2019",
       "ESNext.Array"
     ],
-    "noImplicitAny": false
+    "noImplicitAny": false,
   },
-  "exclude": ["./tests**"]
 }

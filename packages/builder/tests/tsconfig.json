@@ -13,6 +13,5 @@
       "ESNext.Array"
     ],
     "noImplicitAny": false,
-  },
-  "exclude": ["./tests**"]
+  }
 }
