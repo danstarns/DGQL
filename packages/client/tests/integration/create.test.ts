@@ -49,4 +49,44 @@ describe("create", () => {
       await session.close();
     }
   });
+
+  test("should create a node with property", async () => {
+    const session = driver.session();
+
+    const client = new Client({ driver });
+
+    const id = generate({
+      charset: "alphabetic",
+    });
+
+    const query = `
+        {
+            CREATE {
+                node @node {
+                  SET {
+                    id(value: "${id}")
+                  }
+                }
+            }
+            RETURN {
+                node
+            }
+        }
+    `;
+
+    try {
+      await client.run({ query });
+
+      const find = await session.run(
+        `
+            MATCH (n {id: "${id}"})
+            RETURN n
+        `
+      );
+
+      expect(find.records[0]).toBeTruthy();
+    } finally {
+      await session.close();
+    }
+  });
 });
