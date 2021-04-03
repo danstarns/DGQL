@@ -15,7 +15,7 @@ import {
   NodeProjectInput,
   Edge,
 } from "./classes";
-import type { CreateInput, MatchInput, Operation } from "./types";
+import type { CreateInput, MatchInput, Operation, SetInput } from "./types";
 
 function createReturnSelection(returnStrings: string[]): SelectionNode {
   return {
@@ -445,6 +445,65 @@ function createMatchSelectionNodeAndParams({
   return [selection, params];
 }
 
+function createSetSelectionAndParams({
+  parentName,
+  setInput,
+}: {
+  parentName: string;
+  setInput: SetInput;
+}): [FieldNode, any] {
+  let params = {};
+
+  const field: FieldNode = {
+    kind: "Field",
+    name: {
+      kind: "Name",
+
+      value: "SET",
+    },
+    selectionSet: { kind: "SelectionSet", selections: [] },
+  };
+
+  Object.entries(setInput)
+    .filter((entry) => entry[1] instanceof Property)
+    .forEach((entry) => {
+      const property = entry[1] as Property;
+      const selection: FieldNode = {
+        kind: "Field",
+        name: { kind: "Name", value: entry[0] },
+      };
+
+      if (!property.value) {
+        throw new Error("SET property value required");
+      }
+
+      const args: ArgumentNode[] = [];
+      const value = property.value;
+      const paramName = `${parentName}_${entry[0]}`;
+
+      args.push({
+        kind: "Argument",
+        name: {
+          kind: "Name",
+          value: "value",
+        },
+        value: {
+          kind: "Variable",
+          name: {
+            kind: "Name",
+            value: paramName,
+          },
+        },
+      });
+
+      (selection.arguments as ArgumentNode[]) = args;
+      params[paramName] = value;
+      (field.selectionSet?.selections as SelectionNode[]).push(selection);
+    });
+
+  return [field, params];
+}
+
 function createCreateSelectionNodeAndParams({
   create,
 }: {
@@ -484,7 +543,20 @@ function createCreateSelectionNodeAndParams({
                 : {}),
             },
           ],
+          selectionSet: {
+            kind: "SelectionSet",
+            selections: [],
+          },
         };
+
+        if (entry[1].setInput && Object.keys(entry[1].setInput)) {
+          const sSAP = createSetSelectionAndParams({
+            parentName: `create_${entry[0]}_set`,
+            setInput: entry[1].setInput,
+          });
+          params = { ...params, ...sSAP[1] };
+          (field.selectionSet?.selections as SelectionNode[]).push(sSAP[0]);
+        }
 
         return field;
       }),

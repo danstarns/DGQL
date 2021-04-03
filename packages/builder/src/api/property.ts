@@ -1,8 +1,8 @@
 import { Property } from "../classes";
-import { SortDirection } from "../types";
+import type { PropertyInput } from "../types";
 
-function property(input: { equal?: any; direction?: SortDirection } = {}) {
-    return new Property(input);
+function property(input: PropertyInput = {}) {
+  return new Property(input);
 }
 
 export default property;

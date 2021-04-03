@@ -1,4 +1,4 @@
-import type { Node } from "./classes";
+import type { Node, Property } from "./classes";
 
 export type SortDirection = "DESC" | "ASC";
 
@@ -6,6 +6,16 @@ export type EdgeDirection = "IN" | "OUT";
 
 export interface MatchInput {
   [k: string]: Node;
+}
+
+export interface PropertyInput {
+  equal?: any;
+  direction?: SortDirection;
+  value?: any;
+}
+
+export interface SetInput {
+  [k: string]: Property;
 }
 
 export interface CreateInput {

@@ -1,19 +1,17 @@
-import { SortDirection } from "../types";
-
-interface PropertyConstructor {
-    equal?: any;
-    direction?: SortDirection;
-}
+import type { SortDirection, PropertyInput } from "../types";
 
 class Property {
-    equal?: any;
+  equal?: any;
 
-    direction?: SortDirection;
+  direction?: SortDirection;
 
-    constructor(input: PropertyConstructor = {}) {
-        this.equal = input.equal;
-        this.direction = input.direction;
-    }
+  value?: any;
+
+  constructor(input: PropertyInput = {}) {
+    this.equal = input.equal;
+    this.direction = input.direction;
+    this.value = input.value;
+  }
 }
 
 export default Property;

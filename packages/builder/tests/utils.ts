@@ -7,5 +7,5 @@ export function expectEqual({
   expected: DocumentNode;
   received: string;
 }): void {
-  expect(print(expected)).toEqual(print(parse(received)));
+  expect(print(parse(received))).toEqual(print(expected));
 }
