@@ -29,4 +29,70 @@ describe("create", () => {
 
     expect(params).toEqual({});
   });
+
+  test("should create and return many node", () => {
+    const builder = new Builder();
+
+    const [dgql, params] = builder
+      .create({
+        node1: node({ label: "Node" }),
+        node2: node({ label: "Node" }),
+      })
+      .return(["node1", "node2"])
+      .build();
+
+    expect(print(parse(dgql))).toEqual(
+      print(
+        parse(`
+            {
+                CREATE {
+                    node1 @node(label: Node)
+                    node2 @node(label: Node)
+                }
+                RETURN {
+                    node1
+                    node2
+                }
+            }
+        `)
+      )
+    );
+
+    expect(params).toEqual({});
+  });
+
+  test("should create and return many node (many create)", () => {
+    const builder = new Builder();
+
+    const [dgql, params] = builder
+      .create({
+        node1: node({ label: "Node" }),
+      })
+      .create({
+        node2: node({ label: "Node" }),
+      })
+      .return(["node1", "node2"])
+      .build();
+
+    expect(print(parse(dgql))).toEqual(
+      print(
+        parse(`
+            {
+                CREATE {
+                    node1 @node(label: Node)
+                }
+                CREATE {
+                    node2 @node(label: Node)
+                }
+                RETURN {
+                    node1
+                    node2
+                }
+            }
+        `)
+      )
+    );
+
+    expect(params).toEqual({});
+  });
 });
