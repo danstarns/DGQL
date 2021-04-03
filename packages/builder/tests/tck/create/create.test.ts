@@ -1,5 +1,6 @@
 import { Builder, node } from "../../../src";
-import { parse, print } from "graphql";
+import { expectEqual } from "../../utils";
+import gql from "graphql-tag";
 
 describe("create", () => {
   test("should create and return a node", () => {
@@ -12,20 +13,18 @@ describe("create", () => {
       .return(["node"])
       .build();
 
-    expect(print(parse(dgql))).toEqual(
-      print(
-        parse(`
-            {
-                CREATE {
-                    node @node(label: Node)
-                }
-                RETURN {
-                    node
-                }
-            }
-        `)
-      )
-    );
+    const expected = gql`
+      {
+        CREATE {
+          node @node(label: Node)
+        }
+        RETURN {
+          node
+        }
+      }
+    `;
+
+    expectEqual({ received: dgql, expected });
 
     expect(params).toEqual({});
   });
@@ -41,22 +40,20 @@ describe("create", () => {
       .return(["node1", "node2"])
       .build();
 
-    expect(print(parse(dgql))).toEqual(
-      print(
-        parse(`
-            {
-                CREATE {
-                    node1 @node(label: Node)
-                    node2 @node(label: Node)
-                }
-                RETURN {
-                    node1
-                    node2
-                }
-            }
-        `)
-      )
-    );
+    const expected = gql`
+      {
+        CREATE {
+          node1 @node(label: Node)
+          node2 @node(label: Node)
+        }
+        RETURN {
+          node1
+          node2
+        }
+      }
+    `;
+
+    expectEqual({ received: dgql, expected });
 
     expect(params).toEqual({});
   });
@@ -74,24 +71,22 @@ describe("create", () => {
       .return(["node1", "node2"])
       .build();
 
-    expect(print(parse(dgql))).toEqual(
-      print(
-        parse(`
-            {
-                CREATE {
-                    node1 @node(label: Node)
-                }
-                CREATE {
-                    node2 @node(label: Node)
-                }
-                RETURN {
-                    node1
-                    node2
-                }
-            }
-        `)
-      )
-    );
+    const expected = gql`
+      {
+        CREATE {
+          node1 @node(label: Node)
+        }
+        CREATE {
+          node2 @node(label: Node)
+        }
+        RETURN {
+          node1
+          node2
+        }
+      }
+    `;
+
+    expectEqual({ received: dgql, expected });
 
     expect(params).toEqual({});
   });

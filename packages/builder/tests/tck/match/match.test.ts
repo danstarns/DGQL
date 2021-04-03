@@ -1,98 +1,93 @@
 import { Builder, node } from "../../../src";
-import { parse, print } from "graphql";
+import { expectEqual } from "../../utils";
+import gql from "graphql-tag";
 
 describe("match", () => {
-    test("should match and return a node", () => {
-        const builder = new Builder();
+  test("should match and return a node", () => {
+    const builder = new Builder();
 
-        const [dgql, params] = builder
-            .match({
-                node: node({ label: "Node" }),
-            })
-            .return(["node"])
-            .build();
+    const [dgql, params] = builder
+      .match({
+        node: node({ label: "Node" }),
+      })
+      .return(["node"])
+      .build();
 
-        expect(print(parse(dgql))).toEqual(
-            print(
-                parse(`
-                    {
-                        MATCH {
-                            node @node(label: Node)
-                        }
-                        RETURN {
-                            node
-                        }
-                    }
-                `)
-            )
-        );
+    const expected = gql`
+      {
+        MATCH {
+          node @node(label: Node)
+        }
+        RETURN {
+          node
+        }
+      }
+    `;
 
-        expect(params).toEqual({});
-    });
+    expectEqual({ received: dgql, expected });
 
-    test("should match and return many nodes (with 1 match)", () => {
-        const builder = new Builder();
+    expect(params).toEqual({});
+  });
 
-        const [dgql, params] = builder
-            .match({
-                node1: node({ label: "Node1" }),
-                node2: node({ label: "Node2" }),
-            })
-            .return(["node1", "node2"])
-            .build();
+  test("should match and return many nodes (with 1 match)", () => {
+    const builder = new Builder();
 
-        expect(print(parse(dgql))).toEqual(
-            print(
-                parse(`
-                    {
-                        MATCH {
-                            node1 @node(label: Node1)
-                            node2 @node(label: Node2)
-                        }
-                        RETURN {
-                            node1
-                            node2
-                        }
-                    }
-                `)
-            )
-        );
+    const [dgql, params] = builder
+      .match({
+        node1: node({ label: "Node1" }),
+        node2: node({ label: "Node2" }),
+      })
+      .return(["node1", "node2"])
+      .build();
 
-        expect(params).toEqual({});
-    });
+    const expected = gql`
+      {
+        MATCH {
+          node1 @node(label: Node1)
+          node2 @node(label: Node2)
+        }
+        RETURN {
+          node1
+          node2
+        }
+      }
+    `;
 
-    test("should match and return many nodes (with many match)", () => {
-        const builder = new Builder();
+    expectEqual({ received: dgql, expected });
 
-        const [dgql, params] = builder
-            .match({
-                node1: node({ label: "Node1" }),
-            })
-            .match({
-                node2: node({ label: "Node2" }),
-            })
-            .return(["node1", "node2"])
-            .build();
+    expect(params).toEqual({});
+  });
 
-        expect(print(parse(dgql))).toEqual(
-            print(
-                parse(`
-                    {
-                        MATCH {
-                            node1 @node(label: Node1)
-                        }
-                        MATCH {
-                            node2 @node(label: Node2)
-                        }
-                        RETURN {
-                            node1
-                            node2
-                        }
-                    }
-                `)
-            )
-        );
+  test("should match and return many nodes (with many match)", () => {
+    const builder = new Builder();
 
-        expect(params).toEqual({});
-    });
+    const [dgql, params] = builder
+      .match({
+        node1: node({ label: "Node1" }),
+      })
+      .match({
+        node2: node({ label: "Node2" }),
+      })
+      .return(["node1", "node2"])
+      .build();
+
+    const expected = gql`
+      {
+        MATCH {
+          node1 @node(label: Node1)
+        }
+        MATCH {
+          node2 @node(label: Node2)
+        }
+        RETURN {
+          node1
+          node2
+        }
+      }
+    `;
+
+    expectEqual({ received: dgql, expected });
+
+    expect(params).toEqual({});
+  });
 });
