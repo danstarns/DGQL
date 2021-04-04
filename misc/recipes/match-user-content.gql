@@ -1,39 +1,39 @@
 {
-    MATCH {
-        user @node(label: User) {
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        content @edge(type: HAS_CONTENT, direction: OUT) {
+          photo @node(label: Photo) {
             PROJECT {
-                name
-                content @edge(type: HAS_CONTENT, direction: OUT) {
-                    photo @node(label: Photo) {
-                        PROJECT {
-                            size
-                            type
-                            base64
-                        }
-                    }
-                    video @node(label: Video) {
-                        PROJECT {
-                            thumbnail
-                            length
-                            url
-                        }
-                    }
-                    post @node(label: Post) {
-                        PROJECT {
-                            title
-                            content
-                        }
-                    }
-                    properties @relationship {
-                        PROJECT {
-                            since
-                        }
-                    }
-                }
+              size
+              type
+              base64
             }
+          }
+          video @node(label: Video) {
+            PROJECT {
+              thumbnail
+              length
+              url
+            }
+          }
+          post @node(label: Post) {
+            PROJECT {
+              title
+              content
+            }
+          }
+          PROPERTIES {
+            PROJECT {
+              since
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }

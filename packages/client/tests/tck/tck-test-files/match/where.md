@@ -8,19 +8,19 @@
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                name(equal: Dan)
-            }
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    user @node(label: User) {
+      WHERE {
+        name(equal: Dan)
+      }
+      PROJECT {
+        name
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -54,26 +54,26 @@ RETURN user
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post) {
-                        WHERE {
-                            title(equal: "Beer")
-                        }
-                        PROJECT {
-                            title
-                        }
-                    }
-                }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) {
+          post @node(label: Post) {
+            WHERE {
+              title(equal: "Beer")
             }
+            PROJECT {
+              title
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -113,27 +113,27 @@ RETURN user
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post)
-                    properties @relationship {
-                        WHERE {
-                            since(equal: "1999")
-                        }
-                        PROJECT {
-                            since
-                        }
-                    }
-                }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) {
+          post @node(label: Post)
+          PROPERTIES {
+            WHERE {
+              since(equal: "1999")
             }
+            PROJECT {
+              since
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -145,8 +145,8 @@ CALL {
     RETURN user {
         name: user.name,
         posts: [
-            (user)-[properties:HAS_POST]->(post:Post) WHERE properties.since = $params.user_posts_properties_where_since0_equal | {
-                properties: { since: properties.since }
+            (user)-[user_posts_PROPERTIES:HAS_POST]->(post:Post) WHERE user_posts_PROPERTIES.since = $params.user_posts_PROPERTIES_where_since0_equal | {
+                PROPERTIES: { since: user_posts_PROPERTIES.since }
             }
         ]
     } AS user
@@ -160,7 +160,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_posts_properties_where_since0_equal": "1999"
+        "user_posts_PROPERTIES_where_since0_equal": "1999"
     }
 }
 ```
@@ -173,34 +173,34 @@ RETURN user
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post) {
-                        WHERE {
-                            title(equal: "Beer")
-                        }
-                        PROJECT {
-                            title
-                        }
-                    }
-                    properties @relationship {
-                        WHERE {
-                            since(equal: "1999")
-                        }
-                        PROJECT {
-                            since
-                        }
-                    }
-                }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) {
+          post @node(label: Post) {
+            WHERE {
+              title(equal: "Beer")
             }
+            PROJECT {
+              title
+            }
+          }
+          PROPERTIES {
+            WHERE {
+              since(equal: "1999")
+            }
+            PROJECT {
+              since
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -212,9 +212,9 @@ CALL {
     RETURN user {
         name: user.name,
         posts: [
-            (user)-[properties:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title0_equal AND properties.since = $params.user_posts_properties_where_since0_equal | {
+            (user)-[user_posts_PROPERTIES:HAS_POST]->(post:Post) WHERE post.title = $params.user_posts_post_where_title0_equal AND user_posts_PROPERTIES.since = $params.user_posts_PROPERTIES_where_since0_equal | {
                 post: { title: post.title },
-                properties: { since: properties.since }
+                PROPERTIES: { since: user_posts_PROPERTIES.since }
             }
         ]
     } AS user
@@ -228,7 +228,7 @@ RETURN user
 ```params
 {
     "params": {
-        "user_posts_properties_where_since0_equal": "1999",
+        "user_posts_PROPERTIES_where_since0_equal": "1999",
         "user_posts_post_where_title0_equal": "Beer"
     }
 }

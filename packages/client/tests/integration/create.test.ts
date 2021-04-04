@@ -430,8 +430,18 @@ describe("create", () => {
         expect(products[0]).toMatchObject({
           ...product,
           photos: [
-            { ...photos[0], colors: [colors[0]] },
-            { ...photos[1], colors: [colors[1]] },
+            {
+              id: photos[0].id,
+              url: photos[0].url,
+              description: photos[0].description,
+              colors: [colors[0]],
+            },
+            {
+              id: photos[1].id,
+              url: photos[1].url,
+              description: photos[1].description,
+              colors: [colors[1]],
+            },
           ],
         });
       } finally {

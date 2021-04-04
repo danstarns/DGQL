@@ -169,7 +169,7 @@ describe("where", () => {
                             id
                             nodes @edge(type: "${type}", direction: "OUT") {
                                 node @node(label: "${label2}")
-                                properties @relationship {
+                                PROPERTIES {
                                     WHERE {
                                         id(equal: "${id2}")
                                     }
@@ -203,7 +203,7 @@ describe("where", () => {
         const result = await client.run({ query });
 
         expect(result?.test).toEqual([
-          { id: id1, nodes: [{ properties: { id: id2 } }] },
+          { id: id1, nodes: [{ PROPERTIES: { id: id2 } }] },
         ]);
       } finally {
         await session.close();

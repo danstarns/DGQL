@@ -128,9 +128,12 @@ function createProjectionAndParams({
           !(x.directives || []).some((d) => d.name.value === "edge")
       ) as FieldNode[];
 
-      const relationship = selections.find((x) =>
-        (x.directives || []).find((d) => d.name.value === "relationship")
+      const propertiesSelection = selections.find(
+        (x) => x.name.value === "PROPERTIES"
       ) as FieldNode;
+      const propertiesName = propertiesSelection
+        ? `${param}${propertiesSelection ? `_PROPERTIES` : ""}`
+        : "";
 
       const type = (((edgeDirective.arguments || []).find(
         (x) => x.name.value === "type"
@@ -144,9 +147,7 @@ function createProjectionAndParams({
       ) as Direction;
       const inStr = direction === "IN" ? "<-" : "-";
       const outStr = direction === "OUT" ? "->" : "-";
-      const typeStr = `[${
-        relationship ? `${relationship.name.value}` : ""
-      }:${type}]`;
+      const typeStr = `[${propertiesName}:${type}]`;
 
       let projectionRows: string[] = [];
 
@@ -206,8 +207,8 @@ function createProjectionAndParams({
 
       let relW = "";
       let relMP = "";
-      if (relationship) {
-        const relSelections = (relationship?.selectionSet?.selections ||
+      if (propertiesSelection) {
+        const relSelections = (propertiesSelection?.selectionSet?.selections ||
           []) as FieldNode[];
         const relProject = relSelections.find(
           (x) => x.name.value === "PROJECT"
@@ -217,8 +218,8 @@ function createProjectionAndParams({
         if (relProject) {
           const relMPAndP = createProjectionAndParams({
             projectField: relProject,
-            varName: relationship.name.value,
-            chainStr: `${param}_${relationship.name.value}`,
+            varName: propertiesName,
+            chainStr: propertiesName,
             variables,
           });
           if (relMPAndP[0]) {
@@ -232,9 +233,9 @@ function createProjectionAndParams({
 
         if (relWhere) {
           const relWAndP = createWhereAndParams({
-            varName: relationship.name.value,
+            varName: propertiesName,
             whereField: relWhere,
-            chainStr: `${param}_${relationship.name.value}_where`,
+            chainStr: `${propertiesName}_where`,
             variables,
             noWhere: true,
           });
@@ -248,7 +249,7 @@ function createProjectionAndParams({
         }
       }
       if (relMP) {
-        projectionRows.push(`${relationship.name.value}: ${relMP}`);
+        projectionRows.push(`${propertiesSelection.name.value}: ${relMP}`);
       }
 
       let nodeLabels: string[] = [];
@@ -358,7 +359,7 @@ function createProjectionAndParams({
         if (nodeMP && relMP) {
           const innerPath = [
             `[ ${pathStr} ${whereStr} | { ${refName}: ${nodeMP},`,
-            `${relationship.name.value}: ${relMP}`,
+            `${propertiesSelection.name.value}: ${relMP}`,
             `} ]${skipLimit}`,
           ].join(" ");
 
@@ -381,7 +382,7 @@ function createProjectionAndParams({
           }
         } else if (relMP) {
           res.strs.push(
-            `${key}: [ ${pathStr} ${whereStr} | { ${relationship.name.value}: ${relMP} } ]`
+            `${key}: [ ${pathStr} ${whereStr} | { ${propertiesSelection.name.value}: ${relMP} } ]`
           );
         }
 

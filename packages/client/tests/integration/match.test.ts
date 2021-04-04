@@ -318,7 +318,7 @@ describe("match", () => {
                         id
                         nodes @edge(type: "${type}", direction: "${direction}") {
                             test2 @node(label: "${id2}")
-                            properties @relationship {
+                            PROPERTIES {
                                 PROJECT {
                                     id
                                 }
@@ -344,7 +344,7 @@ describe("match", () => {
       const result = await client.run({ query });
 
       expect(result?.test1).toEqual([
-        { id: id1, nodes: [{ properties: { id: id2 } }] },
+        { id: id1, nodes: [{ PROPERTIES: { id: id2 } }] },
       ]);
     } finally {
       await session.close();
@@ -382,7 +382,7 @@ describe("match", () => {
                                     id
                                 }
                             }
-                            properties @relationship {
+                            PROPERTIES {
                                 PROJECT {
                                     id
                                 }
@@ -410,7 +410,7 @@ describe("match", () => {
       expect(result?.test1).toEqual([
         {
           id: id1,
-          nodes: [{ node: { id: id2 }, properties: { id: id2 } }],
+          nodes: [{ node: { id: id2 }, PROPERTIES: { id: id2 } }],
         },
       ]);
     } finally {

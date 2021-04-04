@@ -8,16 +8,16 @@ Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT`
 
 ```graphql
 {
-    MATCH {
-        users @node(label: User) {
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    users @node(label: User) {
+      PROJECT {
+        name
+      }
     }
-    RETURN {
-        users
-    }
+  }
+  RETURN {
+    users
+  }
 }
 ```
 
@@ -27,16 +27,16 @@ Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT`
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
-                    title
-                }
-            }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+          title
         }
+      }
     }
+  }
 }
 ```
 
@@ -44,35 +44,35 @@ Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT`
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        content @edge(type: HAS_CONTENT, direction: OUT) {
+          photo @node(label: Photo) {
             PROJECT {
-                name
-                content @edge(type: HAS_CONTENT, direction: OUT) {
-                    photo @node(label: Photo) {
-                        PROJECT {
-                            size
-                            type
-                            base64
-                        }
-                    }
-                    video @node(label: Video) {
-                        PROJECT {
-                            thumbnail
-                            length
-                            url
-                        }
-                    }
-                    post @node(label: Post) {
-                        PROJECT {
-                            title
-                            content
-                        }
-                    }
-                }
+              size
+              type
+              base64
             }
+          }
+          video @node(label: Video) {
+            PROJECT {
+              thumbnail
+              length
+              url
+            }
+          }
+          post @node(label: Post) {
+            PROJECT {
+              title
+              content
+            }
+          }
         }
+      }
     }
+  }
 }
 ```
 
@@ -80,20 +80,20 @@ Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT`
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+        posts @edge(type: HAS_POST, direction: OUT) {
+          post @node(label: Post)
+          PROPERTIES {
             PROJECT {
-                name
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    post @node(label: Post)
-                    properties @relationship {
-                        PROJECT {
-                            since
-                        }
-                    }
-                }
+              since
             }
+          }
         }
+      }
     }
+  }
 }
 ```

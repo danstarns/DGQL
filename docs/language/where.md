@@ -12,16 +12,16 @@ User to filter both node and relationship properties plus edges.
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                name(equal: "Dan")
-            }
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    user @node(label: User) {
+      WHERE {
+        name(equal: "Dan")
+      }
+      PROJECT {
+        name
+      }
     }
+  }
 }
 ```
 
@@ -29,17 +29,17 @@ User to filter both node and relationship properties plus edges.
 
 ```graphql
 {
-    MATCH {
-        posts @node(label: Post) {
-            WHERE {
-                EDGE(type: HAS_POST, direction: IN) {
-                    NODE(label: User) {
-                        name(equal: "Dan")
-                    }
-                }
-            }
+  MATCH {
+    posts @node(label: Post) {
+      WHERE {
+        EDGE(type: HAS_POST, direction: IN) {
+          NODE(label: User) {
+            name(equal: "Dan")
+          }
         }
+      }
     }
+  }
 }
 ```
 
@@ -47,23 +47,23 @@ User to filter both node and relationship properties plus edges.
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                id
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    node @node(label: Post) {
-                        WHERE {
-                            content(equal: "Cool")
-                        }
-                        PROJECT {
-                            content
-                        }
-                    }
-                }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        id
+        posts @edge(type: HAS_POST, direction: OUT) {
+          node @node(label: Post) {
+            WHERE {
+              content(equal: "Cool")
             }
+            PROJECT {
+              content
+            }
+          }
         }
+      }
     }
+  }
 }
 ```
 
@@ -71,27 +71,27 @@ User to filter both node and relationship properties plus edges.
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        id
+        posts @edge(type: HAS_POST, direction: OUT) {
+          node @node(label: Post) {
             PROJECT {
-                id
-                posts @edge(type: HAS_POST, direction: OUT) {
-                    node @node(label: Post) {
-                        PROJECT {
-                            content
-                        }
-                    }
-                    properties @relationship {
-                        WHERE {
-                            since(equal: "1999")
-                        }
-                    }
-                }
+              content
             }
+          }
+          PROPERTIES {
+            WHERE {
+              since(equal: "1999")
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
