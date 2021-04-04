@@ -302,5 +302,141 @@ describe("create", () => {
         }
       });
     });
+
+    test("should create pringles", async () => {
+      const session = driver.session();
+
+      const client = new Client({ driver });
+
+      const product = {
+        id: generate({
+          charset: "alphabetic",
+        }),
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const colors = [
+        {
+          name: generate({
+            charset: "alphabetic",
+          }),
+        },
+        {
+          name: generate({
+            charset: "alphabetic",
+          }),
+        },
+      ];
+
+      const photos = [
+        {
+          id: generate({
+            charset: "alphabetic",
+          }),
+          description: generate({
+            charset: "alphabetic",
+          }),
+          url: generate({
+            charset: "alphabetic",
+          }),
+        },
+        {
+          id: generate({
+            charset: "alphabetic",
+          }),
+          description: generate({
+            charset: "alphabetic",
+          }),
+          url: generate({
+            charset: "alphabetic",
+          }),
+        },
+      ];
+
+      const query = gql`
+        {
+          CREATE {
+            products @node(label: Product) {
+              SET {
+                id(value: "${product.id}")
+                name(value: "${product.name}")
+              }
+              CREATE @edge(type: HAS_PHOTO, direction: OUT) {
+                NODE(label: Photo) {
+                  SET {
+                    id(value: "${photos[0].id}")
+                    url(value: "${photos[0].url}")
+                    description(value: "${photos[0].description}")
+                  }
+                  CONNECT @edge(type: HAS_COLOR, direction: OUT) {
+                    NODE(label: Color) {
+                      WHERE {
+                        name(equal: "${colors[0].name}") # existing color
+                      }
+                    }
+                  }
+                }
+              }
+              CREATE @edge(type: HAS_PHOTO, direction: OUT) {
+                NODE(label: Photo) {
+                  SET {
+                    id(value: "${photos[1].id}")
+                    url(value: "${photos[1].url}")
+                    description(value: "${photos[1].description}")
+                  }
+                  CONNECT @edge(type: HAS_COLOR, direction: OUT) {
+                    NODE(label: Color) {
+                      WHERE {
+                        name(equal: "${colors[1].name}") # existing color
+                      }
+                    }
+                  }
+                }
+              }
+              PROJECT {
+                id
+                name
+                photos @edge(type: HAS_PHOTO, direction: OUT) @node(label: Photo) {
+                  id
+                  url
+                  description
+                  colors @edge(type: HAS_COLOR, direction: OUT) @node(label: Color) {
+                    name
+                  }
+                }
+              }
+            }
+          }
+          RETURN {
+            products
+          }
+        }
+      `;
+
+      try {
+        await session.run(
+          `
+          CREATE (:Color {name: "${colors[0].name}"})
+          CREATE (:Color {name: "${colors[1].name}"})
+        `
+        );
+
+        const { products } = await client.run<{ products: any[] }>({ query });
+
+        expect(products.length).toEqual(1);
+
+        expect(products[0]).toMatchObject({
+          ...product,
+          photos: [
+            { ...photos[0], colors: [colors[0]] },
+            { ...photos[1], colors: [colors[1]] },
+          ],
+        });
+      } finally {
+        await session.close();
+      }
+    });
   });
 });
