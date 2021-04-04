@@ -4,35 +4,45 @@ import {
   FieldNode,
   valueFromASTUntyped,
 } from "graphql";
+import createConnectAndParams from "./create-connect-and-params";
 import createProjectionAndParams from "./create-projection-and-params";
+import createSetAndParams from "./create-set-and-params";
 
-function createSetAndParams({
-  setSelections,
+function getEdgeMeta({
+  selection,
   variables,
-  varName,
 }: {
-  setSelections: FieldNode[];
+  selection: FieldNode;
   variables: any;
-  varName: string;
-}): [string, any] {
-  let strs: string[] = [];
-  let params = {};
+}): { direction?: string; type?: string } {
+  const edgeDirective = selection.directives?.find(
+    (x) => x.name.value === "edge"
+  ) as DirectiveNode;
 
-  setSelections?.forEach((selection) => {
-    const valueArg = (selection?.arguments || [])?.find(
-      (x) => x.name.value === "value"
-    ) as ArgumentNode;
+  if (!edgeDirective) {
+    throw new Error("CREATE @edge required");
+  }
 
-    if (!valueArg) {
-      throw new Error("value arg required for SET.property");
-    }
+  const edgeArgs = edgeDirective?.arguments || [];
 
-    const paramName = `${varName}_set_${selection.name.value}`;
-    params[paramName] = valueFromASTUntyped(valueArg.value, variables);
-    strs.push(`SET ${varName}.${selection.name.value} = $params.${paramName}`);
-  });
+  const typeArg = edgeArgs.find((x) => x.name.value === "type") as ArgumentNode;
 
-  return [strs.join("\n"), params];
+  const directionArg = edgeArgs.find(
+    (x) => x.name.value === "direction"
+  ) as ArgumentNode;
+
+  const type = typeArg
+    ? valueFromASTUntyped(typeArg.value, variables)
+    : (undefined as string | undefined);
+
+  const direction = directionArg
+    ? valueFromASTUntyped(directionArg.value, variables)
+    : (undefined as string | undefined);
+
+  return {
+    type,
+    direction,
+  };
 }
 
 function createCreateAndParams({
@@ -86,31 +96,7 @@ function createCreateAndParams({
       }
 
       if (selection.name.value === "CREATE") {
-        const edgeDirective = selection.directives?.find(
-          (x) => x.name.value === "edge"
-        ) as DirectiveNode;
-
-        if (!edgeDirective) {
-          throw new Error("CREATE @edge required");
-        }
-
-        const edgeArgs = edgeDirective?.arguments || [];
-
-        const typeArg = edgeArgs.find(
-          (x) => x.name.value === "type"
-        ) as ArgumentNode;
-
-        const directionArg = edgeArgs.find(
-          (x) => x.name.value === "direction"
-        ) as ArgumentNode;
-
-        const type = typeArg
-          ? valueFromASTUntyped(typeArg.value, variables)
-          : (undefined as string | undefined);
-
-        const direction = directionArg
-          ? valueFromASTUntyped(directionArg.value, variables)
-          : (undefined as string | undefined);
+        const { type, direction } = getEdgeMeta({ selection, variables });
 
         const selections = (selection.selectionSet?.selections ||
           []) as FieldNode[];
@@ -169,6 +155,27 @@ function createCreateAndParams({
         }
 
         return;
+      }
+
+      if (selection.name.value === "CONNECT") {
+        const { type, direction } = getEdgeMeta({ selection, variables });
+        const selections = (selection.selectionSet?.selections ||
+          []) as FieldNode[];
+        const innerChainStr = `${varName}_connect${i}`;
+        const cCAP = createConnectAndParams({
+          chainStr: innerChainStr,
+          type,
+          direction,
+          selections,
+          variables,
+          parentVar: varName,
+        });
+
+        if (cCAP[0]) {
+          cyphers.push(`WITH ${varName}`);
+          cyphers.push(cCAP[0]);
+          params = { ...params, ...cCAP[1] };
+        }
       }
     });
 
