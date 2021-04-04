@@ -79,6 +79,7 @@ function createCreateAndParams({
         }
 
         const edgeArgs = edgeDirective?.arguments || [];
+
         const typeArg = edgeArgs.find(
           (x) => x.name.value === "type"
         ) as ArgumentNode;
@@ -91,7 +92,7 @@ function createCreateAndParams({
           ? valueFromASTUntyped(typeArg.value, variables)
           : (undefined as string | undefined);
 
-        const direction = labelArg
+        const direction = directionArg
           ? valueFromASTUntyped(directionArg.value, variables)
           : (undefined as string | undefined);
 
