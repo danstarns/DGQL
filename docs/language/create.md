@@ -16,7 +16,7 @@ Given the most basic example, above, your just create and then holding a referen
 
 ## Usage
 
-### `CREATE` & `SET`
+### `CREATE` & `SET` & `PROJECT`
 
 ```graphql
 {

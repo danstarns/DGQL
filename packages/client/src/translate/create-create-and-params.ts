@@ -4,6 +4,7 @@ import {
   FieldNode,
   valueFromASTUntyped,
 } from "graphql";
+import createProjectionAndParams from "./create-projection-and-params";
 
 function createSetAndParams({
   setSelections,
@@ -171,7 +172,19 @@ function createCreateAndParams({
       }
     });
 
-    cyphers.push(`RETURN ${varName}`);
+    const projectField = selections.find((x) => x.name.value === "PROJECT");
+    if (projectField) {
+      const pAP = createProjectionAndParams({
+        varName,
+        projectField,
+        variables,
+      });
+      params = { ...params, ...pAP[1] };
+      cyphers.push(`RETURN ${varName} ${pAP[0]} AS ${varName}`);
+    } else {
+      cyphers.push(`RETURN ${varName}`);
+    }
+
     cyphers.push(`}`); // close CALL
   });
 
