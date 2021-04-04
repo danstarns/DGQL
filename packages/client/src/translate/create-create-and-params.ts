@@ -59,7 +59,7 @@ function createCreateAndParams({
             throw new Error("value arg required for SET.property");
           }
 
-          const paramName = `create_${varName}_set_${selection.name.value}`;
+          const paramName = `${varName}_set_${selection.name.value}`;
           cyphers.push(
             `SET ${varName}.${selection.name.value} = $params.${paramName}`
           );

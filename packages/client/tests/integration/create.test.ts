@@ -134,5 +134,56 @@ describe("create", () => {
         await session.close();
       }
     });
+
+    test("should create a node with an edge to a node (while SETting values)", async () => {
+      const session = driver.session();
+
+      const client = new Client({ driver });
+
+      const id1 = generate({
+        charset: "alphabetic",
+      });
+      const id2 = generate({
+        charset: "alphabetic",
+      });
+
+      const query = `
+        {
+          CREATE {
+            node @node {
+              SET {
+                id(value: "${id1}")
+              }
+              CREATE @edge(type: HAS_EDGE, direction: OUT) {
+                NODE {
+                  SET {
+                    id(value: "${id2}")
+                  }
+                }
+              }
+            }
+          }
+          RETURN {
+            node
+          }
+        }
+    `;
+
+      try {
+        await client.run({ query });
+
+        const find = await session.run(
+          `
+            MATCH (one {id: "${id1}"})-[:HAS_EDGE]->(two {id: "${id2}"})
+            RETURN one, two
+        `
+        );
+
+        expect(find.records[0].get("one")).toBeTruthy();
+        expect(find.records[0].get("two")).toBeTruthy();
+      } finally {
+        await session.close();
+      }
+    });
   });
 });

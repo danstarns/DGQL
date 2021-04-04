@@ -92,3 +92,132 @@ RETURN node
 ```
 
 ---
+
+### `CREATE @edge` Node & `SET` Node (2 level)
+
+**Input GraphQL**
+
+```graphql
+{
+  CREATE {
+    node @node {
+      SET {
+        id(value: "some-id1")
+      }
+      CREATE @edge(type: HAS_EDGE, direction: OUT) {
+        NODE(label: Node) {
+          SET {
+            id(value: "some-id2")
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+  CREATE (node)
+  SET node.id = $params.node_set_id
+  WITH node
+  CALL {
+    CREATE (node_create1_NODE:Node)
+    SET node_create1_NODE.id = $params.node_create1_NODE_set_id
+    RETURN node_create1_NODE
+  }
+  MERGE (node)-[:HAS_EDGE]->(node_create1_NODE)
+  RETURN node
+}
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+      "node_set_id": "some-id1",
+      "node_create1_NODE_set_id": "some-id2"
+    }
+}
+```
+
+---
+
+### `CREATE @edge` Node & `SET` Node (3 level)
+
+**Input GraphQL**
+
+```graphql
+{
+  CREATE {
+    node @node {
+      SET {
+        id(value: "some-id1")
+      }
+      CREATE @edge(type: HAS_EDGE, direction: OUT) {
+        NODE(label: Node) {
+          SET {
+            id(value: "some-id2")
+          }
+          CREATE @edge(type: HAS_EDGE, direction: OUT) {
+            NODE(label: Node) {
+              SET {
+                id(value: "some-id3")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+  CREATE (node)
+  SET node.id = $params.node_set_id
+  WITH node
+  CALL {
+    CREATE (node_create1_NODE:Node)
+    SET node_create1_NODE.id = $params.node_create1_NODE_set_id
+    WITH node_create1_NODE
+    CALL {
+      CREATE (node_create1_NODE_create1_NODE:Node)
+      SET node_create1_NODE_create1_NODE.id = $params.node_create1_NODE_create1_NODE_set_id
+      RETURN node_create1_NODE_create1_NODE
+    }
+    MERGE (node_create1_NODE)-[:HAS_EDGE]->(node_create1_NODE_create1_NODE)
+    RETURN node_create1_NODE
+  }
+  MERGE (node)-[:HAS_EDGE]->(node_create1_NODE)
+  RETURN node
+}
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+      "node_set_id": "some-id1",
+      "node_create1_NODE_set_id": "some-id2",
+      "node_create1_NODE_create1_NODE_set_id": "some-id3"
+    }
+}
+```
+
+---
