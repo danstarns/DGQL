@@ -235,8 +235,11 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 
 ## TODO
 
-- [ ] UPDATE
-- [ ] DELETE
-- [ ] DISCONNECT
+Overall the state of the project is good! The Builder or Client is not published yet. But if you want to play around with DGQL now; then install the published version of the [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground). The following operations; [`MATCH`](https://github.com/danstarns/DGQL/blob/main/docs/language/match.md) & [`CREATE`](https://github.com/danstarns/DGQL/blob/main/docs/language/create.md) are in a good state to experiment with. The Builder; `MATCH` is in progress, porting `CREATE` into the builder is one of my next tasks.
+
+- [ ] `UPDATE`
+- [ ] `DELETE`
+- [ ] `DISCONNECT`
+- [ ] `AGGREGATE`
 - [ ] Property directives IE: `@datetime`, `@uuid`
-- [ ] DGQL => Builder (1-1 Mapping)
+- [ ] DGQL => Builder (1-1 Mapping) (only `MATCH` implemented)
