@@ -18,23 +18,23 @@ const { Builder, node, property, edge } = require("@dgql/builder");
 const builder = new Builder();
 
 const [dgql, variables] = builder
-    .match({
-        user: node({ label: "User" })
-            .where({ name: property({ equal: "Dan" }) })
-            .project({
-                id: property(),
-                name: property(),
-                posts: edge({
-                    type: "HAS_POST",
-                    direction: "OUT",
-                    node: node({ label: "Post" }),
-                }).project({
-                    title: property(),
-                }),
-            }),
-    })
-    .return(["user"])
-    .build();
+  .match({
+    user: node({ label: "User" })
+      .where({ name: property({ equal: "Dan" }) })
+      .project({
+        id: property(),
+        name: property(),
+        posts: edge({
+          type: "HAS_POST",
+          direction: "OUT",
+          node: node({ label: "Post" }),
+        }).project({
+          title: property(),
+        }),
+      }),
+  })
+  .return(["user"])
+  .build();
 
 console.log(dgql);
 /*
@@ -78,34 +78,34 @@ import { Builder, node, property, edge } from "@dgql/builder";
 const builder = new Builder();
 
 const [dgql, variables] = builder
-    .match({
-        blog: node({ label: "Blog" }).project({
+  .match({
+    blog: node({ label: "Blog" }).project({
+      name: property(),
+      posts: edge({
+        type: "HAS_POST",
+        direction: "OUT",
+        node: node({ label: "Post" }),
+      }).project({
+        title: property(),
+        comments: edge({
+          type: "HAS_COMMENT",
+          direction: "OUT",
+          node: node({ label: "Comment" }),
+        }).project({
+          content: property(),
+          authors: edge({
+            type: "COMMENTED",
+            direction: "IN",
+            node: node({ label: "User" }),
+          }).project({
             name: property(),
-            posts: edge({
-                type: "HAS_POST",
-                direction: "OUT",
-                node: node({ label: "Post" }),
-            }).project({
-                title: property(),
-                comments: edge({
-                    type: "HAS_COMMENT",
-                    direction: "OUT",
-                    node: node({ label: "Comment" }),
-                }).project({
-                    content: property(),
-                    authors: edge({
-                        type: "COMMENTED",
-                        direction: "IN",
-                        node: node({ label: "User" }),
-                    }).project({
-                        email: property(),
-                    }),
-                }),
-            }),
+          }),
         }),
-    })
-    .return(["blog"])
-    .build();
+      }),
+    }),
+  })
+  .return(["blog"])
+  .build();
 ```
 
 #### Match Blog (TODO REL PROPERTIES USING BUILDER)
@@ -122,33 +122,33 @@ import { Builder, node, property, edge } from "@dgql/builder";
 const builder = new Builder();
 
 const [dgql, variables] = builder
-    .match({
-        product: node({ label: "Product" }).project({
-            name: property(),
-            sizes: edge({
-                type: "HAS_SIZE",
-                direction: "OUT",
-                node: node({ label: "Size" }),
-            }).project({
-                name: property(),
-            }),
-            photos: edge({
-                type: "HAS_PHOTO",
-                direction: "OUT",
-                node: node({ label: "Photo" }),
-            }).project({
-                url: property(),
-                description: property(),
-                color: edge({
-                    type: "OF_COLOR",
-                    direction: "OUT",
-                    node: node({ label: "Color" }),
-                }).project({ name: property() }),
-            }),
-        }),
-    })
-    .return(["product"])
-    .build();
+  .match({
+    product: node({ label: "Product" }).project({
+      name: property(),
+      sizes: edge({
+        type: "HAS_SIZE",
+        direction: "OUT",
+        node: node({ label: "Size" }),
+      }).project({
+        name: property(),
+      }),
+      photos: edge({
+        type: "HAS_PHOTO",
+        direction: "OUT",
+        node: node({ label: "Photo" }),
+      }).project({
+        url: property(),
+        description: property(),
+        color: edge({
+          type: "OF_COLOR",
+          direction: "OUT",
+          node: node({ label: "Color" }),
+        }).project({ name: property() }),
+      }),
+    }),
+  })
+  .return(["product"])
+  .build();
 ```
 
 #### Match User Comments (TODO EDGE WHERE USING BUILDER)

@@ -5,6 +5,8 @@ import { print } from "graphql";
 // @ts-ignore
 import matchBlog from "../../../misc/recipes/match-blog.gql";
 // @ts-ignore
+import createBlog from "../../../misc/recipes/create-blog.gql";
+// @ts-ignore
 import matchMovies from "../../../misc/recipes/match-movies.gql";
 // @ts-ignore
 import matchPringles from "../../../misc/recipes/match-pringles.gql";
@@ -18,6 +20,10 @@ import { Sample } from "./types";
 import { prettify } from "./utils";
 
 const samples = [
+    {
+        name: "Create Blog",
+        sample: prettify(print(createBlog)),
+    },
     {
         name: "Match Blog",
         sample: prettify(print(matchBlog)),

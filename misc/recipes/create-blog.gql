@@ -1,0 +1,50 @@
+{
+  CREATE {
+    blog @node(label: Blog) {
+      SET {
+        name(value: "Dan's Cool Blog")
+      }
+      CREATE @edge(type: HAS_BLOG, direction: IN) {
+        NODE(label: User) {
+          SET {
+            name(value: "Dan")
+          }
+        }
+      }
+      CREATE @edge(type: HAS_POST, direction: OUT) {
+        NODE(label: Post) {
+          SET {
+            title(value: "I was on my 3rd beer when I wrote this!")
+          }
+          CONNECT @edge(type: HAS_POST, direction: IN) {
+            NODE(label: User) {
+              WHERE {
+                name(equal: "Dan")
+              }
+            }
+          }
+          CREATE @edge(type: HAS_COMMENT, direction: OUT) {
+            NODE(label: Comment) {
+              SET {
+                content(value: "This is my first comment!")
+              }
+              CONNECT @edge(type: COMMENTED, direction: IN) {
+                NODE(label: User) {
+                  WHERE {
+                    name(equal: "Dan")
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      PROJECT {
+        title
+      }
+    }
+  }
+  RETURN {
+    blog
+  }
+}
