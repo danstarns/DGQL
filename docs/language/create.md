@@ -83,6 +83,11 @@ Given the most basic example, above, your just create and then holding a referen
             content(value: "Nested Mutations are cool!")
           }
         }
+        PROPERTIES {
+          SET {
+            since(value: "04/04/2021")
+          }
+        }
       }
     }
   }
@@ -105,6 +110,11 @@ Given the most basic example, above, your just create and then holding a referen
         NODE(label: Post) {
           WHERE {
             content(equal: "Nested Mutations are cool!")
+          }
+        }
+        PROPERTIES {
+          SET {
+            since(value: "04/04/2021")
           }
         }
       }

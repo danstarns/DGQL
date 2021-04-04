@@ -221,3 +221,56 @@ RETURN node
 ```
 
 ---
+
+### `CREATE @edge` Node & `SET` PROPERTIES (2 level)
+
+**Input GraphQL**
+
+```graphql
+{
+  CREATE {
+    node @node {
+      CREATE @edge(type: HAS_EDGE, direction: OUT) {
+        NODE(label: Node)
+        PROPERTIES {
+          SET {
+            id(value: "some-id")
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+  CREATE (node)
+  WITH node
+  CALL {
+    CREATE (node_create0_NODE:Node)
+    RETURN node_create0_NODE
+  }
+  MERGE (node)-[node_create0_PROPERTIES:HAS_EDGE]->(node_create0_NODE)
+  SET node_create0_PROPERTIES.id = $params.node_create0_PROPERTIES_set_id
+  RETURN node
+}
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+      "node_create0_PROPERTIES_set_id": "some-id"
+    }
+}
+```
+
+---

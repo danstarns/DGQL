@@ -186,5 +186,58 @@ describe("create", () => {
         await session.close();
       }
     });
+
+    test("should create a node with an edge to a node (while SETting relationship PROPERTIES)", async () => {
+      const session = driver.session();
+
+      const client = new Client({ driver });
+
+      const id1 = generate({
+        charset: "alphabetic",
+      });
+      const id2 = generate({
+        charset: "alphabetic",
+      });
+
+      const query = gql`
+        {
+          CREATE {
+            node @node {
+              SET {
+                id(value: "${id1}")
+              }
+              CREATE @edge(type: HAS_EDGE, direction: OUT) {
+                NODE 
+                PROPERTIES {
+                  SET {
+                    id(value: "${id2}")
+                  }
+                }
+              }
+            }
+          }
+          RETURN {
+            node
+          }
+        }
+    `;
+
+      try {
+        await client.run({ query });
+
+        const find = await session.run(
+          `
+            MATCH (one {id: "${id1}"})-[rel:HAS_EDGE]->(two)
+            RETURN one, rel
+          `
+        );
+
+        expect(find.records[0].get("one")).toBeTruthy();
+        // @ts-ignore
+        expect(find.records[0].toObject().rel.properties).toEqual({ id: id2 });
+      } finally {
+        await session.close();
+      }
+    });
   });
 });

@@ -5,6 +5,35 @@ import {
   valueFromASTUntyped,
 } from "graphql";
 
+function createSetAndParams({
+  setSelections,
+  variables,
+  varName,
+}: {
+  setSelections: FieldNode[];
+  variables: any;
+  varName: string;
+}): [string, any] {
+  let strs: string[] = [];
+  let params = {};
+
+  setSelections?.forEach((selection) => {
+    const valueArg = (selection?.arguments || [])?.find(
+      (x) => x.name.value === "value"
+    ) as ArgumentNode;
+
+    if (!valueArg) {
+      throw new Error("value arg required for SET.property");
+    }
+
+    const paramName = `${varName}_set_${selection.name.value}`;
+    params[paramName] = valueFromASTUntyped(valueArg.value, variables);
+    strs.push(`SET ${varName}.${selection.name.value} = $params.${paramName}`);
+  });
+
+  return [strs.join("\n"), params];
+}
+
 function createCreateAndParams({
   createField,
   variables,
@@ -49,23 +78,9 @@ function createCreateAndParams({
     selections.forEach((selection, i) => {
       if (selection.name.value === "SET") {
         const setSelections = selection.selectionSet?.selections as FieldNode[];
-
-        setSelections?.forEach((selection) => {
-          const valueArg = (selection?.arguments || [])?.find(
-            (x) => x.name.value === "value"
-          ) as ArgumentNode;
-
-          if (!valueArg) {
-            throw new Error("value arg required for SET.property");
-          }
-
-          const paramName = `${varName}_set_${selection.name.value}`;
-          cyphers.push(
-            `SET ${varName}.${selection.name.value} = $params.${paramName}`
-          );
-          params[paramName] = valueFromASTUntyped(valueArg.value, variables);
-        });
-
+        const sAP = createSetAndParams({ varName, setSelections, variables });
+        cyphers.push(sAP[0]);
+        params = { ...params, ...sAP[1] };
         return;
       }
 
@@ -96,8 +111,15 @@ function createCreateAndParams({
           ? valueFromASTUntyped(directionArg.value, variables)
           : (undefined as string | undefined);
 
-        const nodeSelection = selection.selectionSet?.selections.find(
+        const selections = (selection.selectionSet?.selections ||
+          []) as FieldNode[];
+
+        const nodeSelection = selections.find(
           (x) => x.kind === "Field" && x.name.value === "NODE"
+        ) as FieldNode;
+
+        const propertiesSelection = selections.find(
+          (x) => x.kind === "Field" && x.name.value === "PROPERTIES"
         ) as FieldNode;
 
         if (!nodeSelection) {
@@ -107,21 +129,43 @@ function createCreateAndParams({
         const innerChainStr = `${varName}_create${i}`;
 
         const cCAP = createCreateAndParams({
-          createField: selection,
+          createField: {
+            ...selection,
+            selectionSet: { kind: "SelectionSet", selections: [nodeSelection] },
+          },
           variables,
           chainStr: innerChainStr,
         });
+        params = { ...params, ...cCAP[1] };
 
         const inStr = direction === "IN" ? "<-" : "-";
         const outStr = direction === "OUT" ? "->" : "-";
-        const relTypeStr = type ? `[:${type}]` : `[]`;
+        const propertiesName = propertiesSelection
+          ? `${innerChainStr}_PROPERTIES`
+          : "";
+        const relTypeStr = type
+          ? `[${propertiesName ? propertiesName : ""}:${type}]`
+          : `[]`;
 
         cyphers.push(`WITH ${varName}`);
         cyphers.push(cCAP[0]);
         cyphers.push(
           `MERGE (${varName})${inStr}${relTypeStr}${outStr}(${`${innerChainStr}_${nodeSelection.name.value}`})`
         );
-        params = { ...params, ...cCAP[1] };
+
+        if (propertiesSelection) {
+          const setSelections = (propertiesSelection.selectionSet?.selections.find(
+            (x) => x.kind === "Field" && x.name.value === "SET"
+          ) as FieldNode).selectionSet?.selections as FieldNode[];
+
+          const sAP = createSetAndParams({
+            varName: propertiesName,
+            setSelections,
+            variables,
+          });
+          cyphers.push(sAP[0]);
+          params = { ...params, ...sAP[1] };
+        }
 
         return;
       }
