@@ -13,10 +13,12 @@ function createCreateAndParams({
   createField,
   variables,
   chainStr,
+  withVars,
 }: {
   createField: FieldNode;
   variables: Record<string, unknown>;
   chainStr?: string;
+  withVars: string[];
 }): [string, any] {
   let cyphers: string[] = [];
   let params: Record<string, unknown> = {};
@@ -84,6 +86,7 @@ function createCreateAndParams({
             ...selection,
             selectionSet: { kind: "SelectionSet", selections: [nodeSelection] },
           },
+          withVars,
           variables,
           chainStr: innerChainStr,
         });
@@ -133,7 +136,7 @@ function createCreateAndParams({
           selections,
           variables,
           parentVar: varName,
-          withVars: [varName],
+          withVars: [...withVars, varName],
         });
 
         if (cCAP[0]) {

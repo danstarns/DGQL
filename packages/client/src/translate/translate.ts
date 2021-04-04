@@ -51,6 +51,7 @@ function translate({
       const [match, mParams] = createCreateAndParams({
         createField: selection,
         variables,
+        withVars: [],
       });
       cyphers.push(match);
       params = { ...params, ...mParams };

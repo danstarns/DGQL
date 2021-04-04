@@ -2,6 +2,7 @@ import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
 import createSetAndParams from "./create-set-and-params";
 import { getEdgeMeta } from "../utils";
+import createCreateAndParams from "./create-create-and-params";
 
 function createConnectAndParams({
   selections,
@@ -96,6 +97,9 @@ function createConnectAndParams({
   if (nodeSelection.selectionSet?.selections.length) {
     (nodeSelection.selectionSet?.selections as FieldNode[]).forEach(
       (selection, i) => {
+        const selections = (selection.selectionSet?.selections ||
+          []) as FieldNode[];
+
         if (selection.name.value === "CONNECT") {
           const { type, direction } = getEdgeMeta({ selection, variables });
 
@@ -103,7 +107,7 @@ function createConnectAndParams({
           const cCAP = createConnectAndParams({
             chainStr: `${_varName}_connect${i}`,
             parentVar: _varName,
-            selections: selection.selectionSet?.selections as FieldNode[],
+            selections,
             variables,
             type,
             direction,
@@ -117,7 +121,71 @@ function createConnectAndParams({
         }
 
         if (selection.name.value === "CREATE") {
-          return;
+          const { type, direction } = getEdgeMeta({ selection, variables });
+
+          const nodeSelectionIndex = selections.findIndex(
+            (x) => x.kind === "Field" && x.name.value === "NODE"
+          );
+          const propertiesSelectionIndex = selections.findIndex(
+            (x) => x.kind === "Field" && x.name.value === "PROPERTIES"
+          );
+
+          const nodeSelection = selections[nodeSelectionIndex] as FieldNode;
+          const propertiesSelection = selections[
+            propertiesSelectionIndex
+          ] as FieldNode;
+
+          if (!nodeSelection) {
+            throw new Error("CONNECT NODE CREATE @edge NODE required");
+          }
+
+          const innerChainStr = `${_varName}_create${i}`;
+          const inStr = direction === "IN" ? "<-" : "-";
+          const outStr = direction === "OUT" ? "->" : "-";
+          const propertiesName = propertiesSelection
+            ? `${innerChainStr}_PROPERTIES`
+            : "";
+          const relTypeStr = type
+            ? `[${propertiesName ? propertiesName : ""}:${type}]`
+            : `[]`;
+
+          const cAP = createCreateAndParams({
+            createField: {
+              ...selection,
+              selectionSet: {
+                kind: "SelectionSet",
+                selections: [nodeSelection],
+              },
+            },
+            chainStr: innerChainStr,
+            variables,
+            withVars: [...withVars, _varName],
+          });
+          params = { ...params, ...cAP[1] };
+
+          if (!cAP[0]) {
+            return;
+          }
+
+          strs.push(`WITH ${withVars.join(", ")}, ${_varName}`);
+          strs.push(cAP[0]);
+          strs.push(
+            `MERGE (${_varName})${inStr}${relTypeStr}${outStr}(${`${innerChainStr}_NODE`})`
+          );
+
+          if (propertiesSelection) {
+            const setSelections = (propertiesSelection.selectionSet?.selections.find(
+              (x) => x.kind === "Field" && x.name.value === "SET"
+            ) as FieldNode).selectionSet?.selections as FieldNode[];
+
+            const sAP = createSetAndParams({
+              varName: propertiesName,
+              setSelections,
+              variables,
+            });
+            strs.push(sAP[0]);
+            params = { ...params, ...sAP[1] };
+          }
         }
       }
     );
