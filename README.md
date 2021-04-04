@@ -232,3 +232,11 @@ Sometimes you may have a highly specific question, Cypher could better help you 
   }
 }
 ```
+
+## TODO
+
+- [ ] UPDATE
+- [ ] DELETE
+- [ ] DISCONNECT
+- [ ] Property directives IE: `@datetime`, `@uuid`
+- [ ] DGQL => Builder (1-1 Mapping)
