@@ -117,8 +117,6 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ### Retrieve large subgraphs
 
-> 💡 See this query with the Builder [here](https://github.com/danstarns/DGQL/tree/main/packages/builder#match-blog)
-
 ```graphql
 {
   MATCH {

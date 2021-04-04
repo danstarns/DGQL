@@ -1,0 +1,35 @@
+# See https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/
+{
+  MATCH {
+    movies @node(label: Movie) {
+      WHERE {
+        title(equal: "The Matrix")
+      }
+      PROJECT {
+        title
+        released
+        tagline
+        imdbRating
+        actors @edge(type: ACTED_IN, direction: IN) {
+          actor @node(label: Person) {
+            PROJECT {
+              name
+              born
+            }
+          }
+          PROPERTIES {
+            PROJECT {
+              roles
+            }
+          }
+        }
+        genres @edge(type: HAS_GENRE, direction: OUT) @node(label: Genre) {
+          name
+        }
+      }
+    }
+  }
+  RETURN {
+    movies
+  }
+}

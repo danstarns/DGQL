@@ -110,7 +110,11 @@ function createCreateAndParams({
         if (propertiesSelection) {
           const setSelections = (propertiesSelection.selectionSet?.selections.find(
             (x) => x.kind === "Field" && x.name.value === "SET"
-          ) as FieldNode).selectionSet?.selections as FieldNode[];
+          ) as FieldNode)?.selectionSet?.selections as FieldNode[];
+
+          if (!setSelections) {
+            throw new Error("CREATE @edge PROPERTIES SET required");
+          }
 
           const sAP = createSetAndParams({
             varName: propertiesName,

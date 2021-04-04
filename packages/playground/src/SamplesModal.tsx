@@ -7,15 +7,9 @@ import matchBlog from "../../../misc/recipes/match-blog.gql";
 // @ts-ignore
 import createBlog from "../../../misc/recipes/create-blog.gql";
 // @ts-ignore
-import matchMovies from "../../../misc/recipes/match-movies.gql";
+import matchMovies from "../../../misc/recipes/match-movie.gql";
 // @ts-ignore
-import matchPringles from "../../../misc/recipes/match-pringles.gql";
-// @ts-ignore
-import matchUserComments from "../../../misc/recipes/match-user-comments.gql";
-// @ts-ignore
-import matchUserContent from "../../../misc/recipes/match-user-content.gql";
-// @ts-ignore
-import matchWithCypher from "../../../misc/recipes/match-with-cypher.gql";
+import createMovies from "../../../misc/recipes/create-movie.gql";
 import { Sample } from "./types";
 import { prettify } from "./utils";
 
@@ -29,24 +23,12 @@ const samples = [
         sample: prettify(print(matchBlog)),
     },
     {
-        name: "Match Movies",
+        name: "Create Movie",
+        sample: prettify(print(createMovies)),
+    },
+    {
+        name: "Match Movie",
         sample: prettify(print(matchMovies)),
-    },
-    {
-        name: "Match Pringles",
-        sample: prettify(print(matchPringles)),
-    },
-    {
-        name: "Match User Comments",
-        sample: prettify(print(matchUserComments)),
-    },
-    {
-        name: "Match User Content",
-        sample: prettify(print(matchUserContent)),
-    },
-    {
-        name: "Match With Cypher Directive",
-        sample: prettify(print(matchWithCypher)),
     },
 ];
 

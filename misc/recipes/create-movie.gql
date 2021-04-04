@@ -1,0 +1,38 @@
+{
+  CREATE {
+    movie @node(label: Movie) {
+      SET {
+        title(value: "The Matrix")
+        released(value: 1999)
+        tagline(value: "Welcome to the Real World")
+        imdbRating(value: 8.7)
+      }
+      CREATE @edge(type: ACTED_IN, direction: IN) {
+        NODE(label: Person) {
+          SET {
+            name(value: "Keanu Reeves")
+            born(value: 1964)
+          }
+        }
+        PROPERTIES {
+          SET {
+            roles(value: ["Neo"])
+          }
+        }
+      }
+      CREATE @edge(type: HAS_GENRE, direction: OUT) {
+        NODE(label: Genre) {
+          SET {
+            name(value: "Action")
+          }
+        }
+      }
+      PROJECT {
+        title
+      }
+    }
+  }
+  RETURN {
+    movie
+  }
+}
