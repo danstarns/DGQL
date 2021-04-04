@@ -4,46 +4,10 @@ import {
   FieldNode,
   valueFromASTUntyped,
 } from "graphql";
+import { getEdgeMeta } from "../utils";
 import createConnectAndParams from "./create-connect-and-params";
 import createProjectionAndParams from "./create-projection-and-params";
 import createSetAndParams from "./create-set-and-params";
-
-function getEdgeMeta({
-  selection,
-  variables,
-}: {
-  selection: FieldNode;
-  variables: any;
-}): { direction?: string; type?: string } {
-  const edgeDirective = selection.directives?.find(
-    (x) => x.name.value === "edge"
-  ) as DirectiveNode;
-
-  if (!edgeDirective) {
-    throw new Error("CREATE @edge required");
-  }
-
-  const edgeArgs = edgeDirective?.arguments || [];
-
-  const typeArg = edgeArgs.find((x) => x.name.value === "type") as ArgumentNode;
-
-  const directionArg = edgeArgs.find(
-    (x) => x.name.value === "direction"
-  ) as ArgumentNode;
-
-  const type = typeArg
-    ? valueFromASTUntyped(typeArg.value, variables)
-    : (undefined as string | undefined);
-
-  const direction = directionArg
-    ? valueFromASTUntyped(directionArg.value, variables)
-    : (undefined as string | undefined);
-
-  return {
-    type,
-    direction,
-  };
-}
 
 function createCreateAndParams({
   createField,
@@ -169,6 +133,7 @@ function createCreateAndParams({
           selections,
           variables,
           parentVar: varName,
+          withVars: [varName],
         });
 
         if (cCAP[0]) {

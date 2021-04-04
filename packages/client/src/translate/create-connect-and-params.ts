@@ -1,6 +1,7 @@
 import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
 import createSetAndParams from "./create-set-and-params";
+import { getEdgeMeta } from "../utils";
 
 function createConnectAndParams({
   selections,
@@ -9,6 +10,7 @@ function createConnectAndParams({
   direction,
   type,
   variables,
+  withVars,
 }: {
   selections: FieldNode[];
   chainStr: string;
@@ -16,6 +18,7 @@ function createConnectAndParams({
   type?: string;
   direction?: string;
   variables: any;
+  withVars: string[];
 }): [string, any] {
   let strs: string[] = [];
   let params = {};
@@ -89,6 +92,36 @@ function createConnectAndParams({
   }
 
   strs.push(")"); // close foreach
+
+  if (nodeSelection.selectionSet?.selections.length) {
+    (nodeSelection.selectionSet?.selections as FieldNode[]).forEach(
+      (selection, i) => {
+        if (selection.name.value === "CONNECT") {
+          const { type, direction } = getEdgeMeta({ selection, variables });
+
+          strs.push(`WITH ${withVars.join(", ")}, ${_varName}`);
+          const cCAP = createConnectAndParams({
+            chainStr: `${_varName}_connect${i}`,
+            parentVar: _varName,
+            selections: selection.selectionSet?.selections as FieldNode[],
+            variables,
+            type,
+            direction,
+            withVars: [...withVars, _varName],
+          });
+          if (cCAP[0]) {
+            strs.push(cCAP[0]);
+            params = { ...params, ...cCAP[1] };
+          }
+          return;
+        }
+
+        if (selection.name.value === "CREATE") {
+          return;
+        }
+      }
+    );
+  }
 
   return [strs.join("\n"), params];
 }
