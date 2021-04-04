@@ -1,4 +1,4 @@
-import { FieldNode, OperationDefinitionNode, SelectionNode } from "graphql";
+import { FieldNode, OperationDefinitionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
@@ -49,7 +49,7 @@ function translate({
 
     if (selection.name.value === "CREATE") {
       const [match, mParams] = createCreateAndParams({
-        matchField: selection,
+        createField: selection,
         variables,
       });
       cyphers.push(match);

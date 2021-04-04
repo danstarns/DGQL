@@ -89,4 +89,50 @@ describe("create", () => {
       await session.close();
     }
   });
+
+  describe("edge", () => {
+    test("should create a node with an edge to a node", async () => {
+      const session = driver.session();
+
+      const client = new Client({ driver });
+
+      const label1 = generate({
+        charset: "alphabetic",
+      });
+      const label2 = generate({
+        charset: "alphabetic",
+      });
+
+      const query = `
+        {
+          CREATE {
+            node @node(label: "${label1}") {
+              CREATE @edge(type: HAS_EDGE, direction: OUT) {
+                NODE(label: "${label2}")
+              }
+            }
+          }
+          RETURN {
+            node
+          }
+        }
+    `;
+
+      try {
+        await client.run({ query });
+
+        const find = await session.run(
+          `
+            MATCH (one:${label1})-[:HAS_EDGE]->(two:${label2})
+            RETURN one, two
+        `
+        );
+
+        expect(find.records[0].get("one")).toBeTruthy();
+        expect(find.records[0].get("two")).toBeTruthy();
+      } finally {
+        await session.close();
+      }
+    });
+  });
 });
