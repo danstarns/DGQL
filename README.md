@@ -20,7 +20,8 @@ Dynamic Graph Query Language 👍
 
 ### Documentation
 
-You can find the [documentation here](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
+- You can find the [documentation here](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
+- You can find the [TCK tests here](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
 
 ### Prerequisites
 
