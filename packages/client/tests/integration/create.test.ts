@@ -2,6 +2,7 @@ import { Driver } from "neo4j-driver";
 import { generate } from "randomstring";
 import neo4j from "./neo4j";
 import { Client } from "../../src";
+import gql from "graphql-tag";
 
 describe("create", () => {
   let driver: Driver;
@@ -23,7 +24,7 @@ describe("create", () => {
       charset: "alphabetic",
     });
 
-    const query = `
+    const query = gql`
         {
             CREATE {
                 node @node(label: "${label}")
@@ -59,7 +60,7 @@ describe("create", () => {
       charset: "alphabetic",
     });
 
-    const query = `
+    const query = gql`
         {
             CREATE {
                 node @node {
@@ -103,7 +104,7 @@ describe("create", () => {
         charset: "alphabetic",
       });
 
-      const query = `
+      const query = gql`
         {
           CREATE {
             node @node(label: "${label1}") {
@@ -147,7 +148,7 @@ describe("create", () => {
         charset: "alphabetic",
       });
 
-      const query = `
+      const query = gql`
         {
           CREATE {
             node @node {
