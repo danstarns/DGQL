@@ -18,11 +18,11 @@ Dynamic Graph Query Language 👍
 
 ### Documentation
 
-- You can find the [documentation here](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
-- You can find the [TCK tests here](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
-- You can find the [DGQL Recipes here](https://github.com/danstarns/dgql/tree/main/misc/recipes)
+- [Documentation](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
+- [TCK tests](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
+- [DGQL Recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes)
 
-## TODO
+### TODO
 
 The Builder or Client is not published yet. But if you want to play around with DGQL now; then install the published version of the [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground). The following operations; [`MATCH`](https://github.com/danstarns/DGQL/blob/main/docs/language/match.md) & [`CREATE`](https://github.com/danstarns/DGQL/blob/main/docs/language/create.md) are in a good state to experiment with. The Builder; `MATCH` is in progress, porting `CREATE` into the builder is one of my next tasks.
 
@@ -30,6 +30,7 @@ The Builder or Client is not published yet. But if you want to play around with 
 - [ ] `DELETE`
 - [ ] `DISCONNECT`
 - [ ] `AGGREGATE`
+- [ ] Auto complete in Playground
 - [ ] Property directives IE: `@datetime`, `@uuid`
 - [ ] DGQL => Builder (1-1 Mapping) (only `MATCH` implemented)
 
@@ -37,7 +38,7 @@ The Builder or Client is not published yet. But if you want to play around with 
 
 GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
 
-[![Image from Gyazo](https://i.gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d.png)](https://gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d)
+[![What is graphql](https://i.gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d.png)](https://gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d)
 
 To grasp this implementation one should understand the two separate sections above; **GraphQL is a query language** & a runtime for fulfilling those queries. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
 
@@ -99,24 +100,29 @@ const [dgql, variables] = builder
 The following Cypher is produced;
 
 ```cypher
-MATCH (user:User)
-WHERE user.name = "Dan"
-RETURN user {
-    .id,
-    .name,
-    posts: [ (user)-[:HAS_POST]->(posts:Post) | { title: posts.title } ]
-} as user
+CALL {
+  MATCH (user:User)
+  WHERE user.name = "Dan"
+  RETURN user {
+      .id,
+      .name,
+      posts: [ (user)-[:HAS_POST]->(posts:Post) | { title: posts.title } ]
+  } as user
+}
+RETURN user
 ```
 
 Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like;
 
 ```json
 {
-  "user": {
-    "id": "user-id-01",
-    "name": "Dan",
-    "posts": [{ "title": "Checkout DGQL!" }]
-  }
+  "user": [
+    {
+      "id": "user-id-01",
+      "name": "Dan",
+      "posts": [{ "title": "Checkout DGQL!" }]
+    }
+  ]
 }
 ```
 
@@ -245,3 +251,9 @@ Sometimes you may have a highly specific question, Cypher could better help you 
   }
 }
 ```
+
+### Play on your desktop
+
+[Playground](https://github.com/danstarns/dgql/tree/main/packages/playground).
+
+[![Image from Gyazo](https://i.gyazo.com/194bc89547cb025043e03f7bc0439257.gif)](https://gyazo.com/194bc89547cb025043e03f7bc0439257)

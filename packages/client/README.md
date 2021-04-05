@@ -17,14 +17,14 @@ const { Client } = require("@dgql/client");
 const neo4j = require("neo4j-driver");
 
 const driver = neo4j.driver(
-    "bolt://localhost:7687",
-    neo4j.auth.basic("neo4j", "password")
+  "bolt://localhost:7687",
+  neo4j.auth.basic("neo4j", "password")
 );
 
 const client = new Client({ driver });
 
 async function main() {
-    const query = `
+  const query = `
         {
             MATCH {
                 user @node(label: User) {
@@ -45,10 +45,10 @@ async function main() {
         }
     `;
 
-    const { ussr } = await client.run({ query });
+  const { user } = await client.run({ query });
 
-    console.log(user);
-    /*
+  console.log(user);
+  /*
         [{
             name: "Dan",
             posts: [
@@ -76,15 +76,15 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            WHERE {
-                id(equal: $id)
-            }
-        }
+  MATCH {
+    user @node(label: User) {
+      WHERE {
+        id(equal: $id)
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
