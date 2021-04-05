@@ -22,9 +22,24 @@ Dynamic Graph Query Language 👍
 - You can find the [TCK tests here](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
 - You can find the [DGQL Recipes here](https://github.com/danstarns/dgql/tree/main/misc/recipes)
 
+## TODO
+
+The Builder or Client is not published yet. But if you want to play around with DGQL now; then install the published version of the [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground). The following operations; [`MATCH`](https://github.com/danstarns/DGQL/blob/main/docs/language/match.md) & [`CREATE`](https://github.com/danstarns/DGQL/blob/main/docs/language/create.md) are in a good state to experiment with. The Builder; `MATCH` is in progress, porting `CREATE` into the builder is one of my next tasks.
+
+- [ ] `UPDATE`
+- [ ] `DELETE`
+- [ ] `DISCONNECT`
+- [ ] `AGGREGATE`
+- [ ] Property directives IE: `@datetime`, `@uuid`
+- [ ] DGQL => Builder (1-1 Mapping) (only `MATCH` implemented)
+
 ### Prerequisites
 
 GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
+
+[![Image from Gyazo](https://i.gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d.png)](https://gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d)
+
+To grasp this implementation one should understand the two separate sections above; **GraphQL is a query language** & a runtime for fulfilling those queries. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
 
 ### What
 
@@ -157,7 +172,7 @@ Sometimes you may have a highly specific question, Cypher could better help you 
           @cypher(
             arguments: { first: 3 }
             statement: """
-            MATCH (this)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(overlap)-[:ACTED_IN|:DIRECTED|:IN_GENRE]-(rec:Movie)
+            MATCH (this)-[:ACTED_IN|:IN_GENRE]-()-[:ACTED_IN|:IN_GENRE]-(rec:Movie)
             WITH rec, COUNT(*) AS score
             RETURN rec ORDER BY score DESC LIMIT $first
             """
@@ -230,14 +245,3 @@ Sometimes you may have a highly specific question, Cypher could better help you 
   }
 }
 ```
-
-## TODO
-
-Overall the state of the project is good! The Builder or Client is not published yet. But if you want to play around with DGQL now; then install the published version of the [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground). The following operations; [`MATCH`](https://github.com/danstarns/DGQL/blob/main/docs/language/match.md) & [`CREATE`](https://github.com/danstarns/DGQL/blob/main/docs/language/create.md) are in a good state to experiment with. The Builder; `MATCH` is in progress, porting `CREATE` into the builder is one of my next tasks.
-
-- [ ] `UPDATE`
-- [ ] `DELETE`
-- [ ] `DISCONNECT`
-- [ ] `AGGREGATE`
-- [ ] Property directives IE: `@datetime`, `@uuid`
-- [ ] DGQL => Builder (1-1 Mapping) (only `MATCH` implemented)
