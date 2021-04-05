@@ -134,6 +134,10 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 **Why no Schema?** - This implementation is designed to be lightweight and run anywhere. The lack of schema facilitates this but also means no validation or type checking is performed, usually the expensive part of GraphQL execution.
 
+[![Image from Gyazo](https://i.gyazo.com/852aa6474e6872604566fab5a9b20298.jpg)](https://gyazo.com/852aa6474e6872604566fab5a9b20298)
+
+- Image showing a representation of a typical GraphQL engine.
+
 ## Overview
 
 ### Retrieve large subgraphs
