@@ -36,11 +36,11 @@ The Builder or Client is not published yet. But if you want to play around with 
 
 ### Prerequisites
 
-GraphQL can be separated into two sections; language & execution. To truly understand this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
+GraphQL can be separated into two sections; language & execution. To truly grasp this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
 
 [![What is graphql](https://i.gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d.png)](https://gyazo.com/127d6883ae1ae024c8d05cb9fa359b0d)
 
-To grasp this implementation one should understand the two separate sections above; **GraphQL is a query language** & a runtime for fulfilling those queries. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
+Looking at the two separate sections above; **GraphQL is a query language** & a runtime for fulfilling those queries. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
 
 ### What
 
