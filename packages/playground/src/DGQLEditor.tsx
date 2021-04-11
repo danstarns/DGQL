@@ -156,7 +156,7 @@ function DGQLEditor({
       defaultLanguage="graphql"
       beforeMount={beforeMount}
       onMount={onMount}
-      options={{ fontSize: "18", tabSize: 2 }}
+      options={{ fontSize: "14", tabSize: 2 }}
     />
   );
 }

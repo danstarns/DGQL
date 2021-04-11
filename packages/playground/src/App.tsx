@@ -134,6 +134,11 @@ function App() {
           >
             Pretty
           </Button>
+          <p className="ml-3 pt-1 font-weight-bold">
+            <a href="https://github.com/danstarns/DGQL">
+              https://github.com/danstarns/DGQL
+            </a>
+          </p>
         </Card>
 
         {(loading || error) && (
@@ -174,7 +179,7 @@ function App() {
                         height="30vh"
                         theme="vs-dark"
                         defaultLanguage="json"
-                        options={{ fontSize: "18" }}
+                        options={{ fontSize: "14" }}
                         value={queryParams}
                         onChange={(v) => setQueryParams(v)}
                       />
@@ -197,7 +202,7 @@ function App() {
                         defaultLanguage="json"
                         value={JSON.stringify(response, null, 2)}
                         options={{
-                          fontSize: "18",
+                          fontSize: "14",
                           readOnly: true,
                         }}
                       />
@@ -215,7 +220,7 @@ function App() {
                         theme="vs-dark"
                         value={cypher}
                         options={{
-                          fontSize: "18",
+                          fontSize: "14",
                           readOnly: true,
                         }}
                       />
@@ -238,7 +243,7 @@ function App() {
                     defaultLanguage="json"
                     value={cypherParams}
                     options={{
-                      fontSize: "18",
+                      fontSize: "14",
                       readOnly: true,
                     }}
                   />
@@ -257,7 +262,7 @@ function App() {
                     defaultLanguage="json"
                     value={cypherStats}
                     options={{
-                      fontSize: "18",
+                      fontSize: "14",
                       readOnly: true,
                     }}
                   />
