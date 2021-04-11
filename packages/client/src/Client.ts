@@ -25,9 +25,11 @@ class Client {
   async run<T = any>({
     query,
     variables = {},
+    includeStats,
   }: {
     query: Query;
     variables?: Record<string, unknown>;
+    includeStats?: boolean;
   }): Promise<T> {
     const translation = translate({
       query,
@@ -43,6 +45,7 @@ class Client {
     return (execute({
       ...translation,
       driver: this.driver,
+      includeStats,
     }) as unknown) as T;
   }
 }

@@ -51,6 +51,43 @@ describe("create", () => {
     }
   });
 
+  test("should create a node (and return stats)", async () => {
+    const session = driver.session();
+
+    const client = new Client({ driver });
+
+    const label = generate({
+      charset: "alphabetic",
+    });
+
+    const query = gql`
+        {
+            CREATE {
+                node @node(label: "${label}")
+            }
+            RETURN {
+                node
+            }
+        }
+    `;
+
+    try {
+      const { __STATS__ } = await client.run({ query, includeStats: true });
+
+      const find = await session.run(
+        `
+            MATCH (n:${label})
+            RETURN n
+        `
+      );
+
+      expect(__STATS__.nodesCreated).toEqual(1);
+      expect(find.records[0]).toBeTruthy();
+    } finally {
+      await session.close();
+    }
+  });
+
   test("should create a node with property", async () => {
     const session = driver.session();
 
