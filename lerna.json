@@ -1,9 +1,14 @@
 {
-    "packages": ["packages/client", "packages/playground", "packages/builder"],
-    "version": "independent",
-    "command": {
-        "bootstrap": {
-            "ci": true
-        }
+  "packages": [
+    "packages/client",
+    "packages/playground",
+    "packages/builder",
+    "packages/language"
+  ],
+  "version": "independent",
+  "command": {
+    "bootstrap": {
+      "ci": true
     }
+  }
 }

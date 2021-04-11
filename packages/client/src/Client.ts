@@ -1,5 +1,5 @@
 import * as neo4j from "neo4j-driver";
-import { translate } from "./translate";
+import { translate } from "../../language/src";
 import { Query, Translation } from "./types";
 import { execute, formatCypher } from "./utils";
 

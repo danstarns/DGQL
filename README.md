@@ -10,11 +10,13 @@ Dynamic Graph Query Language 👍
 
 ## Intro
 
-1. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Translation Engine & Executable Client for DGQL Queries
+1. [Language](https://github.com/danstarns/dgql/tree/main/packages/language) - The Javascript Implementation For The DGQL Language
 
-2. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
+2. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Executable Client for DGQL Queries
 
-3. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Graph app Developer playground to issue DGQL queries
+3. [Builder](https://github.com/danstarns/dgql/tree/main/packages/builder) - DGQL Query Builder
+
+4. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Graph app Developer playground to issue DGQL queries
 
 ### Documentation
 

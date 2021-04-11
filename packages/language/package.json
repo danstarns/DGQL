@@ -1,8 +1,8 @@
 {
-  "name": "@dgql/client",
+  "name": "@dgql/language",
   "version": "1.0.0",
-  "description": "Translation engine and client for the DGQL Language",
-  "main": "./dist/client/src/index.js",
+  "description": "The Javascript Implementation For The DGQL Language",
+  "main": "dist/index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc"
