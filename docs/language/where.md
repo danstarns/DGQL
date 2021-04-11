@@ -2,7 +2,7 @@
 
 ## Intro
 
-> See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files/where/operators) for info on operators.
+> See [TCK](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/where/operators) for info on operators.
 
 User to filter both node and relationship properties plus edges.
 
