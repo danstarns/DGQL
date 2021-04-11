@@ -19,3 +19,7 @@ Setting values on either nodes or relationship properties
 ### `SET` Date
 
 See [DateTime TCK](https://github.com/danstarns/DGQL/blob/main/packages/language/tests/tck/tck-test-files/set/date.md)
+
+### `SET` UUID
+
+See [UUID TCK](https://github.com/danstarns/DGQL/blob/main/packages/language/tests/tck/tck-test-files/set/uuid.md)

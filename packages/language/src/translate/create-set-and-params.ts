@@ -13,6 +13,14 @@ function createSetAndParams({
   let params = {};
 
   setSelections?.forEach((selection) => {
+    const uuidDirective = selection.directives?.find(
+      (x) => x.name.value === "uuid"
+    );
+    if (uuidDirective) {
+      strs.push(`SET ${varName}.${selection.name.value} = randomUUID()`);
+      return;
+    }
+
     const dateTimeDirective = selection.directives?.find(
       (x) => x.name.value === "datetime"
     );
