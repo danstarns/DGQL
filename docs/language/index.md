@@ -5,5 +5,6 @@
 3. [`PROJECT`](./project.md)
 4. [`RETURN`](./return.md)
 5. [`CREATE`](./create.md)
-6. [Pagination](./pagination.md)
-7. [`@cypher`](./cypher.md)
+6. [`SET`](./set.md)
+7. [Pagination](./pagination.md)
+8. [`@cypher`](./cypher.md)
