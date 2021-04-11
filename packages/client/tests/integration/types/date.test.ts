@@ -18,7 +18,7 @@ describe("date", () => {
   test("should create a node with datetime", async () => {
     const session = driver.session();
 
-    const client = new Client({ driver, debug: true });
+    const client = new Client({ driver });
 
     const label = generate({
       charset: "alphabetic",
