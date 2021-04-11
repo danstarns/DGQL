@@ -14,11 +14,13 @@ function createCreateAndParams({
   variables,
   chainStr,
   withVars,
+  escapeQuotes,
 }: {
   createField: FieldNode;
   variables: Record<string, unknown>;
   chainStr?: string;
   withVars: string[];
+  escapeQuotes?: boolean;
 }): [string, any] {
   let cyphers: string[] = [];
   let params: Record<string, unknown> = {};
@@ -49,6 +51,9 @@ function createCreateAndParams({
       : (undefined as string | undefined);
 
     cyphers.push(`CALL {`);
+    if (withVars.length) {
+      cyphers.push(`WITH ${withVars.join(", ")}`);
+    }
     cyphers.push(`CREATE (${varName}${label ? `:${label}` : ""})`);
 
     const selections = (field.selectionSet?.selections || []) as FieldNode[];
@@ -86,9 +91,10 @@ function createCreateAndParams({
             ...selection,
             selectionSet: { kind: "SelectionSet", selections: [nodeSelection] },
           },
-          withVars,
+          withVars: [], // not needed here
           variables,
           chainStr: innerChainStr,
+          escapeQuotes,
         });
         params = { ...params, ...cCAP[1] };
 
@@ -101,7 +107,7 @@ function createCreateAndParams({
           ? `[${propertiesName ? propertiesName : ""}:${type}]`
           : `[]`;
 
-        cyphers.push(`WITH ${varName}`);
+        cyphers.push(`WITH ${[...withVars, varName]}`);
         cyphers.push(cCAP[0]);
         cyphers.push(
           `MERGE (${varName})${inStr}${relTypeStr}${outStr}(${`${innerChainStr}_${nodeSelection.name.value}`})`
@@ -141,10 +147,11 @@ function createCreateAndParams({
           variables,
           parentVar: varName,
           withVars: [...withVars, varName],
+          escapeQuotes,
         });
 
         if (cCAP[0]) {
-          cyphers.push(`WITH ${varName}`);
+          cyphers.push(`WITH ${[...withVars, varName]}`);
           cyphers.push(cCAP[0]);
           params = { ...params, ...cCAP[1] };
         }

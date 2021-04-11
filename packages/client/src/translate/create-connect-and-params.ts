@@ -12,6 +12,7 @@ function createConnectAndParams({
   type,
   variables,
   withVars,
+  escapeQuotes,
 }: {
   selections: FieldNode[];
   chainStr: string;
@@ -20,6 +21,7 @@ function createConnectAndParams({
   direction?: string;
   variables: any;
   withVars: string[];
+  escapeQuotes?: boolean;
 }): [string, any] {
   let strs: string[] = [];
   let params = {};
@@ -59,6 +61,8 @@ function createConnectAndParams({
 
   const _varName = `${chainStr}_NODE`;
 
+  strs.push("CALL {");
+  strs.push(`WITH ${withVars.join(", ")}`);
   strs.push(`OPTIONAL MATCH (${_varName}${label ? `:${label}` : ""})`);
 
   if (nodeWhere) {
@@ -74,11 +78,13 @@ function createConnectAndParams({
     }
   }
 
+  const quote = escapeQuotes ? `\\"` : `"`;
+
   strs.push(
     [
-      `FOREACH(_ IN CASE ${_varName} WHEN NULL THEN [] ELSE [1] END |`,
+      `CALL apoc.do.when(${_varName} IS NOT NULL, ${quote}`,
       `MERGE (${parentVar})${inStr}${relTypeStr}${outStr}(${_varName})`,
-    ].join(" ")
+    ].join("\n")
   );
 
   if (propertiesSet) {
@@ -91,8 +97,6 @@ function createConnectAndParams({
     strs.push(sAP[0]);
     params = { ...params, ...sAP[1] };
   }
-
-  strs.push(")"); // close foreach
 
   if (nodeSelection.selectionSet?.selections.length) {
     (nodeSelection.selectionSet?.selections as FieldNode[]).forEach(
@@ -112,6 +116,7 @@ function createConnectAndParams({
             type,
             direction,
             withVars: [...withVars, _varName],
+            escapeQuotes: true,
           });
           if (cCAP[0]) {
             strs.push(cCAP[0]);
@@ -190,6 +195,15 @@ function createConnectAndParams({
       }
     );
   }
+
+  strs.push(quote);
+  strs.push(`, ${quote}${quote}`);
+  strs.push(
+    `, { params: $params, ${_varName}: ${_varName}, ${parentVar}: ${parentVar} }`
+  );
+  strs.push(") YIELD value as _");
+  strs.push("RETURN COUNT(*)");
+  strs.push("}"); // close CALL
 
   return [strs.join("\n"), params];
 }

@@ -2,7 +2,7 @@
 
 ---
 
-### `CONNECT @edge` Node (without label or direction or type)
+### `CONNECT @edge` Node (without direction)
 
 **Input GraphQL**
 
@@ -10,7 +10,7 @@
 {
   CREATE {
     node @node {
-      CONNECT @edge {
+      CONNECT @edge(type: HAS_NODE) {
         NODE
       }
     }
@@ -27,13 +27,14 @@
 CALL {
   CREATE (node)
   WITH node
-
-  OPTIONAL MATCH (node_connect0_NODE)
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-      MERGE (node)-[]-(node_connect0_NODE)
-  )
-
-  RETURN node
+  CALL {
+    WITH node
+    OPTIONAL MATCH (node_connect0_NODE)
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, "
+      MERGE (node)-[:HAS_NODE]-(node_connect0_NODE) " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
+      RETURN COUNT(*)
+    }
+    RETURN node
 }
 RETURN node
 ```
@@ -77,15 +78,16 @@ RETURN node
 CALL {
   CREATE (node)
   WITH node
-
-  OPTIONAL MATCH (node_connect0_NODE:Node)
-  WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-      MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
-  )
-
+  CALL {
+    WITH node OPTIONAL MATCH (node_connect0_NODE:Node)
+    WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, "
+      MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE) " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
+      RETURN COUNT(*)
+    }
   RETURN node
 }
+
 RETURN node
 ```
 
@@ -137,22 +139,27 @@ RETURN node
 CALL {
   CREATE (node)
   WITH node
-
-  OPTIONAL MATCH (node_connect0_NODE:Node)
-  WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
-  )
-
-  WITH node, node_connect0_NODE
-  OPTIONAL MATCH (node_connect0_NODE_connect1_NODE:Node)
-  WHERE node_connect0_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE_connect1_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE)
-  )
+  CALL {
+    WITH node
+    OPTIONAL MATCH (node_connect0_NODE:Node)
+    WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, "
+      MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
+      WITH node, node_connect0_NODE
+      CALL {
+        WITH node, node_connect0_NODE
+        OPTIONAL MATCH (node_connect0_NODE_connect1_NODE:Node)
+        WHERE node_connect0_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_where_id0_equal
+        CALL apoc.do.when(node_connect0_NODE_connect1_NODE IS NOT NULL, \"
+          MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE) \" , \"\" , { params: $params, node_connect0_NODE_connect1_NODE: node_connect0_NODE_connect1_NODE, node_connect0_NODE: node_connect0_NODE } ) YIELD value as _
+          RETURN COUNT(*)
+      } " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
+      RETURN COUNT(*)
+  }
 
   RETURN node
 }
+
 RETURN node
 ```
 
@@ -212,29 +219,36 @@ RETURN node
 CALL {
   CREATE (node)
   WITH node
+  CALL {
+    WITH node
+    OPTIONAL MATCH (node_connect0_NODE:Node)
+    WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, "
+      MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
+      WITH node, node_connect0_NODE
+      CALL {
+        WITH node, node_connect0_NODE
+        OPTIONAL MATCH (node_connect0_NODE_connect1_NODE:Node)
+        WHERE node_connect0_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_where_id0_equal
+        CALL apoc.do.when(node_connect0_NODE_connect1_NODE IS NOT NULL, \"
+          MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE)
+          WITH node, node_connect0_NODE, node_connect0_NODE_connect1_NODE
+          CALL {
+            WITH node, node_connect0_NODE, node_connect0_NODE_connect1_NODE
+            OPTIONAL MATCH (node_connect0_NODE_connect1_NODE_connect1_NODE:Node)
+            WHERE node_connect0_NODE_connect1_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_connect1_NODE_where_id0_equal
+            CALL apoc.do.when(node_connect0_NODE_connect1_NODE_connect1_NODE IS NOT NULL, \"
+              MERGE (node_connect0_NODE_connect1_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE_connect1_NODE) \" , \"\" , { params: $params, node_connect0_NODE_connect1_NODE_connect1_NODE: node_connect0_NODE_connect1_NODE_connect1_NODE, node_connect0_NODE_connect1_NODE: node_connect0_NODE_connect1_NODE } ) YIELD value as _
+              RETURN COUNT(*)
+            } \" , \"\" , { params: $params, node_connect0_NODE_connect1_NODE: node_connect0_NODE_connect1_NODE, node_connect0_NODE: node_connect0_NODE } ) YIELD value as _
+            RETURN COUNT(*)
+          } " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
 
-  OPTIONAL MATCH (node_connect0_NODE:Node)
-  WHERE node_connect0_NODE.id = $params.node_connect0_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
-  )
-
-  WITH node, node_connect0_NODE
-  OPTIONAL MATCH (node_connect0_NODE_connect1_NODE:Node)
-  WHERE node_connect0_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE_connect1_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE)
-  )
-
-  WITH node, node_connect0_NODE, node_connect0_NODE_connect1_NODE
-  OPTIONAL MATCH (node_connect0_NODE_connect1_NODE_connect1_NODE:Node)
-  WHERE node_connect0_NODE_connect1_NODE_connect1_NODE.id = $params.node_connect0_NODE_connect1_NODE_connect1_NODE_where_id0_equal
-  FOREACH(_ IN CASE node_connect0_NODE_connect1_NODE_connect1_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node_connect0_NODE_connect1_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect1_NODE_connect1_NODE)
-  )
-
-  RETURN node
+        RETURN COUNT(*)
+      }
+    RETURN node
 }
+
 RETURN node
 ```
 
@@ -293,27 +307,32 @@ RETURN node
 ```cypher
 CALL {
   CREATE (node)
-
   WITH node
-  OPTIONAL MATCH (node_connect0_NODE:Node)
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
-  )
-
-  WITH node, node_connect0_NODE
-  OPTIONAL MATCH (node_connect0_NODE_connect0_NODE:Node)
-  FOREACH(_ IN CASE node_connect0_NODE_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-    MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect0_NODE)
-  )
-
-  WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE
   CALL {
-    CREATE (node_connect0_NODE_connect0_NODE_create0_NODE:Node)
-    SET node_connect0_NODE_connect0_NODE_create0_NODE.id = $params.node_connect0_NODE_connect0_NODE_create0_NODE_set_id
-    RETURN node_connect0_NODE_connect0_NODE_create0_NODE
+    WITH node
+    OPTIONAL MATCH (node_connect0_NODE:Node)
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, "
+      MERGE (node)<-[:HAS_NODE]-(node_connect0_NODE)
+      WITH node, node_connect0_NODE
+      CALL {
+        WITH node, node_connect0_NODE
+        OPTIONAL MATCH (node_connect0_NODE_connect0_NODE:Node)
+        CALL apoc.do.when(node_connect0_NODE_connect0_NODE IS NOT NULL, \"
+          MERGE (node_connect0_NODE)-[:HAS_NODE]->(node_connect0_NODE_connect0_NODE)
+          WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE
+          CALL {
+            WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE
+            CREATE (node_connect0_NODE_connect0_NODE_create0_NODE:Node)
+            SET node_connect0_NODE_connect0_NODE_create0_NODE.id = $params.node_connect0_NODE_connect0_NODE_create0_NODE_set_id
+            RETURN node_connect0_NODE_connect0_NODE_create0_NODE
+          }
+          MERGE (node_connect0_NODE_connect0_NODE)-[node_connect0_NODE_connect0_NODE_create0_PROPERTIES:HAS_NODE]->(node_connect0_NODE_connect0_NODE_create0_NODE)
+          SET node_connect0_NODE_connect0_NODE_create0_PROPERTIES.id = $params.node_connect0_NODE_connect0_NODE_create0_PROPERTIES_set_id \" , \"\" , { params: $params, node_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE, node_connect0_NODE: node_connect0_NODE } ) YIELD value as _
+          RETURN COUNT(*)
+      } " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
+
+      RETURN COUNT(*)
   }
-  MERGE (node_connect0_NODE_connect0_NODE)-[node_connect0_NODE_connect0_NODE_create0_PROPERTIES:HAS_NODE]->(node_connect0_NODE_connect0_NODE_create0_NODE)
-  SET node_connect0_NODE_connect0_NODE_create0_PROPERTIES.id = $params.node_connect0_NODE_connect0_NODE_create0_PROPERTIES_set_id
 
   RETURN node
 }
@@ -365,14 +384,16 @@ CALL {
   CREATE (node)
   WITH node
 
-  OPTIONAL MATCH (node_connect0_NODE:Node)
-  FOREACH(_ IN CASE node_connect0_NODE WHEN NULL THEN [] ELSE [1] END |
-      MERGE (node)<-[node_connect0_PROPERTIES:HAS_NODE]-(node_connect0_NODE)
-      SET node_connect0_PROPERTIES.id = $params.node_connect0_PROPERTIES_set_id
-  )
+  CALL {
+    WITH node
+    OPTIONAL MATCH (node_connect0_NODE:Node)
+    CALL apoc.do.when(node_connect0_NODE IS NOT NULL, " MERGE (node)<-[node_connect0_PROPERTIES:HAS_NODE]-(node_connect0_NODE) SET node_connect0_PROPERTIES.id = $params.node_connect0_PROPERTIES_set_id " , "" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _
+    RETURN COUNT(*)
+  }
 
   RETURN node
 }
+
 RETURN node
 ```
 

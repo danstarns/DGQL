@@ -397,15 +397,6 @@ describe("create", () => {
               }
               PROJECT {
                 id
-                name
-                photos @edge(type: HAS_PHOTO, direction: OUT) @node(label: Photo) {
-                  id
-                  url
-                  description
-                  colors @edge(type: HAS_COLOR, direction: OUT) @node(label: Color) {
-                    name
-                  }
-                }
               }
             }
           }
@@ -418,31 +409,43 @@ describe("create", () => {
       try {
         await session.run(
           `
-          CREATE (:Color {name: "${colors[0].name}"})
-          CREATE (:Color {name: "${colors[1].name}"})
-        `
+            CREATE (:Color {name: "${colors[0].name}"})
+            CREATE (:Color {name: "${colors[1].name}"})
+          `
         );
 
         const { products } = await client.run<{ products: any[] }>({ query });
 
         expect(products.length).toEqual(1);
+        const [p] = products;
+        expect(p.id).toEqual(product.id);
 
-        expect(products[0]).toMatchObject({
-          ...product,
-          photos: [
-            {
-              id: photos[0].id,
-              url: photos[0].url,
-              description: photos[0].description,
-              colors: [colors[0]],
-            },
-            {
-              id: photos[1].id,
-              url: photos[1].url,
-              description: photos[1].description,
-              colors: [colors[1]],
-            },
-          ],
+        const findCypher = `
+            MATCH (product:Product {id: $id})
+            CALL {
+                MATCH (:Product {id: $id})-[:HAS_PHOTO]->(photo:Photo)-[:HAS_COLOR]->(photoColor)
+                WITH collect(photo.id) AS photoIds, collect(photoColor.name) as photoColorNames
+                RETURN photoIds, photoColorNames
+            }
+            RETURN product {.id, .name, photos: {ids: photoIds, colors: photoColorNames} } as product
+        `;
+
+        const find = await session.run(findCypher, { id: p.id });
+
+        const neo4jProduct = (find.records[0].toObject() as any).product;
+
+        expect(neo4jProduct.id).toMatch(product.id);
+        expect(neo4jProduct.name).toMatch(product.name);
+        expect(neo4jProduct.colors);
+
+        expect(neo4jProduct.photos.ids.length).toEqual(2);
+        neo4jProduct.photos.ids.forEach((photo) => {
+          expect(photos.map((x) => x.id).includes(photo)).toBeTruthy();
+        });
+
+        expect(neo4jProduct.photos.colors.length).toEqual(2);
+        neo4jProduct.photos.colors.forEach((photoColor) => {
+          expect(colors.map((x) => x.name).includes(photoColor)).toBeTruthy();
         });
       } finally {
         await session.close();
