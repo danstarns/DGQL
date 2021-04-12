@@ -1,53 +1,53 @@
 {
-    "name": "@dgql/playground",
-    "main": "index.js",
-    "version": "1.0.2",
-    "description": "Developer playground for the DGQL language",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/danstarns/dgql.git"
-    },
-    "neo4jDesktop": {
-        "apiVersion": "^1.4.0",
-        "permissions": [
-            "allGraphs"
-        ]
-    },
-    "keywords": [],
-    "author": "",
-    "license": "MIT",
-    "scripts": {
-        "build": "webpack --config webpack.config.js",
-        "dev": "webpack serve"
-    },
-    "bugs": {
-        "url": "https://github.com/danstarns/dgql/issues"
-    },
-    "homepage": "https://github.com/danstarns/dgql#readme",
-    "dependencies": {
-        "@monaco-editor/react": "^4.0.11",
-        "graphql": "^15.4.0",
-        "graphql-tag": "^2.11.0",
-        "neo4j-driver": "^4.2.3",
-        "react": "^17.0.1",
-        "react-bootstrap": "^1.4.0",
-        "react-dom": "^17.0.1",
-        "use-neo4j": "^0.3.4"
-    },
-    "devDependencies": {
-        "@types/react": "^17.0.0",
-        "@types/react-dom": "^17.0.0",
-        "@types/webpack": "^4.41.25",
-        "css-loader": "^5.0.1",
-        "dotenv-webpack": "^6.0.0",
-        "file-loader": "^6.2.0",
-        "html-webpack-plugin": "^4.5.0",
-        "prettier": "^2.2.1",
-        "style-loader": "^2.0.0",
-        "ts-loader": "^8.0.12",
-        "typescript": "^4.1.3",
-        "webpack": "^5.10.3",
-        "webpack-cli": "^4.2.0",
-        "webpack-dev-server": "^3.11.0"
-    }
+  "name": "@dgql/playground",
+  "main": "index.js",
+  "version": "1.0.3",
+  "description": "Developer playground for the DGQL language",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danstarns/dgql.git"
+  },
+  "neo4jDesktop": {
+    "apiVersion": "^1.4.0",
+    "permissions": [
+      "allGraphs"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "dev": "webpack serve"
+  },
+  "bugs": {
+    "url": "https://github.com/danstarns/dgql/issues"
+  },
+  "homepage": "https://github.com/danstarns/dgql#readme",
+  "dependencies": {
+    "@monaco-editor/react": "^4.0.11",
+    "graphql": "^15.4.0",
+    "graphql-tag": "^2.11.0",
+    "neo4j-driver": "^4.2.3",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.0",
+    "react-dom": "^17.0.1",
+    "use-neo4j": "^0.3.4"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/webpack": "^4.41.25",
+    "css-loader": "^5.0.1",
+    "dotenv-webpack": "^6.0.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.0",
+    "prettier": "^2.2.1",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.12",
+    "typescript": "^4.1.3",
+    "webpack": "^5.10.3",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  }
 }
