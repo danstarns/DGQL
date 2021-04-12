@@ -4,6 +4,7 @@ import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
 import createCreateAndParams from "./create-create-and-params";
 import createUpdateAndParams from "./create-update-and-params";
+import createDeleteAndParams from "./create-delete-and-params";
 
 function translate({
   query,
@@ -26,7 +27,7 @@ function translate({
       throw new Error("Fields are only supported here");
     }
 
-    const validSelections = ["MATCH", "CREATE", "UPDATE", "RETURN"];
+    const validSelections = ["MATCH", "CREATE", "UPDATE", "DELETE", "RETURN"];
     if (!validSelections.includes(selection.name.value)) {
       throw new Error(`Invalid selection: ${selection.name.value}`);
     }
@@ -67,6 +68,18 @@ function translate({
         withVars: [],
       });
       cyphers.push(update);
+      params = { ...params, ...mParams };
+
+      return;
+    }
+
+    if (selection.name.value === "DELETE") {
+      const [del, mParams] = createDeleteAndParams({
+        deleteField: selection,
+        variables,
+        withVars: [],
+      });
+      cyphers.push(del);
       params = { ...params, ...mParams };
 
       return;
