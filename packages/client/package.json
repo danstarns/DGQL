@@ -1,6 +1,6 @@
 {
   "name": "@dgql/client",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.1",
   "description": "Translation engine and client for the DGQL Language",
   "main": "./dist/client/src/index.js",
   "scripts": {
