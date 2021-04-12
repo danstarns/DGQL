@@ -12,6 +12,12 @@
     "url": "git+https://github.com/danstarns/dgql.git"
   },
   "author": "danielstarns@hotmail.com",
+  "keywords": [
+    "neo4j",
+    "graphql",
+    "language",
+    "client"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/danstarns/dgql/issues"
