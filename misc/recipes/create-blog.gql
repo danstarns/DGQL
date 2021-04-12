@@ -2,11 +2,14 @@
   CREATE {
     blog @node(label: Blog) {
       SET {
+        id @uuid
         name(value: "Dan's Cool Blog")
+        createdAt @datetime
       }
       CREATE @edge(type: HAS_BLOG, direction: IN) {
         NODE(label: User) {
           SET {
+            id @uuid
             name(value: "Dan")
           }
         }
@@ -14,7 +17,9 @@
       CREATE @edge(type: HAS_POST, direction: OUT) {
         NODE(label: Post) {
           SET {
-            title(value: "I was on my 3rd beer when I wrote this!")
+            id @uuid
+            title(value: "DGQL is cool! Maybe too cool for school!")
+            createdAt @datetime
           }
           CONNECT @edge(type: HAS_POST, direction: IN) {
             NODE(label: User) {
@@ -26,7 +31,9 @@
           CREATE @edge(type: HAS_COMMENT, direction: OUT) {
             NODE(label: Comment) {
               SET {
+                id @uuid
                 content(value: "This is my first comment!")
+                createdAt @datetime
               }
               CONNECT @edge(type: COMMENTED, direction: IN) {
                 NODE(label: User) {
