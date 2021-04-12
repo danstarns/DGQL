@@ -7,7 +7,7 @@ Use to update nodes and their edges.
 ```graphql
 {
   UPDATE {
-    user @node(label: User) @where() {
+    user @node(label: User) {
         WHERE {
 
         }
