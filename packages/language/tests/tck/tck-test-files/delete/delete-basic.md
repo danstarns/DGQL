@@ -18,8 +18,8 @@
 
 ```cypher
 CALL {
-    MATCH (NODE)
-    DELETE NODE
+    MATCH (delete0_NODE0)
+    DELETE delete0_NODE0
     RETURN COUNT(*)
 }
 RETURN COUNT(*)
@@ -51,8 +51,8 @@ RETURN COUNT(*)
 
 ```cypher
 CALL {
-    MATCH (NODE)
-    DETACH DELETE NODE
+    MATCH (delete0_NODE0)
+    DETACH DELETE delete0_NODE0
     RETURN COUNT(*)
 }
 RETURN COUNT(*)
@@ -63,6 +63,46 @@ RETURN COUNT(*)
 ```params
 {
     "params": {}
+}
+```
+
+---
+
+### Delete Node With `WHERE`
+
+**Input GraphQL**
+
+```graphql
+{
+  DELETE {
+    NODE {
+      WHERE {
+        id(equal: "123")
+      }
+    }
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    MATCH (delete0_NODE0)
+    WHERE delete0_NODE0.id = $params.delete0_id0_equal
+    DELETE delete0_NODE0
+    RETURN COUNT(*)
+}
+RETURN COUNT(*)
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+        "delete0_id0_equal": "123"
+    }
 }
 ```
 

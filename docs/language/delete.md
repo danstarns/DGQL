@@ -7,7 +7,11 @@ Use to delete nodes and their edges.
 ```graphql
 {
   DELETE {
-    NODE(label: User)
+    NODE(label: User) {
+      WHERE {
+
+      }
+    }
   }
 }
 ```
@@ -20,6 +24,20 @@ Detach `DELETE`
 {
   DELETE {
     NODE @detach
+  }
+}
+```
+
+`DELETE` with [`WHERE`](./where.md)
+
+```graphql
+{
+  DELETE {
+    NODE {
+      WHERE {
+        id(equal: "123445678")
+      }
+    }
   }
 }
 ```

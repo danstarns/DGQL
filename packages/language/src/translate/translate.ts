@@ -22,7 +22,7 @@ function translate({
 
   let returnSelection: FieldNode | undefined;
 
-  selections.forEach((selection) => {
+  selections.forEach((selection, i) => {
     if (selection.kind !== "Field") {
       throw new Error("Fields are only supported here");
     }
@@ -78,6 +78,7 @@ function translate({
         deleteField: selection,
         variables,
         withVars: [],
+        chainStr: `delete${i}`,
       });
       cyphers.push(del);
       params = { ...params, ...mParams };

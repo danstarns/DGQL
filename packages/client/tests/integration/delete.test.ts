@@ -79,4 +79,40 @@ describe("delete", () => {
       await session.close();
     }
   });
+
+  test("should delete delete a node with where", async () => {
+    const session = driver.session();
+
+    const client = new Client({ driver });
+
+    const id = generate({
+      charset: "alphabetic",
+    });
+
+    const query = gql`
+        {
+            DELETE {
+                NODE {
+                    WHERE {
+                        id(equal: "${id}")
+                    }
+                }
+            }
+        }
+    `;
+
+    try {
+      await session.run(
+        `
+            CREATE ({id: "${id}"})
+        `
+      );
+
+      const { __STATS__ } = await client.run({ query, includeStats: true });
+
+      expect(__STATS__.nodesDeleted).toEqual(1);
+    } finally {
+      await session.close();
+    }
+  });
 });
