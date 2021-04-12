@@ -2,12 +2,28 @@
 
 ## Intro
 
-Use in correlation with cyphers `CREATE` statement. The most Basic of `CREATE` would be;
+Use in correlation with cyphers `CREATE` statement.
 
 ```graphql
 {
   CREATE {
-    user @node(label: User)
+    user @node(label: User) @where() {
+        SET {
+
+        }
+        UPDATE {
+
+        }
+        CONNECT { # Nested Mutations
+
+        }
+        CREATE { # nested Mutations
+
+        }
+        PROJECT {
+
+        }
+    }
   }
 }
 ```

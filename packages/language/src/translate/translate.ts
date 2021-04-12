@@ -3,6 +3,7 @@ import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
 import { queryToDocument } from "../utils";
 import createCreateAndParams from "./create-create-and-params";
+import createUpdateAndParams from "./create-update-and-params";
 
 function translate({
   query,
@@ -25,7 +26,7 @@ function translate({
       throw new Error("Fields are only supported here");
     }
 
-    const validSelections = ["MATCH", "CREATE", "RETURN"];
+    const validSelections = ["MATCH", "CREATE", "UPDATE", "RETURN"];
     if (!validSelections.includes(selection.name.value)) {
       throw new Error(`Invalid selection: ${selection.name.value}`);
     }
@@ -48,12 +49,24 @@ function translate({
     }
 
     if (selection.name.value === "CREATE") {
-      const [match, mParams] = createCreateAndParams({
+      const [create, mParams] = createCreateAndParams({
         createField: selection,
         variables,
         withVars: [],
       });
-      cyphers.push(match);
+      cyphers.push(create);
+      params = { ...params, ...mParams };
+
+      return;
+    }
+
+    if (selection.name.value === "UPDATE") {
+      const [update, mParams] = createUpdateAndParams({
+        createField: selection,
+        variables,
+        withVars: [],
+      });
+      cyphers.push(update);
       params = { ...params, ...mParams };
 
       return;
@@ -65,6 +78,8 @@ function translate({
     returnVariables = ((returnSelection.selectionSet?.selections ||
       []) as FieldNode[]).map((s: FieldNode) => s.name.value);
     cyphers.push(`RETURN ${returnVariables.join(", ")}`);
+  } else {
+    cyphers.push(`RETURN COUNT(*)`);
   }
 
   params = { params: { ...params } };
