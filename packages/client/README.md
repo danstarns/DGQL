@@ -8,8 +8,6 @@ Translation engine and client for the [DGQL Language](https://github.com/danstar
 $ npm install @dgql/client
 ```
 
-⚠ Library not yet published
-
 ## Quick Start
 
 ```js
