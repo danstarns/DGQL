@@ -20,6 +20,7 @@ describe("TCK Generated tests", () => {
 
         const translation = translate({
           query: test.query as string,
+          variables: test.queryParams || {},
         });
 
         expect(trimmer(translation.cypher)).toEqual(

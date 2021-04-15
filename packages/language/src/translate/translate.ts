@@ -1,7 +1,10 @@
 import { FieldNode, OperationDefinitionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
-import { queryToDocument } from "../utils";
+import {
+  queryToDocument,
+  filterDocumentWithConditionalSelection,
+} from "../utils";
 import createCreateAndParams from "./create-create-and-params";
 import createUpdateAndParams from "./create-update-and-params";
 import createDeleteAndParams from "./create-delete-and-params";
@@ -16,13 +19,20 @@ function translate({
   const cyphers: string[] = [];
   let params: Record<string, unknown> = {};
 
-  const document = queryToDocument(query);
+  const document = filterDocumentWithConditionalSelection({
+    document: queryToDocument(query),
+    variables,
+  });
   const root = document.definitions[0] as OperationDefinitionNode;
   const selections = root.selectionSet.selections;
 
   let returnSelection: FieldNode | undefined;
 
   selections.forEach((selection, i) => {
+    if (!selection) {
+      console.log(JSON.stringify(document, null, 2));
+    }
+
     if (selection.kind !== "Field") {
       throw new Error("Fields are only supported here");
     }

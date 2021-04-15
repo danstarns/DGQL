@@ -9,4 +9,5 @@
 7. [`DELETE`](./delete.md)
 8. [`SET`](./set.md)
 9. [Pagination](./pagination.md)
-10. [`@cypher`](./cypher.md)
+10. [Conditional Selection](./conditional-selection.md)
+11. [`@cypher`](./cypher.md)
