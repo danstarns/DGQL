@@ -10,6 +10,8 @@ Dynamic Graph Query Language 👍
 
 ## Intro
 
+### Packages
+
 1. [Language](https://github.com/danstarns/dgql/tree/main/packages/language) - The Javascript Implementation For The DGQL Language
 
 2. [Client](https://github.com/danstarns/dgql/tree/main/packages/client) - Executable Client for DGQL Queries
@@ -23,6 +25,10 @@ Dynamic Graph Query Language 👍
 - [Documentation](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
 - [TCK tests](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
 - [DGQL Recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes)
+
+### Examples
+
+See [Examples](./examples/index.md)
 
 ### TODO
 
