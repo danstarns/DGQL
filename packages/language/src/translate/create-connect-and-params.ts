@@ -165,6 +165,7 @@ function createConnectAndParams({
             chainStr: innerChainStr,
             variables,
             withVars: [...withVars, _varName],
+            escapeQuotes: true,
           });
           params = { ...params, ...cAP[1] };
 
