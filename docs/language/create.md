@@ -7,7 +7,7 @@ Use in correlation with cyphers `CREATE` statement.
 ```graphql
 {
   CREATE {
-    user @node(label: User) @where() {
+    user @node(label: User) {
         SET {
 
         }
@@ -28,7 +28,7 @@ Use in correlation with cyphers `CREATE` statement.
 }
 ```
 
-Given the most basic example, above, your just create and then holding a reference to the "raw" node. You also [`PROJECT`](./project.md) values out of the node, easy for application use.
+You also [`PROJECT`](./project.md) values out of the node, easy for application use.
 
 ## Usage
 

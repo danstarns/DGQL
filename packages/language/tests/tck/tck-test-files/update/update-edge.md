@@ -338,7 +338,7 @@ RETURN node
 
 ---
 
-### `UPDATE CONNECT @edge` Node (without direction or type) (3 level)
+### `UPDATE CONNECT @edge` Node (3 level) + `WHERE`
 
 **Input GraphQL**
 
@@ -346,12 +346,25 @@ RETURN node
 {
   UPDATE {
     node @node(label: Node) {
+      WHERE {
+        id(equal: "1")
+      }
       CONNECT @edge(type: HAS_NODE) {
         NODE(label: Node) {
+          WHERE {
+            id(equal: "2")
+          }
           CONNECT @edge(type: HAS_NODE) {
             NODE(label: Node) {
+              WHERE {
+                id(equal: "3")
+              }
               CONNECT @edge(type: HAS_NODE) {
-                NODE(label: Node)
+                NODE(label: Node) {
+                  WHERE {
+                    id(equal: "4")
+                  }
+                }
               }
             }
           }
@@ -369,31 +382,35 @@ RETURN node
 
 ```cypher
 CALL { 
-  OPTIONAL MATCH (node:Node) 
+  OPTIONAL MATCH (node:Node)
+  WHERE node.id = $params.node_where_id0_equal
   CALL apoc.do.when(node IS NOT NULL, " 
     WITH node 
     CALL { 
       WITH node 
-      OPTIONAL MATCH (node_connect0_NODE:Node) 
-      CALL apoc.do.when(node_connect0_NODE IS NOT NULL, \" 
-        MERGE (node)-[:HAS_NODE]-(node_connect0_NODE)
-        WITH node, node_connect0_NODE 
+      OPTIONAL MATCH (node_connect1_NODE:Node)
+      WHERE node_connect1_NODE.id = $params.node_connect1_NODE_where_id0_equal 
+      CALL apoc.do.when(node_connect1_NODE IS NOT NULL, \" 
+        MERGE (node)-[:HAS_NODE]-(node_connect1_NODE)
+        WITH node, node_connect1_NODE 
         CALL { 
-          WITH node, node_connect0_NODE 
-          OPTIONAL MATCH (node_connect0_NODE_connect0_NODE:Node) 
-          CALL apoc.do.when(node_connect0_NODE_connect0_NODE IS NOT NULL, \" 
-            MERGE (node_connect0_NODE)-[:HAS_NODE]-(node_connect0_NODE_connect0_NODE)
-            WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE 
+          WITH node, node_connect1_NODE 
+          OPTIONAL MATCH (node_connect1_NODE_connect1_NODE:Node)
+          WHERE node_connect1_NODE_connect1_NODE.id = $params.node_connect1_NODE_connect1_NODE_where_id0_equal 
+          CALL apoc.do.when(node_connect1_NODE_connect1_NODE IS NOT NULL, \" 
+            MERGE (node_connect1_NODE)-[:HAS_NODE]-(node_connect1_NODE_connect1_NODE)
+            WITH node, node_connect1_NODE, node_connect1_NODE_connect1_NODE 
             CALL { 
-              WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE 
-              OPTIONAL MATCH (node_connect0_NODE_connect0_NODE_connect0_NODE:Node) 
-              CALL apoc.do.when(node_connect0_NODE_connect0_NODE_connect0_NODE IS NOT NULL, \" MERGE (node_connect0_NODE_connect0_NODE)-[:HAS_NODE]-(node_connect0_NODE_connect0_NODE_connect0_NODE) \" , \"\" , { params: $params, node_connect0_NODE_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE_connect0_NODE, node_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE } ) YIELD value as _ 
+              WITH node, node_connect1_NODE, node_connect1_NODE_connect1_NODE 
+              OPTIONAL MATCH (node_connect1_NODE_connect1_NODE_connect1_NODE:Node)
+              WHERE node_connect1_NODE_connect1_NODE_connect1_NODE.id = $params.node_connect1_NODE_connect1_NODE_connect1_NODE_where_id0_equal 
+              CALL apoc.do.when(node_connect1_NODE_connect1_NODE_connect1_NODE IS NOT NULL, \" MERGE (node_connect1_NODE_connect1_NODE)-[:HAS_NODE]-(node_connect1_NODE_connect1_NODE_connect1_NODE) \" , \"\" , { params: $params, node_connect1_NODE_connect1_NODE_connect1_NODE: node_connect1_NODE_connect1_NODE_connect1_NODE, node_connect1_NODE_connect1_NODE: node_connect1_NODE_connect1_NODE } ) YIELD value as _ 
               RETURN COUNT(*) 
             }
-          \" , \"\" , { params: $params, node_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE, node_connect0_NODE: node_connect0_NODE } ) YIELD value as _ 
+          \" , \"\" , { params: $params, node_connect1_NODE_connect1_NODE: node_connect1_NODE_connect1_NODE, node_connect1_NODE: node_connect1_NODE } ) YIELD value as _ 
           RETURN COUNT(*) 
         } 
-        \" , \"\" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _ 
+        \" , \"\" , { params: $params, node_connect1_NODE: node_connect1_NODE, node: node } ) YIELD value as _ 
       RETURN COUNT(*) 
     } 
 
@@ -408,7 +425,122 @@ RETURN node
 
 ```params
 {
-    "params": {}
+    "params": {
+      "node_where_id0_equal": "1",
+      "node_connect1_NODE_where_id0_equal": "2",
+      "node_connect1_NODE_connect1_NODE_where_id0_equal": "3",
+      "node_connect1_NODE_connect1_NODE_connect1_NODE_where_id0_equal": "4"
+    }
+}
+```
+
+---
+
+### `UPDATE DISCONNECT @edge` Node (3 level) + `WHERE`
+
+**Input GraphQL**
+
+```graphql
+{
+  UPDATE {
+    node @node(label: Node) {
+      WHERE {
+        id(equal: "1")
+      }
+      DISCONNECT @edge(type: HAS_NODE) {
+        NODE(label: Node) {
+          WHERE {
+            id(equal: "2")
+          }
+          DISCONNECT @edge(type: HAS_NODE) {
+            NODE(label: Node) {
+              WHERE {
+                id(equal: "3")
+              }
+              DISCONNECT @edge(type: HAS_NODE) {
+                NODE(label: Node) {
+                  WHERE {
+                    id(equal: "4")
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+OPTIONAL MATCH (node:Node) 
+WHERE node.id = $params.node_where_id0_equal
+CALL apoc.do.when(node IS NOT NULL, " 
+  WITH node 
+  CALL { 
+    WITH node 
+    OPTIONAL MATCH (node)-[node_disconnect1_PROPERTIES:HAS_NODE]-(node_disconnect1_NODE:Node)
+    WHERE node_disconnect1_NODE.id = $params.node_disconnect1_NODE_where_id0_equal 
+    CALL apoc.do.when(node_disconnect1_NODE IS NOT NULL, \" 
+      DELETE node_disconnect1_PROPERTIES 
+      WITH node, node_disconnect1_NODE 
+      CALL { 
+        WITH node, node_disconnect1_NODE 
+        OPTIONAL MATCH (node_disconnect1_NODE)-[node_disconnect1_NODE_disconnect1_PROPERTIES:HAS_NODE]-(node_disconnect1_NODE_disconnect1_NODE:Node)
+        WHERE node_disconnect1_NODE_disconnect1_NODE.id = $params.node_disconnect1_NODE_disconnect1_NODE_where_id0_equal
+        CALL apoc.do.when(node_disconnect1_NODE_disconnect1_NODE IS NOT NULL, \" 
+          DELETE node_disconnect1_NODE_disconnect1_PROPERTIES 
+          WITH node, node_disconnect1_NODE, node_disconnect1_NODE_disconnect1_NODE 
+          CALL { 
+            WITH node, node_disconnect1_NODE, node_disconnect1_NODE_disconnect1_NODE 
+            OPTIONAL MATCH (node_disconnect1_NODE_disconnect1_NODE)-[node_disconnect1_NODE_disconnect1_NODE_disconnect1_PROPERTIES:HAS_NODE]-(node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE:Node)
+            WHERE node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE.id = $params.node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE_where_id0_equal 
+            CALL apoc.do.when(node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE IS NOT NULL, \" 
+              DELETE node_disconnect1_NODE_disconnect1_NODE_disconnect1_PROPERTIES RETURN COUNT(*) 
+            \" , \"\" , { params: $params, node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE: node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE, node_disconnect1_NODE_disconnect1_NODE_disconnect1_PROPERTIES: node_disconnect1_NODE_disconnect1_NODE_disconnect1_PROPERTIES } ) YIELD value AS _ 
+
+            RETURN COUNT(*) 
+          } 
+
+          RETURN COUNT(*) 
+        \" , \"\" , { params: $params, node_disconnect1_NODE_disconnect1_NODE: node_disconnect1_NODE_disconnect1_NODE, node_disconnect1_NODE_disconnect1_PROPERTIES: node_disconnect1_NODE_disconnect1_PROPERTIES } ) YIELD value AS _ 
+
+        RETURN COUNT(*) 
+      } 
+
+      RETURN COUNT(*)
+    \" , \"\" , { params: $params, node_disconnect1_NODE: node_disconnect1_NODE, node_disconnect1_PROPERTIES: node_disconnect1_PROPERTIES } ) YIELD value AS _ 
+      
+    RETURN COUNT(*) 
+  } 
+
+  RETURN node 
+  " , "" , { params: $params, node: node } ) YIELD value AS _ 
+
+  RETURN node 
+} 
+
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {
+      "node_where_id0_equal": "1", 
+      "node_disconnect1_NODE_where_id0_equal": "2", 
+      "node_disconnect1_NODE_disconnect1_NODE_where_id0_equal": "3", 
+      "node_disconnect1_NODE_disconnect1_NODE_where_id0_equal": "3",
+      "node_disconnect1_NODE_disconnect1_NODE_disconnect1_NODE_where_id0_equal": "4" 
+    }
 }
 ```
 

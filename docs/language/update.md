@@ -14,6 +14,12 @@ Use to update nodes and their edges.
         UPDATE { # Nested Mutations
 
         }
+        CONNECT { # Nested Mutations
+
+        }
+        DISCONNECT { # Nested Mutations
+
+        }
         PROJECT {
 
         }
@@ -186,6 +192,30 @@ Use to update nodes and their edges.
         PROPERTIES {
           SET {
             since(value: "04/04/2021")
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    user
+  }
+}
+```
+
+### `DISCONNECT @edge`
+
+```graphql
+{
+  UPDATE {
+    user @node(label: User) {
+      WHERE {
+        name(equal: "Dan")
+      }
+      DISCONNECT @edge(type: HAS_POST, direction: OUT) {
+        NODE(label: Post) {
+          WHERE {
+            content(equal: "Nested Mutations are cool!")
           }
         }
       }

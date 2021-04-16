@@ -7,6 +7,7 @@ import {
 import { getEdgeMeta } from "../utils";
 import createConnectAndParams from "./create-connect-and-params";
 import createCreateAndParams from "./create-create-and-params";
+import createDisconnectAndParams from "./create-disconnect-and-params";
 import createProjectionAndParams from "./create-projection-and-params";
 import createSetAndParams from "./create-set-and-params";
 import createWhereAndParams from "./create-where-and-params";
@@ -171,18 +172,35 @@ function createUpdateAndParams({
         });
 
         if (cCAP[0]) {
-          cyphers.push(`WITH ${[...withVars, varName]}`);
+          cyphers.push(`WITH ${[...withVars, varName].join(", ")}`);
           cyphers.push(cCAP[0]);
           params = { ...params, ...cCAP[1] };
         }
+
+        return;
+      }
+
+      if (selection.name.value === "DISCONNECT") {
+        const innerChainStr = `${varName}_disconnect${i}`;
+        const dAP = createDisconnectAndParams({
+          selection,
+          variables,
+          parentVar: varName,
+          withVars: [...withVars, varName],
+          chainStr: innerChainStr,
+        });
+        if (dAP[0]) {
+          cyphers.push(`WITH ${[...withVars, varName].join(", ")}`);
+          cyphers.push(dAP[0]);
+          params = { ...params, ...dAP[1] };
+        }
+        return;
       }
 
       if (selection.name.value === "UPDATE") {
         const { type, direction } = getEdgeMeta({ selection, variables });
-
         const selections = (selection.selectionSet?.selections ||
           []) as FieldNode[];
-
         const nodeSelect = selections.find((x) => x.name.value === "NODE");
         const propertiesSelect = selections.find(
           (x) => x.name.value === "PROPERTIES"
@@ -211,7 +229,7 @@ function createUpdateAndParams({
           : "[]";
 
         cyphers.push(`CALL {`);
-        cyphers.push(`WITH ${[...withVars, varName]}`);
+        cyphers.push(`WITH ${[...withVars, varName].join(", ")}`);
         cyphers.push(
           `OPTIONAL MATCH (${varName})${inStr}${relTypeStr}${outStr}(${toNodeVar}${
             label ? `:${label}` : ""
@@ -267,6 +285,7 @@ function createUpdateAndParams({
                 params = { ...params, ...sAP[1] };
               }
             });
+
             return;
           }
 
@@ -299,6 +318,8 @@ function createUpdateAndParams({
 
         cyphers.push(`RETURN COUNT(*)`);
         cyphers.push(`}`); // close CALL
+
+        return;
       }
     });
 

@@ -17,7 +17,7 @@ function getEdgeMeta({
   ) as DirectiveNode;
 
   if (!edgeDirective) {
-    throw new Error("CREATE @edge required");
+    throw new Error("@edge required");
   }
 
   const edgeArgs = edgeDirective?.arguments || [];

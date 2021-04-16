@@ -270,5 +270,71 @@ describe("update", () => {
         }
       });
     });
+
+    describe("DISCONNECT", () => {
+      test("should DISCONNECT a node edge", async () => {
+        const session = driver.session();
+
+        const client = new Client({ driver });
+
+        const id1 = generate({
+          charset: "alphabetic",
+        });
+
+        const id2 = generate({
+          charset: "alphabetic",
+        });
+
+        const id3 = generate({
+          charset: "alphabetic",
+        });
+
+        const query = gql`
+          {
+              UPDATE {
+                  node @node {
+                      WHERE {
+                          id(equal: "${id1}")
+                      }
+                      DISCONNECT @edge(type: HAS_NODE, direction: OUT) {
+                        NODE {
+                          WHERE {
+                            id(equal: "${id2}")
+                          }
+                        }
+                      }
+                      PROJECT {
+                          id
+                          edges @edge(type: HAS_NODE, direction: OUT) @node {
+                            id
+                          }
+                      }
+                  }
+              }
+              RETURN {
+                  node
+              }
+          }
+      `;
+
+        try {
+          await session.run(
+            `
+            CREATE (one {id: "${id1}"})
+            CREATE (two {id: "${id2}"})
+            CREATE (three {id: "${id3}"})
+            MERGE (one)-[:HAS_NODE]->(two)
+            MERGE (one)-[:HAS_NODE]->(three)
+          `
+          );
+
+          const res = await client.run({ query });
+          expect(res.node[0].id).toEqual(id1);
+          expect(res.node[0].edges).toEqual([{ id: id3 }]);
+        } finally {
+          await session.close();
+        }
+      });
+    });
   });
 });

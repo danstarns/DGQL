@@ -6,6 +6,7 @@ export { default as createSortAndParams } from "./create-sort-and-params";
 export { default as createSkipLimitStr } from "./create-skip-limit-str";
 export { default as createProjectionAndParams } from "./create-projection-and-params";
 export { default as createConnectAndParams } from "./create-connect-and-params";
+export { default as createDisconnectAndParams } from "./create-disconnect-and-params";
 export { default as createDeleteAndParams } from "./create-delete-and-params";
 export { default as createSetAndParams } from "./create-set-and-params";
 export { default as translate } from "./translate";
