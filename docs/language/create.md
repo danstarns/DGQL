@@ -11,9 +11,6 @@ Use in correlation with cyphers `CREATE` statement.
         SET {
 
         }
-        UPDATE {
-
-        }
         CONNECT { # Nested Mutations
 
         }
