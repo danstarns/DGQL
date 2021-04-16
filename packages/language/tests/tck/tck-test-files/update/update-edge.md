@@ -286,6 +286,135 @@ RETURN node
 
 ---
 
+### `UPDATE CONNECT @edge` Node (without direction or type)
+
+**Input GraphQL**
+
+```graphql
+{
+  UPDATE {
+    node @node {
+      CONNECT @edge(type: HAS_NODE) {
+        NODE
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL { 
+  OPTIONAL MATCH (node) 
+  CALL apoc.do.when(node IS NOT NULL, " 
+    WITH node 
+    CALL { 
+      WITH node 
+      OPTIONAL MATCH (node_connect0_NODE) 
+      CALL apoc.do.when(node_connect0_NODE IS NOT NULL, \" 
+        MERGE (node)-[:HAS_NODE]-(node_connect0_NODE) 
+        \" , \"\" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _ 
+      RETURN COUNT(*) 
+    } 
+
+    RETURN node
+  " , "" , { params: $params, node: node } ) YIELD value AS _ 
+  RETURN node 
+} 
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
+### `UPDATE CONNECT @edge` Node (without direction or type) (3 level)
+
+**Input GraphQL**
+
+```graphql
+{
+  UPDATE {
+    node @node(label: Node) {
+      CONNECT @edge(type: HAS_NODE) {
+        NODE(label: Node) {
+          CONNECT @edge(type: HAS_NODE) {
+            NODE(label: Node) {
+              CONNECT @edge(type: HAS_NODE) {
+                NODE(label: Node)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  RETURN {
+    node
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL { 
+  OPTIONAL MATCH (node:Node) 
+  CALL apoc.do.when(node IS NOT NULL, " 
+    WITH node 
+    CALL { 
+      WITH node 
+      OPTIONAL MATCH (node_connect0_NODE:Node) 
+      CALL apoc.do.when(node_connect0_NODE IS NOT NULL, \" 
+        MERGE (node)-[:HAS_NODE]-(node_connect0_NODE)
+        WITH node, node_connect0_NODE 
+        CALL { 
+          WITH node, node_connect0_NODE 
+          OPTIONAL MATCH (node_connect0_NODE_connect0_NODE:Node) 
+          CALL apoc.do.when(node_connect0_NODE_connect0_NODE IS NOT NULL, \" 
+            MERGE (node_connect0_NODE)-[:HAS_NODE]-(node_connect0_NODE_connect0_NODE)
+            WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE 
+            CALL { 
+              WITH node, node_connect0_NODE, node_connect0_NODE_connect0_NODE 
+              OPTIONAL MATCH (node_connect0_NODE_connect0_NODE_connect0_NODE:Node) 
+              CALL apoc.do.when(node_connect0_NODE_connect0_NODE_connect0_NODE IS NOT NULL, \" MERGE (node_connect0_NODE_connect0_NODE)-[:HAS_NODE]-(node_connect0_NODE_connect0_NODE_connect0_NODE) \" , \"\" , { params: $params, node_connect0_NODE_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE_connect0_NODE, node_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE } ) YIELD value as _ 
+              RETURN COUNT(*) 
+            }
+          \" , \"\" , { params: $params, node_connect0_NODE_connect0_NODE: node_connect0_NODE_connect0_NODE, node_connect0_NODE: node_connect0_NODE } ) YIELD value as _ 
+          RETURN COUNT(*) 
+        } 
+        \" , \"\" , { params: $params, node_connect0_NODE: node_connect0_NODE, node: node } ) YIELD value as _ 
+      RETURN COUNT(*) 
+    } 
+
+    RETURN node
+  " , "" , { params: $params, node: node } ) YIELD value AS _ 
+  RETURN node 
+} 
+RETURN node
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
+
 ### `UPDATE UPDATE @edge` Node
 
 **Input GraphQL**
