@@ -15,8 +15,9 @@
     "prepare": "run-s lerna:clean lerna:bootstrap",
     "lerna:clean": "lerna clean -y",
     "playground": "cd ./packages/playground && npm run dev",
-    "test": "cd ./packages/language && npm run test && cd ../client && npm run test && cd ../builder && npm run test",
-    "dev": "npm run playground"
+    "test": "cd ./packages/language && npm run test && cd ../client && npm run test && cd ../builder && npm run test && cd ../../examples/dgql-rest && npm run test",
+    "dev": "npm run playground",
+    "dgql-rest": "cd ./examples/dgql-rest && npm run dev"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.10.0",

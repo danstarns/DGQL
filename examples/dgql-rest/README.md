@@ -7,4 +7,4 @@ Example Node.js CURD Rest api for Movies, backed by Neo4j, using the DGQL langua
 1. `$ git clone https://github.com/danstarns/dgql.git`
 2. `$ cd dgql`
 3. `$ npm i`
-4. `$ npm run gql-rest`
+4. `$ npm run dgql-rest`

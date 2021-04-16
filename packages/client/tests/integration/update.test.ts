@@ -261,7 +261,6 @@ describe("update", () => {
           );
 
           const res = await client.run({ query });
-          console.log(res);
           expect(res.node[0].id).toEqual(id1);
           expect(res.node[0].edges).toEqual([
             { to: { id: id3 }, PROPERTIES: { id: relId } },

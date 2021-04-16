@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "rootDir": "../",
+    "rootDir": "../../../",
     "lib": [
       "es2019",
       "ESNext.Array"

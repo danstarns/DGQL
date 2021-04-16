@@ -3,7 +3,8 @@
     "packages/client",
     "packages/playground",
     "packages/builder",
-    "packages/language"
+    "packages/language",
+    "examples/dgql-rest"
   ],
   "version": "independent",
   "command": {
