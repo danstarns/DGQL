@@ -1,6 +1,6 @@
 # DGQL
 
-> Turn untyped & dynamic GraphQL queries into Cypher.
+> Next Generation Application Specific Graph Query Language.
 
 ~~Dynamic GraphQL~~
 
