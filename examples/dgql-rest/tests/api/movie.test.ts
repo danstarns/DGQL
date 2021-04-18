@@ -5,6 +5,65 @@ import { driver } from "../neo4j";
 
 describe("movie", () => {
   describe("create", () => {
+    test("should throw title should be a required", async () => {
+      const payload = {
+        movie: {},
+      };
+
+      const res = await request(app).post("/movie").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("title @validate required");
+    });
+
+    test("should throw title should be a string", async () => {
+      const payload = {
+        movie: {
+          title: Math.floor(Math.random() * 1000),
+        },
+      };
+
+      const res = await request(app).post("/movie").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("title @validate invalid type expected String");
+    });
+
+    test("should throw imdbRating should be a required", async () => {
+      const payload = {
+        movie: {
+          title: generate({
+            charset: "alphabetic",
+          }),
+        },
+      };
+
+      const res = await request(app).post("/movie").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("imdbRating @validate required");
+    });
+
+    test("should throw imdbRating should be a number", async () => {
+      const payload = {
+        movie: {
+          title: generate({
+            charset: "alphabetic",
+          }),
+          imdbRating: generate({
+            charset: "alphabetic",
+          }),
+        },
+      };
+
+      const res = await request(app).post("/movie").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual(
+        "imdbRating @validate invalid type expected Number"
+      );
+    });
+
     test("should create a new movie", async () => {
       const payload = {
         movie: {

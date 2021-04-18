@@ -51,7 +51,7 @@ export async function createMovie(req: Request, res: Response) {
   };
   const variables = {
     title,
-    imdbRating,
+    imdb: imdbRating,
   };
 
   const query = gql`
@@ -60,8 +60,8 @@ export async function createMovie(req: Request, res: Response) {
         movie @node(label: Movie) {
           SET {
             movieId @uuid
-            title(value: $title)
-            imdbRating(value: $imdbRating)
+            title(value: $title) @validate(type: String, required: true)
+            imdbRating(value: $imdb) @validate(type: Number, required: true)
           }
           PROJECT {
             movieId
