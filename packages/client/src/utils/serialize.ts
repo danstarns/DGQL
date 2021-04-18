@@ -1,45 +1,46 @@
 import { int } from "neo4j-driver";
 
 function isFloat(n: number) {
-    return Number(n) === n && n % 1 !== 0;
+  return Number(n) === n && n % 1 !== 0;
 }
 
 function traverse(v: any): any {
-    function reducer(res: any, [key, value]: [string, any]) {
-        if (Array.isArray(value)) {
-            return {
-                ...res,
-                [key]: value.map((x) => traverse(x)),
-            };
-        }
-
-        return {
-            ...res,
-            [key]: traverse(value),
-        };
+  function reducer(res: any, [key, value]: [string, any]) {
+    if (Array.isArray(value)) {
+      return {
+        ...res,
+        [key]: value.map((x) => traverse(x)),
+      };
     }
 
-    switch (typeof v) {
-        case "number":
-            if (isFloat(v)) {
-                return v;
-            }
+    return {
+      ...res,
+      [key]: traverse(value),
+    };
+  }
 
-            return int(v);
+  switch (typeof v) {
+    case "number":
+      if (isFloat(v)) {
+        return v;
+      }
 
-        case "string":
-            return v;
+      return int(v);
 
-        case "boolean":
-            return v;
+    case "string":
+    case "boolean":
+    case "undefined":
+    case "bigint":
+    case "function":
+      return v;
 
-        default:
-            return Object.entries(v).reduce(reducer, {});
-    }
+    default:
+      return Object.entries(v).reduce(reducer, {});
+  }
 }
 
 function serialize(result: any): any {
-    return traverse(result);
+  return traverse(result);
 }
 
 export default serialize;
