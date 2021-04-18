@@ -1,6 +1,14 @@
 # DGQL Rest
 
-Example Node.js CURD Rest api for Movies, backed by Neo4j, using the DGQL language.
+Example [DGQL](https://github.com/danstarns/DGQL) Node.js CURD Rest API for; Movies, Persons and Generes.
+
+- [x] Full CRUD
+- [x] Connect Edges
+- [x] Disconnect Edges
+- [x] Validation
+- [x] Tests
+
+[![Image from Gyazo](https://i.gyazo.com/848514d87b2ab97b4aee07281618aa0d.png)](https://gyazo.com/848514d87b2ab97b4aee07281618aa0d)
 
 ## Getting Started
 
