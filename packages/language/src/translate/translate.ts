@@ -73,7 +73,7 @@ function translate({
 
     if (selection.name.value === "UPDATE") {
       const [update, mParams] = createUpdateAndParams({
-        createField: selection,
+        updateField: selection,
         variables,
         withVars: [],
       });

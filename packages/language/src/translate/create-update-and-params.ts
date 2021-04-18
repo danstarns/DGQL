@@ -13,13 +13,13 @@ import createSetAndParams from "./create-set-and-params";
 import createWhereAndParams from "./create-where-and-params";
 
 function createUpdateAndParams({
-  createField,
+  updateField,
   variables,
   chainStr,
   withVars,
   escapeQuotes,
 }: {
-  createField: FieldNode;
+  updateField: FieldNode;
   variables: Record<string, unknown>;
   chainStr?: string;
   withVars: string[];
@@ -28,7 +28,7 @@ function createUpdateAndParams({
   let cyphers: string[] = [];
   let params: Record<string, unknown> = {};
 
-  (createField.selectionSet?.selections as FieldNode[]).forEach((field) => {
+  (updateField.selectionSet?.selections as FieldNode[]).forEach((field) => {
     let node: FieldNode | DirectiveNode | undefined;
 
     node = field.directives?.find(
