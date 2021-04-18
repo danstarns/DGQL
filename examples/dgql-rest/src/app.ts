@@ -21,6 +21,11 @@ app.post("/movie", handler(api.movie.createMovie));
 app.put("/movie/:id", handler(api.movie.updateMovie));
 app.delete("/movie/:id", handler(api.movie.deleteMovie));
 
+app.get("/person", handler(api.person.getPerson));
+app.post("/person", handler(api.person.createPerson));
+app.put("/person/:id", handler(api.person.updatePerson));
+app.delete("/person/:id", handler(api.person.deletePerson));
+
 export async function start() {
   const HTTP_PORT = process.env.HTTP_PORT
     ? Number(process.env.HTTP_PORT)
