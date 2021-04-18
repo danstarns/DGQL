@@ -71,8 +71,6 @@ Used to enforce properties when using [`SET`](./set.md)
 
 You can stack the validate directives and to achieve an `AND` operation on each rule.
 
-### Number
-
 ```graphql
 {
   SET {
