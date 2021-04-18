@@ -161,6 +161,10 @@ function createWhereAndParams({
         strs.push(`${varName}.${field.name.value} = $params.${paramName}`);
       }
 
+      if (arg.name.value === "in") {
+        strs.push(`${varName}.${field.name.value} IN $params.${paramName}`);
+      }
+
       if (arg.name.value === "not") {
         strs.push(`NOT ${varName}.${field.name.value} = $params.${paramName}`);
       }
