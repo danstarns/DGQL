@@ -30,14 +30,6 @@ Dynamic Graph Query Language 👍
 
 See [Examples](./examples/index.md)
 
-### TODO
-
-The Builder or Client is not published yet. But if you want to play around with DGQL now; then install the published version of the [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground).
-
-- [ ] `AGGREGATE`
-- [ ] Auto complete in Playground
-- [ ] DGQL => Builder (1-1 Mapping) (only `MATCH` implemented)
-
 ### Prerequisites
 
 GraphQL can be separated into two sections; language & execution. To truly grasp this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
