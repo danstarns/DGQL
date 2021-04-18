@@ -93,8 +93,8 @@ export async function updatePerson(req: Request, res: Response) {
             personId(equal: $personId)
           }
           SET {
-            name(value: $name) @include(if: $name)
-            born(value: $born) @include(if: $born)
+            name(value: $name) @include(if: $name) @validate(type: String)
+            born(value: $born) @include(if: $born) @validate(type: Number)
           }
           PROJECT {
             personId

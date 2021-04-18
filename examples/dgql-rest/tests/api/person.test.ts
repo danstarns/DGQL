@@ -356,7 +356,7 @@ describe("person", () => {
       expect(res.status).toEqual(404);
     });
 
-    test("should update and return person", async () => {
+    test("should throw name should be a string", async () => {
       const session = driver.session();
 
       const person = {
@@ -372,12 +372,90 @@ describe("person", () => {
       };
 
       const newPerson = {
+        name: 123,
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (:Person $person)
+          `,
+          {
+            person,
+          }
+        );
+
+        const res = await request(app).put(`/person/${person.personId}`).send({
+          person: newPerson,
+        });
+
+        expect(res.status).toEqual(500);
+        expect(res.text).toEqual("name @validate invalid type expected String");
+      } finally {
+        await session.close();
+      }
+    });
+
+    test("should throw born should be a number", async () => {
+      const session = driver.session();
+
+      const person = {
+        personId: generate({
+          charset: "alphabetic",
+        }),
         name: generate({
           charset: "alphabetic",
         }),
         born: generate({
           charset: "numeric",
         }),
+      };
+
+      const newPerson = {
+        born: generate({
+          charset: "numeric",
+        }),
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (:Person $person)
+          `,
+          {
+            person,
+          }
+        );
+
+        const res = await request(app).put(`/person/${person.personId}`).send({
+          person: newPerson,
+        });
+
+        expect(res.status).toEqual(500);
+        expect(res.text).toEqual("born @validate invalid type expected Number");
+      } finally {
+        await session.close();
+      }
+    });
+
+    test("should update and return person", async () => {
+      const session = driver.session();
+
+      const person = {
+        personId: generate({
+          charset: "alphabetic",
+        }),
+        name: generate({
+          charset: "alphabetic",
+        }),
+        born: Math.floor(Math.random() * 1000),
+      };
+
+      const newPerson = {
+        name: generate({
+          charset: "alphabetic",
+        }),
+        born: Math.floor(Math.random() * 1000),
       };
 
       try {
