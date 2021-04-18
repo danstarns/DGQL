@@ -27,6 +27,10 @@ export async function getMovie(req: Request, res: Response) {
               name
               born
             }
+            genres @edge(type: IN_GENRE, direction: OUT) @node(label: Genre) {
+              genreId
+              name
+            }
           }
         }
       }

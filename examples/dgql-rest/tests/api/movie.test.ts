@@ -67,6 +67,15 @@ describe("movie", () => {
         born: 2021,
       };
 
+      const genre = {
+        genreId: generate({
+          charset: "alphabetic",
+        }),
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
       try {
         await session.run(
           `
@@ -74,14 +83,18 @@ describe("movie", () => {
           CREATE (m2:Movie $movie2)
           CREATE (p1:Person $person1)
           CREATE (p2:Person $person2)
+          CREATE (g:Genre $genre)
           MERGE (m1)<-[:ACTED_IN]-(p1)
           MERGE (m2)<-[:ACTED_IN]-(p2)
+          MERGE (m1)-[:IN_GENRE]->(g)
+          MERGE (m2)-[:IN_GENRE]->(g)
         `,
           {
             movie1,
             movie2,
             person1,
             person2,
+            genre,
           }
         );
 
@@ -98,6 +111,7 @@ describe("movie", () => {
         expect(movieOne).toEqual({
           ...movie1,
           actors: [person1],
+          genres: [genre],
         });
 
         const movieTwo = res.body.movies.find(
@@ -106,6 +120,7 @@ describe("movie", () => {
         expect(movieTwo).toEqual({
           ...movie2,
           actors: [person2],
+          genres: [genre],
         });
       } finally {
         await session.close();
@@ -158,12 +173,14 @@ describe("movie", () => {
         expect(movieOne).toEqual({
           ...movie1,
           actors: [],
+          genres: [],
         });
 
         const movieTwo = res.body.movies[0];
         expect(movieTwo).toEqual({
           ...movie2,
           actors: [],
+          genres: [],
         });
       } finally {
         await session.close();
@@ -216,12 +233,14 @@ describe("movie", () => {
         expect(movieOne).toEqual({
           ...movie1,
           actors: [],
+          genres: [],
         });
 
         const movieTwo = res.body.movies[1];
         expect(movieTwo).toEqual({
           ...movie2,
           actors: [],
+          genres: [],
         });
       } finally {
         await session.close();
