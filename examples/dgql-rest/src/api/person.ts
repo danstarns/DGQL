@@ -56,8 +56,8 @@ export async function createPerson(req: Request, res: Response) {
         person @node(label: Person) {
           SET {
             personId @uuid
-            name(value: $name)
-            born(value: $born)
+            name(value: $name) @validate(type: String, required: true)
+            born(value: $born) @validate(type: Number, required: true)
           }
           PROJECT {
             personId

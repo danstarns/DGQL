@@ -5,15 +5,77 @@ import { driver } from "../neo4j";
 
 describe("person", () => {
   describe("create", () => {
-    test("should create a new person", async () => {
+    test("should throw name should be required", async () => {
+      const payload = {
+        person: {
+          born: generate({
+            charset: "numeric",
+          }),
+        },
+      };
+
+      const res = await request(app).post("/person").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("name @validate required");
+    });
+
+    test("should throw name should be a string", async () => {
+      const payload = {
+        person: {
+          name: Math.floor(Math.random() * 1000),
+          born: generate({
+            charset: "numeric",
+          }),
+        },
+      };
+
+      const res = await request(app).post("/person").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("name @validate invalid type expected String");
+    });
+
+    test("should throw born should be required", async () => {
+      const payload = {
+        person: {
+          name: generate({
+            charset: "alphabetic",
+          }),
+        },
+      };
+
+      const res = await request(app).post("/person").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("born @validate required");
+    });
+
+    test("should throw born should be a number", async () => {
       const payload = {
         person: {
           name: generate({
             charset: "alphabetic",
           }),
           born: generate({
-            charset: "numeric",
+            charset: "alphabetic",
           }),
+        },
+      };
+
+      const res = await request(app).post("/person").send(payload);
+
+      expect(res.status).toEqual(500);
+      expect(res.text).toEqual("born @validate invalid type expected Number");
+    });
+
+    test("should create a new person", async () => {
+      const payload = {
+        person: {
+          name: generate({
+            charset: "alphabetic",
+          }),
+          born: Math.floor(Math.random() * 1000),
         },
       };
 
