@@ -80,6 +80,76 @@ describe("movie", () => {
       expect(res.body).toHaveProperty("movie");
       expect(res.body.movie.movieId).toBeTruthy();
     });
+
+    test("should create a new movie with a genre and actor", async () => {
+      const session = driver.session();
+      try {
+        const genre = {
+          genreId: generate({
+            charset: "alphabetic",
+          }),
+          name: generate({
+            charset: "alphabetic",
+          }),
+        };
+
+        const person = {
+          personId: generate({
+            charset: "alphabetic",
+          }),
+          born: 2021,
+          name: generate({
+            charset: "alphabetic",
+          }),
+        };
+
+        const payload = {
+          movie: {
+            title: generate({
+              charset: "alphabetic",
+            }),
+            imdbRating: 8.7,
+            genres: [genre.genreId],
+            actors: [person.personId],
+          },
+        };
+
+        await session.run(
+          `
+          CREATE (:Genre $genre)
+          CREATE (:Person $person)
+        `,
+          { genre, person }
+        );
+
+        const res = await request(app).post("/movie").send(payload);
+
+        expect(res.status).toEqual(201);
+        expect(res.body).toHaveProperty("movie");
+        expect(res.body.movie.movieId).toBeTruthy();
+
+        const find = await session.run(`
+          MATCH (movie:Movie {movieId: "${res.body.movie.movieId}"})
+          RETURN movie {
+            movieId: movie.movieId, 
+            imdbRating: movie.imdbRating,
+            genres: [(movie)-[:IN_GENRE]->(g:Genre) | {genreId: g.genreId, name: g.name}],
+            actors: [(movie)<-[:ACTED_IN]->(p:Person) | {personId: p.personId, name: p.name, born: p.born}]
+          } AS movie
+        `);
+
+        const obj = find.records[0].get("movie");
+
+        expect(obj).toMatchObject({
+          movieId: res.body.movie.movieId,
+          imdbRating: payload.movie.imdbRating,
+          genres: [genre],
+          actors: [person],
+        });
+      } finally {
+        await session.close();
+      }
+    });
   });
 
   describe("read", () => {

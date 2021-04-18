@@ -46,12 +46,19 @@ export async function getMovie(req: Request, res: Response) {
 }
 
 export async function createMovie(req: Request, res: Response) {
-  const { movie: { title, imdbRating } = {} } = req.body as {
-    movie: { title: string; imdbRating: number };
+  const { movie: { title, imdbRating, genres, actors } = {} } = req.body as {
+    movie: {
+      title: string;
+      imdbRating: number;
+      actors?: string[];
+      genres?: string[];
+    };
   };
   const variables = {
     title,
     imdb: imdbRating,
+    genres,
+    actors,
   };
 
   const query = gql`
@@ -62,6 +69,20 @@ export async function createMovie(req: Request, res: Response) {
             movieId @uuid
             title(value: $title) @validate(type: String, required: true)
             imdbRating(value: $imdb) @validate(type: Number, required: true)
+          }
+          CONNECT @edge(type: ACTED_IN, direction: IN) @include(if: $actors) {
+            NODE(label: Person) {
+              WHERE {
+                personId(in: $actors)
+              }
+            }
+          }
+          CONNECT @edge(type: IN_GENRE, direction: OUT) @include(if: $genres) {
+            NODE(label: Genre) {
+              WHERE {
+                genreId(in: $genres)
+              }
+            }
           }
           PROJECT {
             movieId
