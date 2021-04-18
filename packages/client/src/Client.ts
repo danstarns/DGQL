@@ -26,17 +26,19 @@ class Client {
     query,
     variables = {},
     includeStats,
+    debug,
   }: {
     query: Query;
     variables?: Record<string, unknown>;
     includeStats?: boolean;
+    debug?: boolean;
   }): Promise<T> {
     const translation = translate({
       query,
       variables,
     });
 
-    if (this.debug) {
+    if (this.debug || debug) {
       console.log("==============");
       console.log(`CYPHER:\n${formatCypher(translation.cypher)}`);
       console.log(`PARAMS:\n${JSON.stringify(translation.params, null, 2)}`);
