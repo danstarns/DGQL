@@ -1,6 +1,6 @@
 # DGQL Rest
 
-Example [DGQL](https://github.com/danstarns/DGQL) Node.js CURD Rest API for; Movies, Persons and Generes.
+Example [DGQL](https://github.com/danstarns/DGQL) Node.js CURD Rest API for; Movies, Persons and Genres.
 
 - [x] Full CRUD
 - [x] Connect Edges
