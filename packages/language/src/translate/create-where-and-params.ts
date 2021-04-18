@@ -169,6 +169,16 @@ function createWhereAndParams({
         strs.push(`NOT ${varName}.${field.name.value} = $params.${paramName}`);
       }
 
+      if (arg.name.value === "exists") {
+        if (value === true) {
+          strs.push(`${varName}.${field.name.value} IS NOT NULL`);
+        } else {
+          strs.push(`${varName}.${field.name.value} IS NULL`);
+        }
+
+        return;
+      }
+
       if (arg.name.value === "gt") {
         strs.push(`${varName}.${field.name.value} > $params.${paramName}`);
       }
