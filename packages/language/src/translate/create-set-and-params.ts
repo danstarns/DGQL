@@ -89,6 +89,10 @@ function createSetAndParams({
         : undefined;
 
       try {
+        if (requiredArgValue && value === undefined) {
+          throw new Error(`${selection.name.value} @validate required`);
+        }
+
         if (typeArgValue) {
           const expectedTypes = ["String", "Number", "Boolean"];
           if (!expectedTypes.includes(typeArgValue)) {
@@ -184,10 +188,6 @@ function createSetAndParams({
               );
             }
           }
-        }
-
-        if (requiredArgValue && value === undefined) {
-          throw new Error(`${selection.name.value} @validate required`);
         }
       } catch (error) {
         if (errorArgValue) {
