@@ -93,6 +93,10 @@ function createSetAndParams({
           throw new Error(`${selection.name.value} @validate required`);
         }
 
+        if (value === undefined) {
+          return;
+        }
+
         if (typeArgValue) {
           const expectedTypes = ["String", "Number", "Boolean"];
           if (!expectedTypes.includes(typeArgValue)) {
