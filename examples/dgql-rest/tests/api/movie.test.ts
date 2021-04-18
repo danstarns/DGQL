@@ -480,6 +480,180 @@ describe("movie", () => {
       }
     });
 
+    test("should update a movie by adding a genre and actor", async () => {
+      const session = driver.session();
+
+      const genre = {
+        genreId: generate({
+          charset: "alphabetic",
+        }),
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const person = {
+        personId: generate({
+          charset: "alphabetic",
+        }),
+        born: 2021,
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const movie = {
+        movieId: generate({
+          charset: "alphabetic",
+        }),
+        imdbRating: generate({
+          charset: "alphabetic",
+        }),
+        title: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const newMovie = {
+        imdbRating: Math.floor(Math.random() * 1000),
+        title: generate({
+          charset: "alphabetic",
+        }),
+        addActors: [person.personId],
+        addGenres: [genre.genreId],
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (m:Movie $movie)
+            CREATE (p:Person $person)
+            CREATE (g:Genre $genre)
+          `,
+          {
+            movie,
+            person,
+            genre,
+          }
+        );
+
+        const res = await request(app).put(`/movie/${movie.movieId}`).send({
+          movie: newMovie,
+        });
+
+        expect(res.status).toEqual(200);
+        expect(res.body.movies.length).toEqual(1);
+
+        const find = await session.run(`
+          MATCH (movie:Movie {movieId: "${movie.movieId}"})
+          RETURN movie {
+            movieId: movie.movieId, 
+            imdbRating: movie.imdbRating,
+            genres: [(movie)-[:IN_GENRE]->(g:Genre) | {genreId: g.genreId, name: g.name}],
+            actors: [(movie)<-[:ACTED_IN]->(p:Person) | {personId: p.personId, name: p.name, born: p.born}]
+          } AS movie
+        `);
+
+        const obj = find.records[0].get("movie");
+
+        expect(obj).toMatchObject({
+          movieId: movie.movieId,
+          genres: [genre],
+          actors: [person],
+        });
+      } finally {
+        await session.close();
+      }
+    });
+
+    test("should update a movie by removing a genre and actor", async () => {
+      const session = driver.session();
+
+      const genre = {
+        genreId: generate({
+          charset: "alphabetic",
+        }),
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const person = {
+        personId: generate({
+          charset: "alphabetic",
+        }),
+        born: 2021,
+        name: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const movie = {
+        movieId: generate({
+          charset: "alphabetic",
+        }),
+        imdbRating: generate({
+          charset: "alphabetic",
+        }),
+        title: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const newMovie = {
+        imdbRating: Math.floor(Math.random() * 1000),
+        title: generate({
+          charset: "alphabetic",
+        }),
+        removeActors: [person.personId],
+        removeGenres: [genre.genreId],
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (m:Movie $movie)
+            CREATE (p:Person $person)
+            CREATE (g:Genre $genre)
+            MERGE (m)<-[:ACTED_IN]-(p)
+            MERGE (m)-[:IN_GENRE]->(g)
+          `,
+          {
+            movie,
+            person,
+            genre,
+          }
+        );
+
+        const res = await request(app).put(`/movie/${movie.movieId}`).send({
+          movie: newMovie,
+        });
+
+        expect(res.status).toEqual(200);
+        expect(res.body.movies.length).toEqual(1);
+
+        const find = await session.run(`
+          MATCH (movie:Movie {movieId: "${movie.movieId}"})
+          RETURN movie {
+            movieId: movie.movieId, 
+            imdbRating: movie.imdbRating,
+            genres: [(movie)-[:IN_GENRE]->(g:Genre) | {genreId: g.genreId, name: g.name}],
+            actors: [(movie)<-[:ACTED_IN]->(p:Person) | {personId: p.personId, name: p.name, born: p.born}]
+          } AS movie
+        `);
+
+        const obj = find.records[0].get("movie");
+
+        expect(obj).toMatchObject({
+          movieId: movie.movieId,
+          genres: [],
+          actors: [],
+        });
+      } finally {
+        await session.close();
+      }
+    });
+
     test("should update and return movie", async () => {
       const session = driver.session();
 

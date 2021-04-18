@@ -101,13 +101,33 @@ export async function createMovie(req: Request, res: Response) {
 }
 
 export async function updateMovie(req: Request, res: Response) {
-  const { movie: { title, imdbRating } = {} } = req.body as {
-    movie: { title?: string; imdbRating?: number };
+  const {
+    movie: {
+      title,
+      imdbRating,
+      addActors,
+      addGenres,
+      removeActors,
+      removeGenres,
+    } = {},
+  } = req.body as {
+    movie: {
+      title?: string;
+      imdbRating?: number;
+      addActors?: string[];
+      addGenres?: string[];
+      removeActors?: string[];
+      removeGenres?: string[];
+    };
   };
   const variables = {
     movieId: req.params.id,
     title,
     imdb: imdbRating,
+    addActors,
+    addGenres,
+    removeActors,
+    removeGenres,
   };
 
   const query = gql`
@@ -120,6 +140,42 @@ export async function updateMovie(req: Request, res: Response) {
           SET {
             title(value: $title) @include(if: $title) @validate(type: String)
             imdbRating(value: $imdb) @include(if: $imdb) @validate(type: Number)
+          }
+          CONNECT
+            @edge(type: ACTED_IN, direction: IN)
+            @include(if: $addActors) {
+            NODE(label: Person) {
+              WHERE {
+                personId(in: $addActors)
+              }
+            }
+          }
+          DISCONNECT
+            @edge(type: ACTED_IN, direction: IN)
+            @include(if: $removeActors) {
+            NODE(label: Person) {
+              WHERE {
+                personId(in: $removeActors)
+              }
+            }
+          }
+          CONNECT
+            @edge(type: IN_GENRE, direction: OUT)
+            @include(if: $addGenres) {
+            NODE(label: Genre) {
+              WHERE {
+                genreId(in: $addGenres)
+              }
+            }
+          }
+          DISCONNECT
+            @edge(type: IN_GENRE, direction: OUT)
+            @include(if: $removeGenres) {
+            NODE(label: Genre) {
+              WHERE {
+                genreId(in: $removeGenres)
+              }
+            }
           }
           PROJECT {
             movieId
