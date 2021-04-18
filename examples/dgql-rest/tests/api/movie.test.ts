@@ -318,7 +318,7 @@ describe("movie", () => {
       expect(res.status).toEqual(404);
     });
 
-    test("should update and return movie", async () => {
+    test("should throw title should be a string", async () => {
       const session = driver.session();
 
       const movie = {
@@ -337,6 +337,96 @@ describe("movie", () => {
         imdbRating: generate({
           charset: "alphabetic",
         }),
+        title: 123,
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (:Movie $movie)
+          `,
+          {
+            movie,
+          }
+        );
+
+        const res = await request(app).put(`/movie/${movie.movieId}`).send({
+          movie: newMovie,
+        });
+
+        expect(res.status).toEqual(500);
+        expect(res.text).toEqual(
+          "title @validate invalid type expected String"
+        );
+      } finally {
+        await session.close();
+      }
+    });
+
+    test("should throw imdbRating should be a number", async () => {
+      const session = driver.session();
+
+      const movie = {
+        movieId: generate({
+          charset: "alphabetic",
+        }),
+        imdbRating: generate({
+          charset: "alphabetic",
+        }),
+        title: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const newMovie = {
+        imdbRating: generate({
+          charset: "alphabetic",
+        }),
+        title: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      try {
+        await session.run(
+          `
+            CREATE (:Movie $movie)
+          `,
+          {
+            movie,
+          }
+        );
+
+        const res = await request(app).put(`/movie/${movie.movieId}`).send({
+          movie: newMovie,
+        });
+
+        expect(res.status).toEqual(500);
+        expect(res.text).toEqual(
+          "imdbRating @validate invalid type expected Number"
+        );
+      } finally {
+        await session.close();
+      }
+    });
+
+    test("should update and return movie", async () => {
+      const session = driver.session();
+
+      const movie = {
+        movieId: generate({
+          charset: "alphabetic",
+        }),
+        imdbRating: generate({
+          charset: "alphabetic",
+        }),
+        title: generate({
+          charset: "alphabetic",
+        }),
+      };
+
+      const newMovie = {
+        imdbRating: Math.floor(Math.random() * 1000),
         title: generate({
           charset: "alphabetic",
         }),

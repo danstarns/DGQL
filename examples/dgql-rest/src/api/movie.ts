@@ -86,7 +86,7 @@ export async function updateMovie(req: Request, res: Response) {
   const variables = {
     movieId: req.params.id,
     title,
-    imdbRating,
+    imdb: imdbRating,
   };
 
   const query = gql`
@@ -97,8 +97,8 @@ export async function updateMovie(req: Request, res: Response) {
             movieId(equal: $movieId)
           }
           SET {
-            title(value: $title) @include(if: $title)
-            imdbRating(value: $imdbRating) @include(if: $imdbRating)
+            title(value: $title) @include(if: $title) @validate(type: String)
+            imdbRating(value: $imdb) @include(if: $imdb) @validate(type: Number)
           }
           PROJECT {
             movieId
