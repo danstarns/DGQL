@@ -23,3 +23,9 @@ See [DateTime TCK](https://github.com/danstarns/DGQL/blob/main/packages/language
 ### `SET` UUID
 
 See [UUID TCK](https://github.com/danstarns/DGQL/blob/main/packages/language/tests/tck/tck-test-files/set/uuid.md)
+
+### `@validate`
+
+Validate properties.
+
+See [`@validate`](./validate.md)

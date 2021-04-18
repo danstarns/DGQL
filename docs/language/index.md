@@ -11,3 +11,4 @@
 9. [Pagination](./pagination.md)
 10. [Conditional Selection](./conditional-selection.md)
 11. [`@cypher`](./cypher.md)
+12. [`@validate`](./validate.md)
