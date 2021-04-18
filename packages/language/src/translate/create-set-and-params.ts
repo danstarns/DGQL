@@ -46,6 +46,12 @@ function createSetAndParams({
     }
 
     const paramName = `${varName}_set_${selection.name.value}`;
+    const value = valueArg
+      ? valueFromASTUntyped(valueArg.value, variables)
+      : undefined;
+    if (value) {
+      params[paramName] = value;
+    }
 
     if (dateTimeDirective) {
       strs.push(
@@ -66,9 +72,6 @@ function createSetAndParams({
 
       return;
     }
-
-    const value = valueFromASTUntyped(valueArg.value, variables);
-    params[paramName] = value;
 
     validateDirectives.forEach((direct) => {
       const args = (direct.arguments || []) as ArgumentNode[];
