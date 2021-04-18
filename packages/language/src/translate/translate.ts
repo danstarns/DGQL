@@ -98,7 +98,7 @@ function translate({
   });
 
   let returnVariables: string[] = [];
-  if (returnSelection) {
+  if (returnSelection?.selectionSet?.selections.length) {
     returnVariables = ((returnSelection.selectionSet?.selections ||
       []) as FieldNode[]).map((s: FieldNode) => s.name.value);
     cyphers.push(`RETURN ${returnVariables.join(", ")}`);

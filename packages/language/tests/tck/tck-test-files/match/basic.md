@@ -8,16 +8,16 @@
 
 ```graphql
 {
-    MATCH {
-        node @node {
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    node @node {
+      PROJECT {
+        name
+      }
     }
-    RETURN {
-        node
-    }
+  }
+  RETURN {
+    node
+  }
 }
 ```
 
@@ -48,12 +48,12 @@ RETURN node
 
 ```graphql
 {
-    MATCH {
-        node @node
-    }
-    RETURN {
-        node
-    }
+  MATCH {
+    node @node
+  }
+  RETURN {
+    node
+  }
 }
 ```
 
@@ -84,16 +84,16 @@ RETURN node
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        name
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -102,6 +102,46 @@ RETURN node
 ```cypher
 CALL {
     MATCH (user:User)
+    RETURN user { name: user.name } AS user
+}
+
+RETURN user
+```
+
+**Output Cypher params**
+
+```params
+{
+    "params": {}
+}
+```
+
+---
+
+### Match Node with `@optional`
+
+**Input GraphQL**
+
+```graphql
+{
+  MATCH {
+    user @node(label: User) @optional {
+      PROJECT {
+        name
+      }
+    }
+  }
+  RETURN {
+    user
+  }
+}
+```
+
+**Output Cypher**
+
+```cypher
+CALL {
+    OPTIONAL MATCH (user:User)
     RETURN user { name: user.name } AS user
 }
 

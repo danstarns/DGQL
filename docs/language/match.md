@@ -6,9 +6,9 @@ Use in correlation with cyphers `MATCH` statement. The most Basic of `MATCH` is;
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User)
-    }
+  MATCH {
+    user @node(label: User)
+  }
 }
 ```
 
@@ -18,22 +18,32 @@ Given the most basic example, above, your just matching and holding a reference 
 
 ## Usage
 
+### Optional
+
+```graphql
+{
+  MATCH {
+    user @node(label: User) @optional
+  }
+}
+```
+
 ### `MATCH` & `PROJECT` & `RETURN`
 
 > [`PROJECT`](./project.md) & [`RETURN`](./return.md)
 
 ```graphql
 {
-    MATCH {
-        users @node(label: User) {
-            PROJECT {
-                name
-            }
-        }
+  MATCH {
+    users @node(label: User) {
+      PROJECT {
+        name
+      }
     }
-    RETURN {
-        users
-    }
+  }
+  RETURN {
+    users
+  }
 }
 ```
 
@@ -41,10 +51,10 @@ Given the most basic example, above, your just matching and holding a reference 
 
 ```graphql
 {
-    MATCH {
-        users @node(label: User)
-        posts @node(label: Post)
-    }
+  MATCH {
+    users @node(label: User)
+    posts @node(label: Post)
+  }
 }
 ```
 
@@ -52,11 +62,11 @@ Given the most basic example, above, your just matching and holding a reference 
 
 ```graphql
 {
-    MATCH {
-        users @node(label: User)
-    }
-    MATCH {
-        posts @node(label: Post)
-    }
+  MATCH {
+    users @node(label: User)
+  }
+  MATCH {
+    posts @node(label: Post)
+  }
 }
 ```

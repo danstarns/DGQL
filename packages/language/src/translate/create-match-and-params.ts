@@ -27,6 +27,9 @@ function createMatchAndParams({
     const nodeDirective = field.directives?.find(
       (x) => x.name.value === "node"
     ) as DirectiveNode;
+    const optionalDirective = field.directives?.find(
+      (x) => x.name.value === "optional"
+    ) as DirectiveNode;
     const cypherDirective = field.directives?.find(
       (x) => x.name.value === "cypher"
     ) as DirectiveNode;
@@ -95,7 +98,11 @@ function createMatchAndParams({
         ? valueFromASTUntyped(labelArg.value, variables)
         : (undefined as string | undefined);
 
-      cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
+      cyphers.push(
+        `${optionalDirective ? "OPTIONAL " : ""}MATCH (${varName}${
+          label ? `:${label}` : ""
+        })`
+      );
 
       if (whereField) {
         const whereAndParams = createWhereAndParams({
