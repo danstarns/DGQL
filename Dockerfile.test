@@ -14,9 +14,4 @@ COPY packages/language ./packages/language
 
 RUN npm ci
 
-COPY node_modules ./node_modules
-COPY packages/builder/node_modules ./packages/builder/node_modules
-COPY packages/client/node_modules ./packages/client/node_modules
-COPY packages/language/node_modules ./packages/language/node_modules
-
 CMD ["npm", "test"]
