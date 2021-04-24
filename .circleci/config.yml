@@ -12,6 +12,7 @@ jobs:
       - run:
           name: Start Docker Network
           command: npm run test-docker
+
 workflows:
   version: 2
   master_default:
