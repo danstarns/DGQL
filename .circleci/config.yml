@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Run Docker Compose Tests
-          command: npm run test docker
+          command: npm run test-docker
 
 workflows:
   version: 2
