@@ -1,40 +1,23 @@
 version: 2.1
 orbs:
-  node: circleci/node@4.3.0
+  node: circleci/node@1.1.6
 jobs:
-  tests:
+  test_suite:
     docker:
-      - image: circleci/node:14.16
+      - image: circleci/node:12.16.1
     working_directory: ~/repo
     steps:
       - setup_remote_docker
       - checkout
       - run:
-          name: Build Neo4j
-          command: docker image pull neo4j
-      - run:
-          name: Run Neo4j
-          command: docker run -p 7687:7687 -p 7474:7474 --detach --name neo4j_container -e NEO4J_AUTH="admin/password" -e NEO4J_dbms_security_procedures_unrestricted="apoc.*" -e NEO4JLABS_PLUGINS="['apoc']" -e NEO4J_dbms_security_procedures_whitelist="apoc.*" -v $HOME/neo4j/data:/data -v $HOME/neo4j/logs:/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/plugins neo4j
-      - run:
-          name: install dockerize
-          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          environment:
-            DOCKERIZE_VERSION: v0.3.0
-      - run:
-          name: Wait for db
-          command: dockerize -wait http://127.0.0.1:7474/browser -timeout 1m
-      - run:
-          name: Install Dependencies
-          command: npm ci
-      - run:
-          name: Run Tests
-          command: NEO_URL="bolt://127.0.0.1:7687/neo4j" NEO_USER="admin" NEO_PASSWORD="password" npm run test
+          name: Run Docker Compose Tests
+          command: npm run test docker
 
 workflows:
   version: 2
-  main_default:
+  master_default:
     jobs:
-      - tests:
+      - test_suite:
           filters:
             branches:
-              only: /main/
+              only: /master/
