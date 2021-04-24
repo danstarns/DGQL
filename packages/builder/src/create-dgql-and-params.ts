@@ -63,16 +63,22 @@ function createWhereSelectionAndParams({
           const property = e[1] as Property;
           const args: ArgumentNode[] = [];
 
-          if (property.equal !== undefined) {
-            let paramName = `${parentName}_${e[0]}_equal`;
+          const operators = ["equal", "regex"];
 
-            params[paramName] = property.equal;
+          operators.forEach((operator) => {
+            if (property[operator] === undefined) {
+              return;
+            }
+
+            let paramName = `${parentName}_${e[0]}_${operator}`;
+
+            params[paramName] = property[operator];
 
             args.push({
               kind: "Argument",
               name: {
                 kind: "Name",
-                value: "equal",
+                value: operator,
               },
               value: {
                 kind: "Variable",
@@ -82,7 +88,7 @@ function createWhereSelectionAndParams({
                 },
               },
             });
-          }
+          });
 
           if (args.length) {
             (field.arguments as ArgumentNode[]) = args;

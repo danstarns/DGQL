@@ -10,6 +10,7 @@ export interface MatchInput {
 
 export interface PropertyInput {
   equal?: any;
+  regex?: string;
   direction?: SortDirection;
   value?: any;
 }

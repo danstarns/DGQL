@@ -4,7 +4,8 @@
     "packages/playground",
     "packages/builder",
     "packages/language",
-    "examples/dgql-rest"
+    "examples/dgql-rest",
+    "examples/dgql-builder-rest"
   ],
   "version": "independent",
   "command": {
