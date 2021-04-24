@@ -33,9 +33,3 @@ services:
       - NEO_USER=neo4j
       - NEO_PASSWORD=test
       - NEO_URL=bolt://host.docker.internal:7687/neo4j
-    volumes:
-      - /app/src/node_modules
-      - /app/src/examples/dgql-rest/node_modules
-      - /app/src/packages/builder/node_modules
-      - /app/src/packages/client/node_modules
-      - /app/src/packages/language/node_modules

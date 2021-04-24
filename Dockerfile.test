@@ -2,9 +2,7 @@ FROM node:14.16
 
 WORKDIR /app/src
 
-COPY package.json .
-COPY package-lock.json .
-COPY lerna.json .
+COPY . . 
 
 RUN npm ci
 
