@@ -17,7 +17,7 @@ services:
       - $HOME/neo4j/import:/var/lib/neo4j/import
       - $HOME/neo4j/plugins:/plugins
     healthcheck:
-      test: wget http://localhost:7474/browser -O -
+      test: wget http://host.docker.internal:7474/browser -O -
       interval: 1s
       timeout: 1s
       retries: 25
