@@ -25,7 +25,7 @@ jobs:
             DOCKERIZE_VERSION: v0.3.0
       - run:
           name: Wait for db
-          command: dockerize -wait http://dgql_network:7474/browser -timeout 1m
+          command: dockerize -wait http://localhost:7474/browser -timeout 1m
       - run:
           name: Install Dependencies
           command: npm ci
