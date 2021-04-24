@@ -11,6 +11,7 @@
     "neo4j-driver": "^4.2.0"
   },
   "scripts": {
+    "ci-install-and-test": "npm ci && npm run test",
     "lerna:bootstrap": "lerna bootstrap",
     "prepare": "run-s lerna:clean lerna:bootstrap",
     "lerna:clean": "lerna clean -y",
