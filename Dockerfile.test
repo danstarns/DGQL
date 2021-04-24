@@ -8,7 +8,7 @@ COPY package-lock.json .
 COPY jest-global.config.js .
 COPY jest-global.setup.js .
 COPY lerna.json .
-COPY ./examples/ .
+COPY ./examples ./examples
 COPY ./packages/builder ./packages/builder
 COPY ./packages/client ./packages/client
 COPY ./packages/language ./packages/language
