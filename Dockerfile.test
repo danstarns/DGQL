@@ -12,5 +12,6 @@ COPY packages/builder ./packages/builder
 COPY packages/client ./packages/client
 COPY packages/language ./packages/language
 
-# CircleCi dont preserve node_modules this fixes problem - eek!
-CMD ["npm", "run", "ci-install-and-test"]
+RUN npm ci
+
+CMD ["npm", "test"]
