@@ -1,0 +1,22 @@
+version: 2.1
+orbs:
+  node: circleci/node@4.3.0
+jobs:
+  tests:
+    docker:
+      - image: circleci/node:14.16
+    working_directory: ~/repo
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Start Docker Network
+          command: npm run test-docker
+workflows:
+  version: 2
+  master_default:
+    jobs:
+      - tests:
+          filters:
+            branches:
+              only: /master/
