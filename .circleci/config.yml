@@ -11,7 +11,38 @@ jobs:
       - checkout
       - run:
           name: Start Docker Network
-          command: npm run test-docker
+          command: docker network create dgql_network
+      - run:
+          name: Build Neo4j
+          command: docker image pull neo4j
+      - run: |
+          docker run --network dgql_network 
+          -p 7687-7687:7474-7474 
+          --detach 
+          --name neo4j_container 
+          -e NEO4J_AUTH='neo4j/test' 
+          -e NEO4J_dbms_security_procedures_unrestricted='apoc.*' 
+          -e NEO4JLABS_PLUGINS=['apoc']
+          -e NEO4J_dbms_security_procedures_whitelist='apoc.*' 
+          -v $HOME/neo4j/data:/data
+          -v $HOME/neo4j/logs:/logs
+          -v $HOME/neo4j/import:/var/lib/neo4j/import
+          -v $HOME/neo4j/plugins:/plugins
+          neo4j
+      - run:
+        name: install dockerize
+        command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+        environment:
+          DOCKERIZE_VERSION: v0.3.0
+      - run:
+        name: Wait for db
+        command: dockerize -wait http://dgql_network:7474/browser -timeout 1m
+      - run:
+          name: Build Test Image
+          command: docker build -f ./Dockerfile.test -t neo4j-graphql .
+      - run:
+          name: Run Tests
+          command: docker run --network dgql_network --name tests -e PORT='3000' -e SECRET='secret' -e NEO_URL='bolt://dgql_network:7687/neo4j' -e NEO_USER='admin' -e NEO_PASSWORD='password' neo4j-graphql
 
 workflows:
   version: 2
