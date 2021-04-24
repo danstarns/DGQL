@@ -1,6 +1,6 @@
 FROM node:14.16
 
-WORKDIR /app
+WORKDIR /app/src
 
 COPY ./package.json ./package.json
 COPY ./jest-global.config.js ./jest-global.config.js
