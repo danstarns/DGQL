@@ -15,9 +15,9 @@ jobs:
 
 workflows:
   version: 2
-  master_default:
+  main_default:
     jobs:
       - tests:
           filters:
             branches:
-              only: /master/
+              only: /main/
