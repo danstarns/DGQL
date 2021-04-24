@@ -15,20 +15,9 @@ jobs:
       - run:
           name: Build Neo4j
           command: docker image pull neo4j
-      - run: |
-          docker run --network dgql_network 
-          -p 7687-7687:7474-7474 
-          --detach 
-          --name neo4j_container 
-          -e NEO4J_AUTH='neo4j/test' 
-          -e NEO4J_dbms_security_procedures_unrestricted='apoc.*' 
-          -e NEO4JLABS_PLUGINS=['apoc']
-          -e NEO4J_dbms_security_procedures_whitelist='apoc.*' 
-          -v $HOME/neo4j/data:/data
-          -v $HOME/neo4j/logs:/logs
-          -v $HOME/neo4j/import:/var/lib/neo4j/import
-          -v $HOME/neo4j/plugins:/plugins
-          neo4j
+      - run:
+          name: Run Neo4j
+          command: docker run --network dgql_network -p 7687-7687:7474-7474 --detach --name neo4j_container -e NEO4J_AUTH='neo4j/test' -e NEO4J_dbms_security_procedures_unrestricted='apoc.*' -e NEO4JLABS_PLUGINS='[\'apoc\']' -e NEO4J_dbms_security_procedures_whitelist='apoc.*' -v $HOME/neo4j/data:/data -v $HOME/neo4j/logs:/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/plugins neo4j
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
