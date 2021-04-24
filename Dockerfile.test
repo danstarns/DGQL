@@ -2,12 +2,14 @@ FROM node:14.16
 
 WORKDIR /app/src
 
+
 COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
 COPY ./jest-global.config.js ./jest-global.config.js
 COPY ./jest-global.setup.js ./jest-global.setup.js
 COPY ./lerna.json ./lerna.json
 
+RUN npm install -g jest
 RUN npm ci
 
 COPY ./ ./
