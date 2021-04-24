@@ -32,4 +32,4 @@ services:
     environment:
       - NEO_USER=neo4j
       - NEO_PASSWORD=test
-      - NEO_URL=bolt://localhost:7687/neo4j
+      - NEO_URL=bolt://neo4j:7687
