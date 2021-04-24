@@ -3,6 +3,8 @@ orbs:
   node: circleci/node@4.3.0
 jobs:
   test_suite:
+    docker:
+      - image: circleci/node:14.16
     working_directory: ~/repo
     steps:
       - setup_remote_docker
