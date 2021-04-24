@@ -8,10 +8,16 @@ COPY package-lock.json .
 COPY jest-global.config.js .
 COPY jest-global.setup.js .
 COPY lerna.json .
+COPY ./examples/ .
+COPY ./packages/builder ./packages/builder
+COPY ./packages/client ./packages/client
+COPY ./packages/language ./packages/language
 
-RUN npm install -g jest
 RUN npm ci
 
-COPY . .
+COPY ./node_modules ./node_modules
+COPY ./packages/builder/node_modules ./packages/builder/node_modules
+COPY ./packages/client/node_modules ./packages/client/node_modules
+COPY ./packages/language/node_modules ./packages/language/node_modules
 
 CMD ["npm", "test"]
