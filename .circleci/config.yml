@@ -30,13 +30,13 @@ jobs:
           -v $HOME/neo4j/plugins:/plugins
           neo4j
       - run:
-        name: install dockerize
-        command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-        environment:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
           DOCKERIZE_VERSION: v0.3.0
       - run:
-        name: Wait for db
-        command: dockerize -wait http://dgql_network:7474/browser -timeout 1m
+          name: Wait for db
+          command: dockerize -wait http://dgql_network:7474/browser -timeout 1m
       - run:
           name: Build Test Image
           command: docker build -f ./Dockerfile.test -t neo4j-graphql .
