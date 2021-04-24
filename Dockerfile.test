@@ -1,0 +1,14 @@
+FROM node:14.16
+
+WORKDIR /app
+
+COPY ./package.json ./package.json
+COPY ./jest-global.config.js ./jest-global.config.js
+COPY ./jest-global.setup.js ./jest-global.setup.js
+COPY ./lerna.json ./lerna.json
+
+RUN npm install
+
+COPY ./ ./
+
+CMD ["npm", "test"]

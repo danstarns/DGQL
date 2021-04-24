@@ -16,6 +16,7 @@
     "lerna:clean": "lerna clean -y",
     "playground": "cd ./packages/playground && npm run dev",
     "test": "cd ./packages/language && npm run test && cd ../client && npm run test && cd ../builder && npm run test && cd ../../examples/dgql-rest && npm run test",
+    "test-docker": "docker-compose -f ./docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test",
     "dev": "npm run playground",
     "dgql-rest": "cd ./examples/dgql-rest && npm run dev"
   },
