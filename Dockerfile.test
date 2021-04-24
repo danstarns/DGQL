@@ -12,6 +12,4 @@ COPY packages/builder ./packages/builder
 COPY packages/client ./packages/client
 COPY packages/language ./packages/language
 
-RUN npm ci
-
-CMD ["npm", "test"]
+CMD ["npm ci && npm test"]
