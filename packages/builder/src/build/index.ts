@@ -7,3 +7,4 @@ export { default as createSortSelectionNode } from "./create-sort-selection-node
 export { default as createProjectionSelectionAndParams } from "./create-projection-selection-and-params";
 export { default as createMatchSelectionNodeAndParams } from "./create-match-selection-node-and-params";
 export { default as createSetSelectionAndParams } from "./create-set-selection-and-params";
+export { default as build } from "./build";

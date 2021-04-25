@@ -3,8 +3,9 @@ import {
   createReturnSelection,
   createCreateSelectionNodeAndParams,
   createMatchSelectionNodeAndParams,
-} from "./build";
-import type { Operation } from "./types";
+} from ".";
+import type { Operation } from "../types";
+import { validate } from "../../../language/src";
 
 function createDGQLAndParams({
   operations,
@@ -57,7 +58,13 @@ function createDGQLAndParams({
     ],
   };
 
-  return [print(document), params];
+  const validated = validate({
+    document,
+    variables: params,
+    shouldPrintError: true,
+  });
+
+  return [print(validated.document), validated.variables];
 }
 
 export default createDGQLAndParams;

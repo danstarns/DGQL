@@ -1,4 +1,4 @@
-import createDGQLAndParams from "../create-dgql-and-params";
+import { build } from "../build";
 import type { MatchInput, CreateInput, Operation } from "../types";
 
 class Builder {
@@ -26,7 +26,7 @@ class Builder {
   }
 
   build(): [string, Record<string, unknown>] {
-    return createDGQLAndParams({
+    return build({
       operations: this.operations,
       returnStrings: this.returnInput || [],
     });
