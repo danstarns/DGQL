@@ -1,6 +1,12 @@
-import React, { useCallback, useContext, useRef, useState } from "react";
-import { Client, Translation } from "../../client/src";
-import { Button, Card, Spinner, Alert, Row, Col, Modal } from "react-bootstrap";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Client } from "../../client/src";
+import { Button, Card, Spinner, Row, Col, Modal } from "react-bootstrap";
 import DGQLEditor from "./DGQLEditor";
 import Editor from "@monaco-editor/react";
 import { Neo4jContext } from "use-neo4j";
@@ -24,10 +30,7 @@ function App() {
   const [showSamplesModal, setShowSamplesModal] = useState(false);
   const { driver } = useContext<Neo4jContextState>(Neo4jContext);
   const editorRef = useRef<typeof Editor>();
-
-  function handleEditorDidMount(editor: typeof Editor) {
-    editorRef.current = editor;
-  }
+  const listenerRef = useRef<any>();
 
   const submit = useCallback(async () => {
     setLoading(true);
@@ -72,6 +75,43 @@ function App() {
     }, 600);
   }, [driver, queryParams]);
 
+  const handleEditorDidMount = useCallback(
+    (editor: typeof Editor, monaco) => {
+      editorRef.current = editor;
+      // @ts-ignore
+      editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+        function () {
+          submit();
+        }
+      );
+    },
+    [submit]
+  );
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener("keydown", listenerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (listenerRef.current) {
+      return;
+    }
+
+    const listener = document.addEventListener("keydown", (ev) => {
+      if (
+        (ev.ctrlKey || ev.metaKey) &&
+        (ev.keyCode == 13 || ev.keyCode == 10)
+      ) {
+        submit();
+      }
+    });
+
+    listenerRef.current = listener;
+  }, [submit]);
+
   const handelHistoryAdd = useCallback((historyItem: HistoryItem) => {
     // @ts-ignore
     editorRef.current.setValue(historyItem.dgql);
@@ -103,7 +143,7 @@ function App() {
       <div className="pl-3 pr-3">
         <Card className="m-3 p-3 d-flex align-items-start flex-row">
           <Button variant="primary" onClick={submit}>
-            Submit
+            Submit (CTRL/CMD-Enter)
           </Button>
 
           <Button

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 
 function DGQLEditor({
@@ -6,7 +6,11 @@ function DGQLEditor({
 }: {
   onMount: (editor: typeof Editor, monaco: Monaco) => void;
 }) {
-  function beforeMount(monaco: Monaco) {
+  const monacoRef = useRef();
+
+  const beforeMount = useCallback((monaco: Monaco) => {
+    monacoRef.current = monaco;
+
     monaco.languages.registerCompletionItemProvider("graphql", {
       provideCompletionItems: (model, position) => {
         // find out if we are completing a property in the 'dependencies' object.
@@ -147,7 +151,7 @@ function DGQLEditor({
         };
       },
     });
-  }
+  }, []);
 
   return (
     <Editor
@@ -155,7 +159,7 @@ function DGQLEditor({
       theme="vs-dark"
       defaultLanguage="graphql"
       beforeMount={beforeMount}
-      onMount={onMount}
+      onMount={(e) => onMount(e, monacoRef.current)}
       options={{ fontSize: "14", tabSize: 2 }}
     />
   );
