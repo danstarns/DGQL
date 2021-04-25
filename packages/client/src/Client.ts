@@ -15,11 +15,13 @@ class Client {
   translate({
     query,
     variables = {},
+    shouldPrintError,
   }: {
     query: Query;
     variables?: Record<string, unknown>;
+    shouldPrintError?: boolean;
   }): Translation {
-    return translate({ query, variables });
+    return translate({ query, variables, shouldPrintError });
   }
 
   async run<T = any>({
@@ -27,15 +29,18 @@ class Client {
     variables = {},
     includeStats,
     debug,
+    shouldPrintError,
   }: {
     query: Query;
     variables?: Record<string, unknown>;
     includeStats?: boolean;
     debug?: boolean;
+    shouldPrintError?: boolean;
   }): Promise<T> {
     const translation = translate({
       query,
       variables,
+      shouldPrintError,
     });
 
     if (this.debug || debug) {

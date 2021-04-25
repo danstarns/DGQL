@@ -42,6 +42,7 @@ function App() {
         // @ts-ignore
         query: editorRef.current.getValue(),
         variables: JSON.parse(queryParams),
+        shouldPrintError: true,
       };
 
       const translation = client.translate(options);
@@ -61,7 +62,6 @@ function App() {
       setCypherStats(JSON.stringify(__STATS__, null, 2));
       setError("");
     } catch (e) {
-      console.error(e);
       setError(e.message);
     } finally {
       session.close();
@@ -141,16 +141,10 @@ function App() {
           </p>
         </Card>
 
-        {(loading || error) && (
+        {loading && (
           <Card className="m-3 p-3 d-flex align-items-center">
             {loading && (
               <Spinner className="m-0 p-0" animation="border"></Spinner>
-            )}
-
-            {error && !loading && (
-              <Alert className="m-0 p-3" variant="danger">
-                {error}
-              </Alert>
             )}
           </Card>
         )}
@@ -200,7 +194,27 @@ function App() {
                         height="100vh"
                         theme="vs-dark"
                         defaultLanguage="json"
-                        value={JSON.stringify(response, null, 2)}
+                        value={
+                          error
+                            ? JSON.stringify(
+                                {
+                                  error: {
+                                    message: {
+                                      lines: error.split("\n").reduce(
+                                        (res: any, v, i) => ({
+                                          ...res,
+                                          [i]: v,
+                                        }),
+                                        {}
+                                      ),
+                                    },
+                                  },
+                                },
+                                null,
+                                2
+                              )
+                            : JSON.stringify(response, null, 2)
+                        }
                         options={{
                           fontSize: "14",
                           readOnly: true,

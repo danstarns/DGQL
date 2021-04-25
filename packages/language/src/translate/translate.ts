@@ -1,47 +1,34 @@
 import { FieldNode, OperationDefinitionNode } from "graphql";
 import { Query, Translation } from "../types";
 import createMatchAndParams from "./create-match-and-params";
-import {
-  queryToDocument,
-  filterDocumentWithConditionalSelection,
-} from "../utils";
+import { queryToDocument } from "../utils";
 import createCreateAndParams from "./create-create-and-params";
 import createUpdateAndParams from "./create-update-and-params";
 import createDeleteAndParams from "./create-delete-and-params";
+import { validate } from "../validate";
 
 function translate({
   query,
-  variables = {},
+  variables: inVars = {},
+  shouldPrintError,
 }: {
   query: Query;
   variables?: Record<string, unknown>;
+  shouldPrintError?: boolean;
 }): Translation {
   const cyphers: string[] = [];
   let params: Record<string, unknown> = {};
 
-  const document = filterDocumentWithConditionalSelection({
+  const { document, variables } = validate({
     document: queryToDocument(query),
-    variables,
+    variables: inVars,
+    shouldPrintError,
   });
   const root = document.definitions[0] as OperationDefinitionNode;
-  const selections = root.selectionSet.selections;
-
+  const selections = root.selectionSet.selections as FieldNode[];
   let returnSelection: FieldNode | undefined;
 
   selections.forEach((selection, i) => {
-    if (!selection) {
-      console.log(JSON.stringify(document, null, 2));
-    }
-
-    if (selection.kind !== "Field") {
-      throw new Error("Fields are only supported here");
-    }
-
-    const validSelections = ["MATCH", "CREATE", "UPDATE", "DELETE", "RETURN"];
-    if (!validSelections.includes(selection.name.value)) {
-      throw new Error(`Invalid selection: ${selection.name.value}`);
-    }
-
     if (selection.name.value === "RETURN") {
       returnSelection = selection;
 
