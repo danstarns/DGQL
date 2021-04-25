@@ -1,7 +1,5 @@
 import {
   DocumentNode,
-  DirectiveNode,
-  valueFromASTUntyped,
   visit,
   OperationDefinitionNode,
   locatedError,
@@ -10,9 +8,7 @@ import {
 } from "graphql";
 
 /**
-    Validates DGQL query and filters out @skip & @limit.
-    Filtering out skip and limit here means when we translate 
-    we don't need to concern ourself about it everywhere. 
+    Validates DGQL query.
     Returns a new document and variables. 
     Throws Error Or GraphQLError.
 */
@@ -25,61 +21,15 @@ function validate({
   variables: any;
   shouldPrintError?: boolean;
 }): { document: DocumentNode; variables: any } {
+  let hasSeenTopLevelReturn = false;
+
   function enter(node, key, parent, path) {
     if (node.kind === "Document") {
       return;
     }
 
-    const directives = node?.directives as undefined | DirectiveNode[];
-
-    if (directives) {
-      let hasSeen = false;
-      let includeValue = true;
-
-      ["skip", "include"].forEach((type) => {
-        const found = directives.find((x) => x.name.value === type);
-
-        if (!found) {
-          return;
-        }
-
-        if (hasSeen) {
-          throw new Error("cannot @skip and @include at the same time");
-        }
-
-        hasSeen = true;
-
-        const ifArg = found.arguments?.find((x) => x.name.value === "if");
-
-        if (!ifArg) {
-          throw new Error(`directive argument: @${type}(if: ) required`);
-        }
-
-        const ifValue = valueFromASTUntyped(ifArg.value, variables);
-
-        if (type === "skip") {
-          if (ifValue) {
-            includeValue = false;
-          }
-        }
-
-        if (type === "include") {
-          if (!ifValue) {
-            includeValue = false;
-          }
-        }
-      });
-
-      if (includeValue) {
-        node.directives = [
-          ...((node?.directives || []) as DirectiveNode[]).filter(
-            (x) => !["skip", "include"].includes(x.name.value)
-          ),
-        ];
-      } else {
-        // delete this node
-        return null;
-      }
+    if (node === null) {
+      return null;
     }
 
     if (node.kind === "OperationDefinition") {
@@ -116,8 +66,27 @@ function validate({
 
           throw error;
         }
+
+        if (selection.name.value === "RETURN") {
+          if (hasSeenTopLevelReturn) {
+            const error = locatedError(
+              `Found a second RETURN when only one allowed`,
+              selection,
+              path
+            );
+
+            throw error;
+          }
+
+          hasSeenTopLevelReturn = true;
+        }
+
+        if (selection.name.value === "MATCH") {
+        }
       });
     }
+
+    return node;
   }
 
   try {

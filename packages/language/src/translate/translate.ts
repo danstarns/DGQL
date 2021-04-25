@@ -5,7 +5,7 @@ import { queryToDocument } from "../utils";
 import createCreateAndParams from "./create-create-and-params";
 import createUpdateAndParams from "./create-update-and-params";
 import createDeleteAndParams from "./create-delete-and-params";
-import { validate } from "../validate";
+import { validate, filterDocumentWithConditionalSelection } from "../validate";
 
 /**
     Translates given GraphQL document and produces
@@ -23,10 +23,14 @@ function translate({
   const cyphers: string[] = [];
   let params: Record<string, unknown> = {};
 
-  const { document, variables } = validate({
+  let { document, variables } = validate({
     document: queryToDocument(query),
     variables: inVars,
     shouldPrintError,
+  });
+  document = filterDocumentWithConditionalSelection({
+    document,
+    variables,
   });
   const root = document.definitions[0] as OperationDefinitionNode;
   const selections = root.selectionSet.selections as FieldNode[];

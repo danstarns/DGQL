@@ -71,148 +71,32 @@ describe("validate", () => {
     }
   });
 
-  describe("filter @skip and @limit", () => {
-    test("should throw cannot @skip and @include at the same time", () => {
-      const doc = parse(`
-          {
-            MATCH @include(if: true) @skip(if: true)
-          }
-        `);
+  test("should throw can only RETURN once top-level", () => {
+    const doc = parse(`
+        {
+           RETURN {
+             name
+           }
+           RETURN {
+             name
+           } 
+        }
+    `);
 
-      expect(() =>
-        validate({
-          document: doc,
-          variables: { truthy: true, falsy: false },
-        })
-      ).toThrow("cannot @skip and @include at the same time");
-    });
+    try {
+      validate({ document: doc, variables: {}, shouldPrintError: true });
+    } catch (error) {
+      expect(trimmer(error.message)).toEqual(
+        trimmer(`
+            Unexpected error value: "Found a second RETURN when only one allowed"
 
-    test("should throw directive argument: @include(if: ) required", () => {
-      const doc = parse(`
-          {
-            MATCH @include
-          }
-        `);
-
-      expect(() =>
-        validate({
-          document: doc,
-          variables: { truthy: true, falsy: false },
-        })
-      ).toThrow("directive argument: @include(if: ) required");
-    });
-
-    test("should throw directive argument: @skip(if: ) required", () => {
-      const doc = parse(`
-          {
-            MATCH @skip
-          }
-        `);
-
-      expect(() =>
-        validate({
-          document: doc,
-          variables: { truthy: true, falsy: false },
-        })
-      ).toThrow("directive argument: @skip(if: ) required");
-    });
-
-    test("should remove all @include where applicable", () => {
-      const doc = parse(`
-          {
-            MATCH @include(if: $truthy)
-            MATCH @include(if: $falsy)
-            MATCH @include(if: true)
-            MATCH @include(if: false)
-            MATCH {
-              MATCH
-            }
-            MATCH {
-              MATCH @include(if: $truthy)
-              MATCH @include(if: $falsy)
-              MATCH @include(if: true)
-              MATCH @include(if: false)
-              MATCH {
-                MATCH
-              }
-            }
-          }
-        `);
-
-      const { document, variables } = validate({
-        document: doc,
-        variables: { truthy: true, falsy: false },
-      });
-
-      expect(print(document)).toEqual(
-        print(
-          parse(`
-              {
-                MATCH
-                MATCH
-                MATCH {
-                  MATCH
-                }
-                MATCH {
-                  MATCH
-                  MATCH
-                  MATCH {
-                    MATCH
-                  }
-                }
-              }
-            `)
-        )
+            GraphQL request:6:12
+            5 |            }
+            6 |            RETURN {
+              |            ^
+            7 |              name
+        `)
       );
-    });
-
-    test("should remove all @skip where applicable", () => {
-      const doc = parse(`
-          {
-            MATCH @skip(if: $truthy)
-            MATCH @skip(if: $falsy)
-            MATCH @skip(if: true)
-            MATCH @skip(if: false)
-            MATCH {
-              MATCH
-            }
-            MATCH {
-              MATCH @skip(if: $truthy)
-              MATCH @skip(if: $falsy)
-              MATCH @skip(if: true)
-              MATCH @skip(if: false)
-              MATCH {
-                MATCH
-              }
-            }
-          }
-        `);
-
-      const { document, variables } = validate({
-        document: doc,
-        variables: { truthy: true, falsy: false },
-      });
-
-      expect(print(document)).toEqual(
-        print(
-          parse(`
-              {
-                MATCH
-                MATCH
-                MATCH {
-                  MATCH
-                }
-                MATCH {
-                  MATCH
-                  MATCH
-                  MATCH {
-                    MATCH
-                  }
-                }
-              }
-            `)
-        )
-      );
-    });
+    }
   });
 });
