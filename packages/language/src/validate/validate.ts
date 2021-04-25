@@ -5,37 +5,8 @@ import {
   locatedError,
   GraphQLError,
   printError,
-  FieldNode,
-  BREAK,
-  SelectionNode,
-  ASTNode,
 } from "graphql";
-
-function validateMatch({ node }: { node: FieldNode; variables: any }): void {
-  function enter(_node, key, parent, path) {
-    const n = _node as FieldNode;
-
-    if (!n.selectionSet) {
-      const error = locatedError("MATCH requires a selection", n, path);
-
-      throw error;
-    }
-
-    ["directives", "arguments"].forEach((type) => {
-      if (n[type]?.length) {
-        const error = locatedError(`${type} not allowed on MATCH`, n, path);
-
-        throw error;
-      }
-    });
-
-    return BREAK;
-  }
-
-  visit(node, {
-    enter,
-  });
-}
+import validateMatch from "./validate-match";
 
 /**
     Validates DGQL query.
@@ -101,6 +72,16 @@ function validate({
           if (hasSeenTopLevelReturn) {
             const error = locatedError(
               `Found a second RETURN when only one allowed`,
+              selection,
+              path
+            );
+
+            throw error;
+          }
+
+          if (!selection.selectionSet?.selections?.length) {
+            const error = locatedError(
+              `RETURN requires a selection`,
               selection,
               path
             );

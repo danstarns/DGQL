@@ -2,23 +2,7 @@ import { parse, print } from "graphql";
 import { validate } from "../../../src/validate";
 import trimmer from "../utils/trimmer";
 
-describe("ABBA", () => {
-  test("should be a function", () => {
-    expect(validate).toBeInstanceOf(Function);
-  });
-
-  test("abc", () => {
-    const doc = parse(`
-        {
-            MATCH {
-              node @node
-            }
-        }
-    `);
-
-    validate({ document: doc, variables: {} });
-  });
-
+describe("validate", () => {
   test("should throw fields are only supported here", () => {
     const doc = parse(`
         {
@@ -102,83 +86,27 @@ describe("ABBA", () => {
     }
   });
 
-  describe("validateMatch", () => {
-    test("should throw MATCH requires a selection", () => {
-      const doc = parse(`
+  test("should throw RETURN requires a selection", () => {
+    const doc = parse(`
         {
-           MATCH
+           RETURN 
         }
-      `);
+    `);
 
-      try {
-        validate({ document: doc, variables: {}, shouldPrintError: true });
-      } catch (error) {
-        expect(trimmer(error.message)).toEqual(
-          trimmer(`
-          Unexpected error value: "MATCH requires a selection"
+    try {
+      validate({ document: doc, variables: {}, shouldPrintError: true });
+    } catch (error) {
+      expect(trimmer(error.message)).toEqual(
+        trimmer(`
+            Unexpected error value: "RETURN requires a selection"
 
-          GraphQL request:3:12
-          2 |         {
-          3 |            MATCH
-            |            ^
-          4 |         }
-      `)
-        );
-      }
-    });
-
-    test("should throw directives|arguments not allowed on MATCH", () => {
-      ["arguments", "directives"].forEach((type) => {
-        let doc;
-
-        if (type === "directives") {
-          doc = parse(`
-              {
-                 MATCH @directives {
-                   node @node
-                 }
-              }
-          `);
-        } else {
-          doc = parse(`
-            {
-               MATCH(arguments: 123) {
-                 node @node
-               }
-            }
-          `);
-        }
-
-        try {
-          validate({ document: doc, variables: {}, shouldPrintError: true });
-        } catch (error) {
-          if (type === "arguments") {
-            expect(trimmer(error.message)).toEqual(
-              trimmer(`
-              Unexpected error value: "${type} not allowed on MATCH"
-  
-              GraphQL request:3:16
-              2 |             {
-              3 |                MATCH(arguments: 123) {
-                |                ^
-              4 |                  node @node
-          `)
-            );
-          } else {
-            expect(trimmer(error.message)).toEqual(
-              trimmer(`
-              Unexpected error value: "${type} not allowed on MATCH"
-  
-              GraphQL request:3:18
-              2 |             {
-              3 |                MATCH @directives {
-                |                ^
-              4 |                  node @node
-            `)
-            );
-          }
-        }
-      });
-    });
+            GraphQL request:3:12
+            2 |         {
+            3 |            RETURN
+              |            ^
+            4 |         }
+        `)
+      );
+    }
   });
 });

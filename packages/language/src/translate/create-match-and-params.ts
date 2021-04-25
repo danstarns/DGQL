@@ -87,8 +87,6 @@ function createMatchAndParams({
           `RETURN apoc.cypher.runFirstColumnSingle("${statement}", ${paramsStr}) AS ${varName}`
         );
       }
-    } else if (!nodeDirective) {
-      throw new Error("@node required");
     } else if (nodeDirective) {
       const labelArg = (nodeDirective?.arguments || [])?.find(
         (x) => x.name.value === "label"

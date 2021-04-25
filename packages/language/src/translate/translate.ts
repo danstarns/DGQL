@@ -24,14 +24,14 @@ function translate({
   let params: Record<string, unknown> = {};
 
   let { document, variables } = validate({
-    document: queryToDocument(query),
+    document: filterDocumentWithConditionalSelection({
+      document: queryToDocument(query),
+      variables: inVars,
+    }),
     variables: inVars,
     shouldPrintError,
   });
-  document = filterDocumentWithConditionalSelection({
-    document,
-    variables,
-  });
+
   const root = document.definitions[0] as OperationDefinitionNode;
   const selections = root.selectionSet.selections as FieldNode[];
   let returnSelection: FieldNode | undefined;

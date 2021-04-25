@@ -120,15 +120,15 @@ export async function updateGenre(req: Request, res: Response) {
   const { genresByName } = await client.run({
     query: gql`
       {
-        MATCH {
-          genresByName @node(label: Genre) @include(if: $name) {
+        MATCH @include(if: $name) {
+          genresByName @node(label: Genre) {
             WHERE {
               name(equal: $name)
             }
           }
         }
-        RETURN {
-          genresByName @include(if: $name)
+        RETURN @include(if: $name) {
+          genresByName
         }
       }
     `,
