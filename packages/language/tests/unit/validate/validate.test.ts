@@ -2,7 +2,7 @@ import { parse, print } from "graphql";
 import { validate } from "../../../src/validate";
 import trimmer from "../utils/trimmer";
 
-describe("validate", () => {
+describe("ABBA", () => {
   test("should be a function", () => {
     expect(validate).toBeInstanceOf(Function);
   });
@@ -10,7 +10,9 @@ describe("validate", () => {
   test("abc", () => {
     const doc = parse(`
         {
-            MATCH
+            MATCH {
+              node @node
+            }
         }
     `);
 
@@ -98,5 +100,31 @@ describe("validate", () => {
         `)
       );
     }
+  });
+
+  describe("validateMatch", () => {
+    test("should throw MATCH requires a selection", () => {
+      const doc = parse(`
+        {
+           MATCH
+        }
+      `);
+
+      try {
+        validate({ document: doc, variables: {}, shouldPrintError: true });
+      } catch (error) {
+        expect(trimmer(error.message)).toEqual(
+          trimmer(`
+          Unexpected error value: "MATCH requires a selection"
+
+          GraphQL request:3:12
+          2 |         {
+          3 |            MATCH
+            |            ^
+          4 |         }
+      `)
+        );
+      }
+    });
   });
 });

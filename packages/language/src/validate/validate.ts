@@ -5,7 +5,27 @@ import {
   locatedError,
   GraphQLError,
   printError,
+  FieldNode,
+  BREAK,
 } from "graphql";
+
+function validateMatch({ node }: { node: FieldNode; variables: any }): any {
+  function enter(_node, key, parent, path) {
+    const n = _node as FieldNode;
+
+    if (!n.selectionSet) {
+      const error = locatedError("MATCH requires a selection", n, path);
+
+      throw error;
+    }
+
+    return BREAK;
+  }
+
+  visit(node, {
+    enter,
+  });
+}
 
 /**
     Validates DGQL query.
@@ -82,6 +102,10 @@ function validate({
         }
 
         if (selection.name.value === "MATCH") {
+          validateMatch({
+            node: selection,
+            variables,
+          });
         }
       });
     }
