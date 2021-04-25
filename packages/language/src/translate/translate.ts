@@ -7,6 +7,10 @@ import createUpdateAndParams from "./create-update-and-params";
 import createDeleteAndParams from "./create-delete-and-params";
 import { validate } from "../validate";
 
+/**
+    Translates given GraphQL document and produces
+    Cypher and Params plus some meta info. 
+*/
 function translate({
   query,
   variables: inVars = {},

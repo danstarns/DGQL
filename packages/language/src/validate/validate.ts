@@ -9,7 +9,7 @@ import {
   printError,
 } from "graphql";
 
-/*
+/**
     Validates DGQL query and filters out @skip & @limit.
     Filtering out skip and limit here means when we translate 
     we don't need to concern ourself about it everywhere. 
