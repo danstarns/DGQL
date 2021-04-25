@@ -206,13 +206,13 @@ Sometimes you may have a highly specific question, Cypher could better help you 
   CREATE {
     product @node(label: Product) {
       SET {
-        id(value: "pringles_product_id")
+        id @uuid
         name(value: "Pringles")
       }
       CREATE @edge(type: HAS_PHOTO, direction: OUT) {
         NODE(label: Photo) {
           SET {
-            id(value: "green_photo_id")
+            id @uuid
             url(value: "green_photo_url.com")
             name(value: "Green photo")
           }
@@ -228,7 +228,7 @@ Sometimes you may have a highly specific question, Cypher could better help you 
       CREATE @edge(type: HAS_PHOTO, direction: OUT) {
         NODE(label: Photo) {
           SET {
-            id(value: "red_photo_id")
+            id @uuid
             url(value: "red_photo_url.com")
             name(value: "Red photo")
           }
