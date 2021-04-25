@@ -7,9 +7,11 @@ import {
   printError,
   FieldNode,
   BREAK,
+  SelectionNode,
+  ASTNode,
 } from "graphql";
 
-function validateMatch({ node }: { node: FieldNode; variables: any }): any {
+function validateMatch({ node }: { node: FieldNode; variables: any }): void {
   function enter(_node, key, parent, path) {
     const n = _node as FieldNode;
 
@@ -18,6 +20,14 @@ function validateMatch({ node }: { node: FieldNode; variables: any }): any {
 
       throw error;
     }
+
+    ["directives", "arguments"].forEach((type) => {
+      if (n[type]?.length) {
+        const error = locatedError(`${type} not allowed on MATCH`, n, path);
+
+        throw error;
+      }
+    });
 
     return BREAK;
   }

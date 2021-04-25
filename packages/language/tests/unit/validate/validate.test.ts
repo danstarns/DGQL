@@ -126,5 +126,59 @@ describe("ABBA", () => {
         );
       }
     });
+
+    test("should throw directives|arguments not allowed on MATCH", () => {
+      ["arguments", "directives"].forEach((type) => {
+        let doc;
+
+        if (type === "directives") {
+          doc = parse(`
+              {
+                 MATCH @directives {
+                   node @node
+                 }
+              }
+          `);
+        } else {
+          doc = parse(`
+            {
+               MATCH(arguments: 123) {
+                 node @node
+               }
+            }
+          `);
+        }
+
+        try {
+          validate({ document: doc, variables: {}, shouldPrintError: true });
+        } catch (error) {
+          if (type === "arguments") {
+            expect(trimmer(error.message)).toEqual(
+              trimmer(`
+              Unexpected error value: "${type} not allowed on MATCH"
+  
+              GraphQL request:3:16
+              2 |             {
+              3 |                MATCH(arguments: 123) {
+                |                ^
+              4 |                  node @node
+          `)
+            );
+          } else {
+            expect(trimmer(error.message)).toEqual(
+              trimmer(`
+              Unexpected error value: "${type} not allowed on MATCH"
+  
+              GraphQL request:3:18
+              2 |             {
+              3 |                MATCH @directives {
+                |                ^
+              4 |                  node @node
+            `)
+            );
+          }
+        }
+      });
+    });
   });
 });
