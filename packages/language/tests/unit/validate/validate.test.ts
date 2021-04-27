@@ -1,4 +1,4 @@
-import { parse, print } from "graphql";
+import { parse } from "graphql";
 import { validate } from "../../../src/validate";
 import trimmer from "../utils/trimmer";
 

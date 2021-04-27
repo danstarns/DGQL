@@ -4,9 +4,10 @@ import {
   valueFromASTUntyped,
   visit,
   locatedError,
+  FragmentDefinitionNode,
 } from "graphql";
 
-function filterDocumentWithConditionalSelection({
+function prepareDocument({
   document,
   variables,
 }: {
@@ -15,8 +16,52 @@ function filterDocumentWithConditionalSelection({
 }): DocumentNode {
   const edited = visit(document, {
     enter(node, key, parent, path) {
+      if (node.kind === "FragmentDefinition") {
+        const isOnDGQL = node.typeCondition.name.value === "DGQL";
+
+        if (!isOnDGQL) {
+          const error = locatedError("fragment not on DGQL", node, path);
+
+          throw error;
+        }
+
+        return null;
+      }
+
       if (node.kind !== "Field") {
         return;
+      }
+
+      if (node.selectionSet?.selections.length) {
+        node.selectionSet.selections.forEach((select, i) => {
+          if (select.kind !== "FragmentSpread") {
+            return;
+          }
+
+          const found = document.definitions.find(
+            (x) =>
+              x.kind === "FragmentDefinition" &&
+              x.name.value === select.name.value
+          ) as FragmentDefinitionNode;
+
+          if (!found) {
+            const error = locatedError(
+              `fragment ${select.name.value} not found`,
+              select,
+              path
+            );
+
+            throw error;
+          }
+
+          // @ts-ignore
+          node.selectionSet?.selections[i] = null;
+          // @ts-ignore
+          node.selectionSet?.selections = [
+            ...(node.selectionSet?.selections || []),
+            ...(found.selectionSet.selections || []),
+          ].filter((x) => x !== null);
+        });
       }
 
       const directives = node?.directives as undefined | DirectiveNode[];
@@ -93,4 +138,4 @@ function filterDocumentWithConditionalSelection({
   return edited;
 }
 
-export default filterDocumentWithConditionalSelection;
+export default prepareDocument;

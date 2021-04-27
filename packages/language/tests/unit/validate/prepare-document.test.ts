@@ -1,12 +1,8 @@
-import { filterDocumentWithConditionalSelection } from "../../../src/validate";
+import { prepareDocument } from "../../../src/validate";
 import { parse, print, printError } from "graphql";
 import trimmer from "../utils/trimmer";
 
-describe("filterDocumentWithConditionalSelection", () => {
-  test("should be a function", () => {
-    expect(filterDocumentWithConditionalSelection).toBeInstanceOf(Function);
-  });
-
+describe("prepareDocument", () => {
   test("should throw cannot @skip and @include at the same time", () => {
     const doc = parse(`
       {
@@ -15,7 +11,7 @@ describe("filterDocumentWithConditionalSelection", () => {
     `);
 
     try {
-      filterDocumentWithConditionalSelection({
+      prepareDocument({
         document: doc,
         variables: { truthy: true, falsy: false },
       });
@@ -42,7 +38,7 @@ describe("filterDocumentWithConditionalSelection", () => {
     `);
 
     try {
-      filterDocumentWithConditionalSelection({
+      prepareDocument({
         document: doc,
         variables: { truthy: true, falsy: false },
       });
@@ -69,7 +65,7 @@ describe("filterDocumentWithConditionalSelection", () => {
     `);
 
     try {
-      filterDocumentWithConditionalSelection({
+      prepareDocument({
         document: doc,
         variables: { truthy: true, falsy: false },
       });
@@ -110,7 +106,7 @@ describe("filterDocumentWithConditionalSelection", () => {
       }
     `);
 
-    const parsedDoc = filterDocumentWithConditionalSelection({
+    const parsedDoc = prepareDocument({
       document: doc,
       variables: { truthy: true, falsy: false },
     });
@@ -159,7 +155,7 @@ describe("filterDocumentWithConditionalSelection", () => {
       }
     `);
 
-    const parsedDoc = filterDocumentWithConditionalSelection({
+    const parsedDoc = prepareDocument({
       document: doc,
       variables: { truthy: true, falsy: false },
     });
@@ -184,5 +180,106 @@ describe("filterDocumentWithConditionalSelection", () => {
         `)
       )
     );
+  });
+
+  describe("Fragments", () => {
+    test("should throw fragment not on DGQL", () => {
+      const doc = parse(`
+        {
+         MATCH {
+           ...MyFragment
+         }
+        }
+        
+        fragment MyFragment on Test {
+          node @node
+        }
+      `);
+
+      try {
+        prepareDocument({
+          document: doc,
+          variables: { truthy: true, falsy: false },
+        });
+      } catch (error) {
+        expect(trimmer(printError(error))).toEqual(
+          trimmer(`
+            Unexpected error value: "fragment not on DGQL"
+
+            GraphQL request:8:9
+            7 |
+            8 |         fragment MyFragment on Test {
+              |         ^
+            9 |           node @node
+        `)
+        );
+      }
+    });
+
+    test("should throw fragment not found", () => {
+      const doc = parse(`
+        {
+         MATCH {
+           ...NotFound
+         }
+        }
+        
+        fragment MyFragment on Test {
+          node @node
+        }
+      `);
+
+      try {
+        prepareDocument({
+          document: doc,
+          variables: { truthy: true, falsy: false },
+        });
+      } catch (error) {
+        expect(trimmer(printError(error))).toEqual(
+          trimmer(`
+            Unexpected error value: "fragment NotFound not found"
+
+            GraphQL request:4:12
+            3 |          MATCH {
+            4 |            ...NotFound
+              |            ^
+            5 |          }
+        `)
+        );
+      }
+    });
+
+    test("should apply fragment onto document", () => {
+      const doc = parse(`
+        {
+         MATCH {
+           ...MyFragment
+         }
+        }
+        
+        fragment MyFragment on DGQL {
+          node @node
+        }
+      `);
+
+      const newDoc = prepareDocument({
+        document: doc,
+        variables: { truthy: true, falsy: false },
+      });
+
+      const printed = print(newDoc);
+
+      expect(printed).toEqual(
+        print(
+          parse(`
+            {
+              MATCH {
+                node @node
+              }
+            }
+          `)
+        )
+      );
+    });
   });
 });

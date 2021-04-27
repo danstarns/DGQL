@@ -5,7 +5,7 @@ import { queryToDocument } from "../utils";
 import createCreateAndParams from "./create-create-and-params";
 import createUpdateAndParams from "./create-update-and-params";
 import createDeleteAndParams from "./create-delete-and-params";
-import { validate, filterDocumentWithConditionalSelection } from "../validate";
+import { validate, prepareDocument } from "../validate";
 
 /**
     Translates given GraphQL document and produces
@@ -24,7 +24,7 @@ function translate({
   let params: Record<string, unknown> = {};
 
   let { document, variables } = validate({
-    document: filterDocumentWithConditionalSelection({
+    document: prepareDocument({
       document: queryToDocument(query),
       variables: inVars,
     }),
