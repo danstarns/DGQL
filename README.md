@@ -10,9 +10,7 @@
 
 Dynamic Graph Query Language 👍
 
-## Intro
-
-### Packages
+## Packages
 
 1. [Language](https://github.com/danstarns/dgql/tree/main/packages/language) - The Javascript Implementation For The DGQL Language
 
@@ -22,17 +20,17 @@ Dynamic Graph Query Language 👍
 
 4. [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground) - Graph app Developer playground to issue DGQL queries
 
-### Documentation
+## Documentation
 
 - [Documentation](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
 - [TCK tests](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
 - [DGQL Recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes)
 
-### Examples
+## Examples
 
 See [Examples](./examples/index.md)
 
-### Prerequisites
+## Prerequisites
 
 GraphQL can be separated into two sections; language & execution. To truly grasp this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language.
 
@@ -40,7 +38,7 @@ GraphQL can be separated into two sections; language & execution. To truly grasp
 
 Looking at the two separate sections above; **GraphQL is a query language** & a runtime for fulfilling those queries. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
 
-### What
+## What
 
 This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
@@ -124,7 +122,7 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 }
 ```
 
-### Why
+## Why
 
 **Why don't you just use Cypher?** - If you are looking for a highly specific answer... Cypher may be the correct tool. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
 
