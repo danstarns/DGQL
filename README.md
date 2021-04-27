@@ -2,6 +2,8 @@
 
 > Next Generation Application Specific Graph Query Language.
 
+[![DGQL](./docs/assets/dgql-banner.png)](.)
+
 ~~Dynamic GraphQL~~
 
 ~~Dans Graph Query Language~~
