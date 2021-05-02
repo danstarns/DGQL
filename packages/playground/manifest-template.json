@@ -1,0 +1,11 @@
+{
+  "name": "DGQL Playground",
+  "description": "Developer playground for the DGQL language",
+  "icons": [
+    {
+      "src": "./dgql-white.png",
+      "type": "png"
+    }
+  ],
+  "homepage": "https://github.com/danstarns/dgql"
+}
