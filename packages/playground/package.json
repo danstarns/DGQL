@@ -1,7 +1,7 @@
 {
   "name": "@dgql/playground",
   "main": "index.js",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Developer playground for the DGQL language",
   "repository": {
     "type": "git",

@@ -1,9 +1,12 @@
 {
   "name": "DGQL Playground",
   "description": "Developer playground for the DGQL language",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
   "icons": [
     {
-      "src": "./dgql-white.png",
+      "src": "./dgql-icon-white.png",
       "type": "png"
     }
   ],
