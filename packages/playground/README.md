@@ -22,14 +22,4 @@ https://registry.npmjs.org/@dgql/playground
 
 ### 3, Play
 
-[![Image from Gyazo](https://i.gyazo.com/194bc89547cb025043e03f7bc0439257.gif)](https://gyazo.com/194bc89547cb025043e03f7bc0439257)
-
-## Screenshots
-
-[![Image from Gyazo](https://i.gyazo.com/c2e1e34998dbb28b7a9a449710a56d0a.png)](https://gyazo.com/c2e1e34998dbb28b7a9a449710a56d0a)
-
-[![Image from Gyazo](https://i.gyazo.com/5f9d7e402736ce288142f45fdd59476f.png)](https://gyazo.com/5f9d7e402736ce288142f45fdd59476f)
-
-[![Image from Gyazo](https://i.gyazo.com/d76fe651d56c8a0769cef1afe4a31a9e.png)](https://gyazo.com/d76fe651d56c8a0769cef1afe4a31a9e)
-
-[![Image from Gyazo](https://i.gyazo.com/653cbcb50efd221d33517707988eafcb.png)](https://gyazo.com/653cbcb50efd221d33517707988eafcb)
+[![Image from Gyazo](https://i.gyazo.com/88e3a580586197e51e246c763d4f594e.gif)](https://gyazo.com/88e3a580586197e51e246c763d4f594e)

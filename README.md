@@ -264,4 +264,4 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 
 [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground).
 
-[![Image from Gyazo](https://i.gyazo.com/194bc89547cb025043e03f7bc0439257.gif)](https://gyazo.com/194bc89547cb025043e03f7bc0439257)
+[![Image from Gyazo](https://i.gyazo.com/88e3a580586197e51e246c763d4f594e.gif)](https://gyazo.com/88e3a580586197e51e246c763d4f594e)
