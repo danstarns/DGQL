@@ -136,13 +136,9 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 **Why don't you just use Cypher?** - If you are looking for a highly specific answer... Cypher may be the correct tool. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
 
-**Why does it use GraphQL?** - The GraphQL parser is a widely adopted and maintained project, meaning we can lean on its tools and infrastructure. Not only does GraphQL provide a solid foundation but also comes with developers & library authors. Finally; GraphQL directives are extremely useful and enable DGQL to facilitate powerful abstractions behind them.
+**Why does it use GraphQL?** - The GraphQL parser is a widely adopted and maintained project, meaning we can lean on its tools and infrastructure. Not only does GraphQL provide a solid foundation but also comes with developers & library authors. Finally, GraphQL directives are extremely useful and enable DGQL to facilitate powerful abstractions behind them.
 
 **Why no Schema?** - This implementation is designed to be lightweight and run anywhere. The lack of schema facilitates this but also means no validation or type checking is performed, usually the expensive part of GraphQL execution.
-
-[![Image from Gyazo](https://i.gyazo.com/852aa6474e6872604566fab5a9b20298.jpg)](https://gyazo.com/852aa6474e6872604566fab5a9b20298)
-
-- Image showing a representation of a typical GraphQL engine.
 
 ## Overview
 
