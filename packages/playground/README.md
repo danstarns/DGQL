@@ -1,5 +1,9 @@
 # @dgql/playground
 
+<a href="https://badge.fury.io/js/%40dgql%2Fplayground">
+  <img alt="npm package" src="https://badge.fury.io/js/%40dgql%2Fplayground.svg">
+</a>
+
 Developer [Graph App](https://neo4j.com/developer/graph-apps/building-a-graph-app/) for the [DGQL Language](https://github.com/danstarns/dgql).
 
 ## Getting Started

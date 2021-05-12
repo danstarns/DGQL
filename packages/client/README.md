@@ -1,5 +1,9 @@
 # @dgql/client
 
+<a href="https://badge.fury.io/js/%40dgql%2Fclient">
+  <img alt="npm package" src="https://badge.fury.io/js/%40dgql%2Fclient.svg">
+</a>
+
 Translation engine and client for the [DGQL Language](https://github.com/danstarns/dgql).
 
 ## Getting Started
