@@ -1,7 +1,13 @@
 import { visit, locatedError, FieldNode, BREAK } from "graphql";
 import validateMatchSelectionSet from "./validate-match-selection-set";
 
-function validateMatch({ node }: { node: FieldNode; variables: any }): void {
+function validateMatch({
+  node,
+  variables,
+}: {
+  node: FieldNode;
+  variables: any;
+}): void {
   function enter(_node, key, parent, path) {
     const n = _node as FieldNode;
 
@@ -19,7 +25,7 @@ function validateMatch({ node }: { node: FieldNode; variables: any }): void {
       }
     });
 
-    validateMatchSelectionSet({ selectionSetNode: n.selectionSet });
+    validateMatchSelectionSet({ selectionSetNode: n.selectionSet, variables });
 
     return BREAK;
   }

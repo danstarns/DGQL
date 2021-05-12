@@ -15,6 +15,7 @@ describe("validateMatchSelectionSet", () => {
 
       try {
         validateMatchSelectionSet({
+          variables: {},
           selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
             .selectionSet?.selections[0] as FieldNode)
             .selectionSet as SelectionSetNode,
@@ -48,6 +49,7 @@ describe("validateMatchSelectionSet", () => {
 
     try {
       validateMatchSelectionSet({
+        variables: {},
         selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
           .selectionSet?.selections[0] as FieldNode)
           .selectionSet as SelectionSetNode,
@@ -78,6 +80,7 @@ describe("validateMatchSelectionSet", () => {
 
     try {
       validateMatchSelectionSet({
+        variables: {},
         selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
           .selectionSet?.selections[0] as FieldNode)
           .selectionSet as SelectionSetNode,
@@ -108,6 +111,7 @@ describe("validateMatchSelectionSet", () => {
 
     try {
       validateMatchSelectionSet({
+        variables: {},
         selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
           .selectionSet?.selections[0] as FieldNode)
           .selectionSet as SelectionSetNode,
@@ -138,6 +142,7 @@ describe("validateMatchSelectionSet", () => {
 
     try {
       validateMatchSelectionSet({
+        variables: {},
         selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
           .selectionSet?.selections[0] as FieldNode)
           .selectionSet as SelectionSetNode,
