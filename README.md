@@ -144,6 +144,8 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ### Retrieve large subgraphs
 
+<!-- prettier-ignore-start -->
+
 ```graphql
 {
   MATCH {
@@ -152,9 +154,7 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
         name
         posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
           title
-          comments
-            @edge(type: HAS_COMMENT, direction: OUT)
-            @node(label: Comment) {
+          comments @edge(type: HAS_COMMENT, direction: OUT) @node(label: Comment) {
             content
             authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
               name
@@ -169,6 +169,8 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
   }
 }
 ```
+
+<!-- prettier-ignore-end -->
 
 ### Execute custom `@cypher`
 
