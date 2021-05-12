@@ -205,60 +205,12 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 }
 ```
 
-### Build large subgraphs
+### Full CRUD Operations
 
-[![Image from Gyazo](https://i.gyazo.com/238741dc134077fdadfacb638c80225e.png)](https://gyazo.com/238741dc134077fdadfacb638c80225e)
-
-```graphql
-{
-  CREATE {
-    product @node(label: Product) {
-      SET {
-        id @uuid
-        name(value: "Pringles")
-      }
-      CREATE @edge(type: HAS_PHOTO, direction: OUT) {
-        NODE(label: Photo) {
-          SET {
-            id @uuid
-            url(value: "green_photo_url.com")
-            name(value: "Green photo")
-          }
-          CONNECT @edge(type: HAS_COLOR, direction: OUT) {
-            NODE(label: Color) {
-              WHERE {
-                name(equal: "Green")
-              }
-            }
-          }
-        }
-      }
-      CREATE @edge(type: HAS_PHOTO, direction: OUT) {
-        NODE(label: Photo) {
-          SET {
-            id @uuid
-            url(value: "red_photo_url.com")
-            name(value: "Red photo")
-          }
-          CONNECT @edge(type: HAS_COLOR, direction: OUT) {
-            NODE(label: Color) {
-              WHERE {
-                name(equal: "Red")
-              }
-            }
-          }
-        }
-      }
-      PROJECT {
-        id
-      }
-    }
-  }
-  RETURN {
-    product
-  }
-}
-```
+1. [CREATE](./docs/language/create.md)
+2. [MATCH](./docs/language/match.md)
+3. [UPDATE](./docs/language/update.md)
+4. [DELETE](./docs/language/delete.md)
 
 ### Play on your desktop
 
