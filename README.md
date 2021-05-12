@@ -62,7 +62,7 @@ Given the below DGQL Query;
 }
 ```
 
-> DGQL is GraphQL **and it is not a fork!** > <br>
+<br>
 
 <details>
 <summary>Or equivalent DGQL Builder</summary>
@@ -127,6 +127,12 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
   ]
 }
 ```
+
+<br>
+
+💡 DGQL is just GraphQL the language, **and DGQL is not a fork**.
+
+<br>
 
 ## Why
 
