@@ -62,6 +62,8 @@ Given the below DGQL Query;
 }
 ```
 
+<br>
+
 <details>
 <summary>Or equivalent DGQL Builder</summary>
 <br>
