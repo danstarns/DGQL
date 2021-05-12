@@ -3,3 +3,8 @@ export { default as validateMatch } from "./validate-match";
 export { default as validateMatchSelectionSet } from "./validate-match-selection-set";
 export { default as prepareDocument } from "./prepare-document";
 export { default as validateCypherDirective } from "./validate-cypher-directive";
+export { default as validateNodeSelection } from "./validate-node-selection";
+export { default as validateProject } from "./validate-project";
+export { default as validateEdgeSelection } from "./validate-edge-selection";
+export { default as validatePropertiesSelection } from "./validate-properties-selection";
+export { default as validateNodeDirective } from "./validate-node-directive";

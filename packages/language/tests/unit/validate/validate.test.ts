@@ -3,32 +3,6 @@ import { validate } from "../../../src/validate";
 import trimmer from "../utils/trimmer";
 
 describe("validate", () => {
-  test("should throw fields are only supported here", () => {
-    const doc = parse(`
-        {
-            ... on Test {
-                test
-            }
-        }
-    `);
-
-    try {
-      validate({ document: doc, variables: {}, shouldPrintError: true });
-    } catch (error) {
-      expect(trimmer(error.message)).toEqual(
-        trimmer(`
-            Unexpected error value: "Fields are only supported here"
-
-            GraphQL request:3:13
-            2 |         {
-            3 |             ... on Test {
-              |             ^
-            4 |                 test
-        `)
-      );
-    }
-  });
-
   test("should throw Invalid operation", () => {
     const validSelections = ["MATCH", "CREATE", "UPDATE", "DELETE", "RETURN"];
 

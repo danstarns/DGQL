@@ -4,8 +4,12 @@ import {
   BREAK,
   SelectionSetNode,
   DirectiveNode,
+  FieldNode,
 } from "graphql";
 import validateCypherDirective from "./validate-cypher-directive";
+import validateNodeDirective from "./validate-node-directive";
+import validateNodeSelection from "./validate-node-selection";
+import validateProject from "./validate-project";
 
 function validateMatchSelectionSet({
   selectionSetNode,
@@ -15,12 +19,6 @@ function validateMatchSelectionSet({
   variables: any;
 }) {
   function enter(field, key, parent, path) {
-    if (field.kind !== "Field") {
-      const error = locatedError("Fields are only supported here", field, path);
-
-      throw error;
-    }
-
     const directives = (field.directives || []) as DirectiveNode[];
     const cypherDirective = directives.find((x) => x.name.value === "cypher");
 
@@ -37,7 +35,15 @@ function validateMatchSelectionSet({
 
       validateCypherDirective({ directive: cypherDirective, path, variables });
 
-      // VALIDATE PROJECTION
+      if ((field as FieldNode).selectionSet?.selections.length) {
+        validateProject({
+          path,
+          projectField: field as FieldNode,
+          type: "node",
+          variables,
+        });
+      }
+
       return BREAK;
     }
 
@@ -79,13 +85,21 @@ function validateMatchSelectionSet({
 
       throw error;
     }
-    // validate node directive
 
-    // Get Selections
-    // Validate SORT ?
-    // Validate WHERE
-    // Validate PROJECTION
-    // Validate NON allowed fields
+    validateNodeDirective({
+      directive: node,
+      path,
+      variables,
+    });
+
+    // TODO Validate Paginate Directive
+    // TODO Validate Where directive
+
+    validateNodeSelection({
+      node: field,
+      variables,
+      path,
+    });
 
     return BREAK;
   }

@@ -34,39 +34,39 @@ describe("validateMatchSelectionSet", () => {
         );
       }
     });
-  });
 
-  test("should throw Fields are only supported here", () => {
-    const doc = parse(`
+    test("should throw one of the validateProjection errors", () => {
+      const doc = parse(`
       {
           MATCH {
-            ... on Test {
-              test
+            custom @cypher(statement: "") {
+              id(abc: 123)
             }
           }
       }
     `);
 
-    try {
-      validateMatchSelectionSet({
-        variables: {},
-        selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
-          .selectionSet?.selections[0] as FieldNode)
-          .selectionSet as SelectionSetNode,
-      });
-    } catch (error) {
-      expect(trimmer(printError(error))).toEqual(
-        trimmer(`
-        Unexpected error value: "Fields are only supported here"
+      try {
+        validateMatchSelectionSet({
+          variables: {},
+          selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
+            .selectionSet?.selections[0] as FieldNode)
+            .selectionSet as SelectionSetNode,
+        });
+      } catch (error) {
+        expect(trimmer(printError(error))).toEqual(
+          trimmer(`
+            Unexpected error value: "Field requires no arguments"
 
-        GraphQL request:4:13
-        3 |               MATCH {
-        4 |                 ... on Test {
-          |                 ^
-        5 |                   test
-    `)
-      );
-    }
+            GraphQL request:5:15
+            4 |             custom @cypher(statement: "") {
+            5 |               id(abc: 123)
+              |               ^
+            6 |             }
+          `)
+        );
+      }
+    });
   });
 
   test("should throw directive test not allowed here", () => {
@@ -158,6 +158,37 @@ describe("validateMatchSelectionSet", () => {
           |                 ^
         5 |               }
     `)
+      );
+    }
+  });
+
+  test("should throw one of validateNodeDirective errors", () => {
+    const doc = parse(`
+    {
+        MATCH {
+          node @node(label: 123)
+        }
+    }
+  `);
+
+    try {
+      validateMatchSelectionSet({
+        variables: {},
+        selectionSetNode: (((doc.definitions[0] as unknown) as FieldNode)
+          .selectionSet?.selections[0] as FieldNode)
+          .selectionSet as SelectionSetNode,
+      });
+    } catch (error) {
+      expect(trimmer(printError(error))).toEqual(
+        trimmer(`
+        Unexpected error value: "@node label must be of type StringValue or Argument or EnumValue"
+
+        GraphQL request:4:16
+        3 |         MATCH {
+        4 |           node @node(label: 123)
+          |                ^
+        5 |         }
+  `)
       );
     }
   });
