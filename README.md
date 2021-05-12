@@ -62,7 +62,7 @@ Given the below DGQL Query;
 }
 ```
 
-<br>
+> DGQL is GraphQL **and it is not a fork!** > <br>
 
 <details>
 <summary>Or equivalent DGQL Builder</summary>
