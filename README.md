@@ -62,7 +62,11 @@ Given the below DGQL Query;
 }
 ```
 
-Or equivalent [DGQL Builder](./packages/builder);
+<details>
+<summary>Or equivalent DGQL Builder</summary>
+<br>
+
+[DGQL Builder](./packages/builder)
 
 ```js
 const { Builder, node, property, edge } = require("@dgql/builder");
@@ -88,6 +92,10 @@ const [dgql, variables] = builder
   .return(["user"])
   .build();
 ```
+
+</details>
+
+<br>
 
 The following Cypher is produced;
 
