@@ -1,5 +1,6 @@
 import { BREAK, FieldNode, locatedError, validate, visit } from "graphql";
 import validateProject from "./validate-project";
+import validateWhereSelection from "./validate-where-selection";
 
 const validNames = ["WHERE", "SORT", "PROJECT"];
 
@@ -34,7 +35,15 @@ function validateNodeSelection({
     }
 
     // TODO Validate SORT selection
-    // TODO Validate WHERE selection
+
+    if (f.name.value === "WHERE") {
+      validateWhereSelection({
+        whereSelection: f,
+        variables,
+        path,
+        type: "node",
+      });
+    }
 
     if (f.name.value === "PROJECT") {
       validateProject({

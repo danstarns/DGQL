@@ -8,3 +8,4 @@ export { default as validateProject } from "./validate-project";
 export { default as validateEdgeSelection } from "./validate-edge-selection";
 export { default as validatePropertiesSelection } from "./validate-properties-selection";
 export { default as validateNodeDirective } from "./validate-node-directive";
+export { default as validateWhereSelection } from "./validate-where-selection";

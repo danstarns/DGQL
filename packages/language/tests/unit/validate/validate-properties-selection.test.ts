@@ -163,4 +163,39 @@ describe("validatePropertiesSelection", () => {
       );
     }
   });
+
+  test("should throw one of the validateWhereSelection errors", () => {
+    const doc = parse(`
+    {
+       PROPERTIES {
+         WHERE {
+           EDGE
+         }
+       }
+    }
+  `);
+
+    try {
+      validatePropertiesSelection({
+        // @ts-ignore
+        propertiesSelection: doc.definitions[0].selectionSet?.selections[0],
+        variables: {},
+        path: undefined,
+      });
+
+      throw Error();
+    } catch (error) {
+      expect(trimmer(printError(error))).toEqual(
+        trimmer(`
+            Unexpected error value: "Cannot edge WHERE from relationship properties"
+
+            GraphQL request:5:12
+            4 |          WHERE {
+            5 |            EDGE
+              |            ^
+            6 |          }
+      `)
+      );
+    }
+  });
 });

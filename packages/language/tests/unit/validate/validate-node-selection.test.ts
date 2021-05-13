@@ -169,5 +169,42 @@ describe("validateNodeSelection", () => {
         );
       }
     });
+
+    test("should throw one of validateWhereSelection errors", () => {
+      const doc = parse(`
+        {
+           MATCH {
+               node @node {
+                   WHERE @abc
+               }
+           }
+        }
+      `);
+
+      try {
+        validateNodeSelection({
+          node:
+            // @ts-ignore
+            doc.definitions[0].selectionSet?.selections[0].selectionSet
+              ?.selections[0],
+          variables: {},
+          path: undefined,
+        });
+
+        throw Error();
+      } catch (error) {
+        expect(trimmer(printError(error))).toEqual(
+          trimmer(`
+            Unexpected error value: "WHERE requires no directives"
+
+            GraphQL request:5:20
+            4 |                node @node {
+            5 |                    WHERE @abc
+              |                    ^
+            6 |                }
+        `)
+        );
+      }
+    });
   });
 });

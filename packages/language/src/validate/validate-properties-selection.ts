@@ -2,6 +2,7 @@ import { locatedError, FieldNode } from "graphql";
 import validateCypherDirective from "./validate-cypher-directive";
 import validateEdgeSelection from "./validate-edge-selection";
 import validateProject from "./validate-project";
+import validateWhereSelection from "./validate-where-selection";
 
 function validatePropertiesSelection({
   propertiesSelection,
@@ -59,7 +60,14 @@ function validatePropertiesSelection({
       }
 
       if (selection.name.value === "WHERE") {
-        // TODO validate WHERE
+        validateWhereSelection({
+          whereSelection: selection,
+          path,
+          type: "relationship",
+          variables,
+        });
+
+        return;
       }
     }
   );
