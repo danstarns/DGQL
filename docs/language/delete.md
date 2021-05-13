@@ -16,6 +16,11 @@ Use to delete nodes and their edges.
 }
 ```
 
+## References
+
+1. [TCK Tests Delete](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/delete)
+2. [WHERE](./where.md)
+
 ## Usage
 
 Detach `DELETE`

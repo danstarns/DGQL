@@ -2,7 +2,7 @@
 
 ## Intro
 
-Maybe you have called [`MATCH`](./match.md) and want to select properties on the matched node or relationship; `PROJECT` is the tool for you.
+Use to select properties on a matched node or relationship
 
 Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT` it into a usable, JSON like, structure - Perfect for application use.
 
@@ -20,6 +20,12 @@ Take the big 'node object', returned from Neo4j Javascript Driver, and `PROJECT`
   }
 }
 ```
+
+## References
+
+1. [TCK Tests Match Project](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/match/match-project.md)
+2. [TCK Tests Create Project](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/create/create-project.md)
+3. [TCK Tests Update Project](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/update/update-project.md)
 
 ## Usage
 

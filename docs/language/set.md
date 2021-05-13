@@ -4,6 +4,10 @@
 
 Setting values on either nodes or relationship properties
 
+## References
+
+1. [TCK Tests Set](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/set)
+
 ## Usage
 
 ### `SET` Value

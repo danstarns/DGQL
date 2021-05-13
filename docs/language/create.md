@@ -25,7 +25,10 @@ Use in correlation with cyphers `CREATE` statement.
 }
 ```
 
-You also [`PROJECT`](./project.md) values out of the node, easy for application use.
+## References
+
+1. [TCK Tests Create](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/create)
+2. [SET](./set.md)
 
 ## Usage
 

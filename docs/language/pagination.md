@@ -4,22 +4,26 @@
 
 Use to skip, limit and sort node and or there edges.
 
+## References
+
+1. [TCK Tests Pagination](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/paging)
+
 ## Usage
 
 ### `SORT`
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            SORT {
-                id(direction: DESC)
-            }
-        }
+  MATCH {
+    user @node(label: User) {
+      SORT {
+        id(direction: DESC)
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -27,12 +31,12 @@ Use to skip, limit and sort node and or there edges.
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) @paginate(skip: 10, limit: 10)
-    }
-    RETURN {
-        user
-    }
+  MATCH {
+    user @node(label: User) @paginate(skip: 10, limit: 10)
+  }
+  RETURN {
+    user
+  }
 }
 ```
 
@@ -40,26 +44,26 @@ Use to skip, limit and sort node and or there edges.
 
 ```graphql
 {
-    MATCH {
-        user @node(label: User) {
-            PROJECT {
-                posts
-                    @edge(type: HAS_POST, direction: OUT)
-                    @paginate(skip: 1, limit: 10) {
-                    post @node {
-                        SORT {
-                            createdAt(direction: DESC)
-                        }
-                        PROJECT {
-                            title
-                        }
-                    }
-                }
+  MATCH {
+    user @node(label: User) {
+      PROJECT {
+        posts
+          @edge(type: HAS_POST, direction: OUT)
+          @paginate(skip: 1, limit: 10) {
+          post @node {
+            SORT {
+              createdAt(direction: DESC)
             }
+            PROJECT {
+              title
+            }
+          }
         }
+      }
     }
-    RETURN {
-        user
-    }
+  }
+  RETURN {
+    user
+  }
 }
 ```

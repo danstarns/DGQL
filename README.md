@@ -114,7 +114,7 @@ CALL {
 RETURN user
 ```
 
-Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like;
+Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/client) you can execute this Cypher and receive an object like:
 
 ```json
 {
@@ -174,7 +174,7 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 ### Execute custom `@cypher`
 
-Sometimes you may have a highly specific question, Cypher could better help you ask. Use the `@cypher` directive, in a projection, to break the flow, and execute custom cypher.
+Sometimes you may have a highly specific question, Cypher could better help you ask. Use [the `@cypher` directive](./docs/language/cypher.md), in a projection, to break the flow, and execute custom cypher.
 
 ```graphql
 {

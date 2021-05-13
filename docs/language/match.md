@@ -2,7 +2,7 @@
 
 ## Intro
 
-Use in correlation with cyphers `MATCH` statement. The most Basic of `MATCH` is;
+Use in correlation with cyphers `MATCH` statement. The most Basic of `MATCH` is:
 
 ```graphql
 {
@@ -12,21 +12,14 @@ Use in correlation with cyphers `MATCH` statement. The most Basic of `MATCH` is;
 }
 ```
 
-> Matching a node and not returning is pretty pointless so checkout [`RETURN`](./return.md).
+## References
 
-Given the most basic example, above, your just matching and holding a reference to the `raw` node object from the Neo4j Javascript Driver. You can however, [`PROJECT`](./project.md) values out of the node, easy for application use.
+1. [RETURN](./return.md)
+2. [PROJECT](./project.md)
+3. [TCK Tests Match](https://github.com/danstarns/DGQL/tree/main/packages/language/tests/tck/tck-test-files/match/)
+4. [WHERE](./where.md)
 
 ## Usage
-
-### Optional
-
-```graphql
-{
-  MATCH {
-    user @node(label: User) @optional
-  }
-}
-```
 
 ### `MATCH` & `PROJECT` & `RETURN`
 
@@ -67,6 +60,16 @@ Given the most basic example, above, your just matching and holding a reference 
   }
   MATCH {
     posts @node(label: Post)
+  }
+}
+```
+
+### `@optional`
+
+```graphql
+{
+  MATCH {
+    user @node(label: User) @optional
   }
 }
 ```
