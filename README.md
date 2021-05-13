@@ -25,6 +25,7 @@ Dynamic Graph Query Language 👍
 - [Documentation](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
 - [TCK tests](https://github.com/danstarns/DGQL/tree/main/packages/client/tests/tck/tck-test-files)
 - [DGQL Recipes](https://github.com/danstarns/dgql/tree/main/misc/recipes)
+- [Blog](https://medium.com/@danstarns/dgql-next-generation-application-specific-graph-query-language-a232e39887e7) - ⚠ In progress
 
 ## Examples
 
