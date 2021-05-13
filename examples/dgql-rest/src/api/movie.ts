@@ -133,10 +133,7 @@ export async function updateMovie(req: Request, res: Response) {
   const query = gql`
     {
       UPDATE {
-        movies @node(label: Movie) {
-          WHERE {
-            movieId(equal: $movieId)
-          }
+        movies @node(label: Movie) @where(movieId: $movieId) {
           SET {
             title(value: $title) @include(if: $title) @validate(type: String)
             imdbRating(value: $imdb) @include(if: $imdb) @validate(type: Number)
@@ -207,11 +204,7 @@ export async function deleteMovie(req: Request, res: Response) {
   const query = gql`
     {
       DELETE {
-        NODE(label: Movie) @detach {
-          WHERE {
-            movieId(equal: $movieId)
-          }
-        }
+        NODE(label: Movie) @detach @where(movieId: $movieId)
       }
     }
   `;

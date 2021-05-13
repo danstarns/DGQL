@@ -11,6 +11,7 @@ import createDisconnectAndParams from "./create-disconnect-and-params";
 import createProjectionAndParams from "./create-projection-and-params";
 import createSetAndParams from "./create-set-and-params";
 import createWhereAndParams from "./create-where-and-params";
+import createWhereFromDirectiveAndParams from "./create-where-from-directive-and-params";
 
 function createUpdateAndParams({
   updateField,
@@ -38,6 +39,13 @@ function createUpdateAndParams({
       node = field;
     }
 
+    let whereDirective;
+    // @ts-ignore
+    const directs = field.directives as DirectiveNode[];
+    if (directs?.length) {
+      whereDirective = directs.find((x) => x.name.value === "where");
+    }
+
     let varName: string = "";
     if (chainStr) {
       varName = `${chainStr}_${field.name.value}`;
@@ -61,17 +69,40 @@ function createUpdateAndParams({
     cyphers.push(`OPTIONAL MATCH (${varName}${label ? `:${label}` : ""})`);
 
     const selections = (field.selectionSet?.selections || []) as FieldNode[];
+    let whereStrs: string[] = [];
 
     const whereField = selections.find((x) => x.name.value === "WHERE");
     if (whereField) {
-      const whereAndParams = createWhereAndParams({
+      const wAP = createWhereAndParams({
         varName,
         whereField,
         chainStr: `${varName}_where`,
         variables,
+        noWhere: true,
       });
-      cyphers.push(whereAndParams[0]);
-      params = { ...params, ...whereAndParams[1] };
+      if (wAP[0]) {
+        whereStrs.push(wAP[0]);
+        params = { ...params, ...wAP[1] };
+      }
+    }
+
+    if (whereDirective) {
+      const wAP = createWhereFromDirectiveAndParams({
+        varName,
+        whereDirective,
+        variables,
+        chainStr: `${varName}_where_directive`,
+      });
+      if (wAP[0]) {
+        whereStrs.push(wAP[0]);
+        params = { ...params, ...wAP[1] };
+      }
+    }
+
+    if (whereStrs.length) {
+      const joined = whereStrs.join(" AND ");
+
+      cyphers.push(`WHERE ${joined}`);
     }
 
     const quote = escapeQuotes ? `\\"` : `"`;
@@ -238,27 +269,31 @@ function createUpdateAndParams({
 
         let whereStrs: string[] = [];
         if (nodeWhere) {
-          const whereAndParams = createWhereAndParams({
+          const wAP = createWhereAndParams({
             varName: toNodeVar,
             whereField: nodeWhere,
             chainStr: `${toNodeVar}_where`,
             variables,
             noWhere: true,
           });
-          whereStrs.push(whereAndParams[0]);
-          params = { ...params, ...whereAndParams[1] };
+          if (wAP[0]) {
+            whereStrs.push(wAP[0]);
+            params = { ...params, ...wAP[1] };
+          }
         }
 
         if (propertiesWhere) {
-          const whereAndParams = createWhereAndParams({
+          const wAP = createWhereAndParams({
             varName: propertiesVar,
             whereField: propertiesWhere,
             chainStr: `${propertiesVar}_where`,
             variables,
             noWhere: true,
           });
-          whereStrs.push(whereAndParams[0]);
-          params = { ...params, ...whereAndParams[1] };
+          if (wAP[0]) {
+            whereStrs.push(wAP[0]);
+            params = { ...params, ...wAP[1] };
+          }
         }
 
         if (whereStrs.length) {

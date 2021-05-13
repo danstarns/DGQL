@@ -88,10 +88,7 @@ export async function updatePerson(req: Request, res: Response) {
   const query = gql`
     {
       UPDATE {
-        persons @node(label: Person) {
-          WHERE {
-            personId(equal: $personId)
-          }
+        persons @node(label: Person) @where(personId: $personId) {
           SET {
             name(value: $name) @include(if: $name) @validate(type: String)
             born(value: $born) @include(if: $born) @validate(type: Number)
@@ -126,11 +123,7 @@ export async function deletePerson(req: Request, res: Response) {
   const query = gql`
     {
       DELETE {
-        NODE(label: Person) @detach {
-          WHERE {
-            personId(equal: $personId)
-          }
-        }
+        NODE(label: Person) @detach @where(personId: $personId)
       }
     }
   `;

@@ -43,10 +43,7 @@ Given the below DGQL Query;
 ```graphql
 {
   MATCH {
-    user @node(label: User) {
-      WHERE {
-        name(equal: "Dan")
-      }
+    user @node(label: User) @where(name: "Dan") {
       PROJECT {
         id
         name

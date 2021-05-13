@@ -10,6 +10,22 @@ User to filter both node and relationship properties plus edges.
 
 ## Usage
 
+### Simple `WHERE` directive
+
+You can only use equality on where directive.
+
+```graphql
+{
+  MATCH {
+    user @node(label: User) @where(name: "Dan") {
+      PROJECT {
+        name
+      }
+    }
+  }
+}
+```
+
 ### Simple `WHERE`
 
 ```graphql

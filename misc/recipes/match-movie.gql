@@ -1,10 +1,7 @@
 # See https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/
 {
   MATCH {
-    movies @node(label: Movie) {
-      WHERE {
-        title(equal: "The Matrix")
-      }
+    movies @node(label: Movie) @where(title: "The Matrix") {
       PROJECT {
         title
         released

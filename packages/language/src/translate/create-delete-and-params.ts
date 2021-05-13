@@ -1,5 +1,6 @@
 import { ArgumentNode, FieldNode, valueFromASTUntyped } from "graphql";
 import createWhereAndParams from "./create-where-and-params";
+import createWhereFromDirectiveAndParams from "./create-where-from-directive-and-params";
 
 function createDeleteAndParams({
   deleteField,
@@ -31,9 +32,11 @@ function createDeleteAndParams({
     const detachDirective = (field.directives || []).find(
       (x) => x.name.value === "detach"
     );
+    const whereDirective = (field.directives || []).find(
+      (x) => x.name.value === "where"
+    );
 
     const selections = (field.selectionSet?.selections || []) as FieldNode[];
-
     const whereSelection = selections.find((x) => x.name.value === "WHERE");
 
     cyphers.push(`CALL {`);
@@ -44,16 +47,41 @@ function createDeleteAndParams({
 
     cyphers.push(`MATCH (${varName}${label ? `:${label}` : ""})`);
 
+    let whereStrs: string[] = [];
+
     if (whereSelection) {
       const wAP = createWhereAndParams({
         varName,
         variables,
         whereField: whereSelection,
-        chainStr,
+        chainStr: `${varName}_where`,
+        noWhere: true,
       });
-      cyphers.push(wAP[0]);
-      params = { ...params, ...wAP[1] };
+      if (wAP[0]) {
+        whereStrs.push(wAP[0]);
+        params = { ...params, ...wAP[1] };
+      }
     }
+
+    if (whereDirective) {
+      const wAP = createWhereFromDirectiveAndParams({
+        varName,
+        whereDirective,
+        variables,
+        chainStr: `${varName}_where_directive`,
+      });
+      if (wAP[0]) {
+        whereStrs.push(wAP[0]);
+        params = { ...params, ...wAP[1] };
+      }
+    }
+
+    if (whereStrs.length) {
+      const joined = whereStrs.join(" AND ");
+
+      cyphers.push(`WHERE ${joined}`);
+    }
+
     cyphers.push(`${detachDirective ? "DETACH" : ""} DELETE ${varName}`);
 
     cyphers.push(`RETURN COUNT(*)`);

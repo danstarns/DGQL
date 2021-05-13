@@ -89,7 +89,7 @@ RETURN COUNT(*)
 ```cypher
 CALL {
     MATCH (delete0_NODE0)
-    WHERE delete0_NODE0.id = $params.delete0_id0_equal
+    WHERE delete0_NODE0.id = $params.delete0_NODE0_where_id0_equal
     DELETE delete0_NODE0
     RETURN COUNT(*)
 }
@@ -101,7 +101,7 @@ RETURN COUNT(*)
 ```params
 {
     "params": {
-        "delete0_id0_equal": "123"
+        "delete0_NODE0_where_id0_equal": "123"
     }
 }
 ```

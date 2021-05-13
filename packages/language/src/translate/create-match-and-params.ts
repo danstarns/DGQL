@@ -7,6 +7,7 @@ import {
 import createWhereAndParams from "./create-where-and-params";
 import createSortAndParams from "./create-sort-and-params";
 import createProjectionAndParams from "./create-projection-and-params";
+import createWhereFromDirectiveAndParams from "./create-where-from-directive-and-params";
 
 function createMatchAndParams({
   matchField,
@@ -35,6 +36,9 @@ function createMatchAndParams({
     ) as DirectiveNode;
     const paginateDirective = field.directives?.find(
       (x) => x.name.value === "paginate"
+    ) as DirectiveNode;
+    const whereDirective = field.directives?.find(
+      (x) => x.name.value === "where"
     ) as DirectiveNode;
 
     cyphers.push(`CALL {`);
@@ -102,15 +106,38 @@ function createMatchAndParams({
         })`
       );
 
+      let whereStrs: string[] = [];
       if (whereField) {
-        const whereAndParams = createWhereAndParams({
+        const wAP = createWhereAndParams({
           varName,
           whereField,
           chainStr: `${varName}_where`,
           variables,
+          noWhere: true,
         });
-        cyphers.push(whereAndParams[0]);
-        params = { ...params, ...whereAndParams[1] };
+        if (wAP[0]) {
+          whereStrs.push(wAP[0]);
+          params = { ...params, ...wAP[1] };
+        }
+      }
+
+      if (whereDirective) {
+        const wAP = createWhereFromDirectiveAndParams({
+          varName,
+          whereDirective,
+          variables,
+          chainStr: `${varName}_where_directive`,
+        });
+        if (wAP[0]) {
+          whereStrs.push(wAP[0]);
+          params = { ...params, ...wAP[1] };
+        }
+      }
+
+      if (whereStrs.length) {
+        const joined = whereStrs.join(" AND ");
+
+        cyphers.push(`WHERE ${joined}`);
       }
 
       if (sortField) {

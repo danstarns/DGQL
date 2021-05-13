@@ -43,11 +43,7 @@ export async function createGenre(req: Request, res: Response) {
     query: gql`
       {
         MATCH {
-          genres @node(label: Genre) {
-            WHERE {
-              name(equal: $name)
-            }
-          }
+          genres @node(label: Genre) @where(name: $name)
         }
         RETURN {
           genres
@@ -99,11 +95,7 @@ export async function updateGenre(req: Request, res: Response) {
     query: gql`
       {
         MATCH {
-          genresById @node(label: Genre) {
-            WHERE {
-              genreId(equal: $genreId)
-            }
-          }
+          genresById @node(label: Genre) @where(genreId: $genreId)
         }
         RETURN {
           genresById
@@ -121,11 +113,7 @@ export async function updateGenre(req: Request, res: Response) {
     query: gql`
       {
         MATCH @include(if: $name) {
-          genresByName @node(label: Genre) {
-            WHERE {
-              name(equal: $name)
-            }
-          }
+          genresByName @node(label: Genre) @where(name: $name)
         }
         RETURN @include(if: $name) {
           genresByName
@@ -142,10 +130,7 @@ export async function updateGenre(req: Request, res: Response) {
   const query = gql`
     {
       UPDATE {
-        genres @node(label: Genre) {
-          WHERE {
-            genreId(equal: $genreId)
-          }
+        genres @node(label: Genre) @where(genreId: $genreId) {
           SET {
             name(value: $name) @validate(type: String, required: true)
           }
@@ -174,11 +159,7 @@ export async function deleteGenre(req: Request, res: Response) {
   const query = gql`
     {
       DELETE {
-        NODE(label: Genre) @detach {
-          WHERE {
-            genreId(equal: $genreId)
-          }
-        }
+        NODE(label: Genre) @detach @where(genreId: $genreId)
       }
     }
   `;
