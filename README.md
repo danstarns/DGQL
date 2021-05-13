@@ -32,11 +32,11 @@ See [Examples](./examples/index.md)
 
 ## Prerequisites
 
-GraphQL can be separated into two sections; language & execution. To truly grasp this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language. DGQL completely breaks the rules 😲 and throws away the runtime, simply focusing on the language.
+GraphQL can be separated into two sections; language & execution. To truly grasp this implementation one should first remove themselves from the conventional execution paradigms, say using Apollo Server, and look towards the pre-made & rich tooling surrounding the language. DGQL completely breaks the rules 😲 throws away the runtime and simply focuses on the language.
 
 ## What
 
-This implementation, at its core, is a transpiler from GraphQL to Cypher and fundamentally concerns itself with the AST produced from a given selection. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
+This implementation, at its core, is a transpiler from GraphQL to Cypher and simply concerns itself with the AST produced from a given selection set. Traversal of the AST enables the translator to generate Cypher from picking up on Client Directives.
 
 Given the below DGQL Query;
 
@@ -130,7 +130,7 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 <br>
 
-💡 DGQL is just GraphQL the language, **and DGQL is not a fork**.
+💡 DGQL is just GraphQL, **and not a fork**.
 
 ## Why
 
@@ -217,3 +217,7 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 [Playground](https://github.com/danstarns/dgql/tree/main/packages/playground).
 
 [![Image from Gyazo](https://i.gyazo.com/88e3a580586197e51e246c763d4f594e.gif)](https://gyazo.com/88e3a580586197e51e246c763d4f594e)
+
+## Licence
+
+MIT

@@ -7,3 +7,7 @@ The Javascript Implementation For The [DGQL Language](https://github.com/danstar
 ## Documentation
 
 See [Docs](https://github.com/danstarns/DGQL/blob/main/docs/index.md)
+
+## Licence
+
+MIT

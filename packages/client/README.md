@@ -90,3 +90,7 @@ const translation = client.translate({ query, variables: { id: "user-id" } }); /
   }
 }
 ```
+
+## Licence
+
+MIT

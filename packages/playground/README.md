@@ -27,3 +27,7 @@ https://registry.npmjs.org/@dgql/playground
 ### 3, Play
 
 [![Image from Gyazo](https://i.gyazo.com/88e3a580586197e51e246c763d4f594e.gif)](https://gyazo.com/88e3a580586197e51e246c763d4f594e)
+
+## Licence
+
+MIT
