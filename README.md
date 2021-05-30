@@ -130,6 +130,8 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
 
 💡 DGQL is just GraphQL, **and not a fork**.
 
+[![DGQL](./docs/assets/dgql-diagram-white.png)](.)
+
 ## Why
 
 **Why don't you just use Cypher?** - If you are looking for a highly specific answer... Cypher may be the correct tool. If you aren't too familiar with the Cypher, and all you need is a JSON structure, similar in shape to your formulated query, then DGQL is for you. Using a DGQL query will make returning values from the database more predictable & easier to manage.
