@@ -1,5 +1,9 @@
 # @dgql/builder
 
+<a href="https://badge.fury.io/js/%40dgql%2Fbuilder">
+  <img alt="npm package" src="https://badge.fury.io/js/%40dgql%2Fbuilder.svg">
+</a>
+
 DGQL Query Builder.
 
 ## Getting Started
@@ -7,8 +11,6 @@ DGQL Query Builder.
 ```
 $ npm install @dgql/builder
 ```
-
-⚠ Library not yet published
 
 ## Quick Start
 

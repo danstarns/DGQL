@@ -1,8 +1,10 @@
 # @dgql/language
 
-The Javascript Implementation For The [DGQL Language](https://github.com/danstarns/dgql).
+<a href="https://badge.fury.io/js/%40dgql%2Flanguage">
+  <img alt="npm package" src="https://badge.fury.io/js/%40dgql%2Flanguage.svg">
+</a>
 
-⚠ Library not yet published
+The Javascript Implementation For The [DGQL Language](https://github.com/danstarns/dgql).
 
 ## Documentation
 
