@@ -24,7 +24,8 @@ async function bumpPackageJson(cwd) {
 
   const pkJ = path.resolve(cwd, "./package.json");
   const content = JSON.parse(await fs.readFile(pkJ, "utf-8"));
-  content.version = VERSION;
+  const [, version] = VERSION.split("release-");
+  content.version = version;
 
   await fs.writeFile(pkJ, JSON.stringify(content, null, 2));
 
