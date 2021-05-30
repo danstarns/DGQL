@@ -79,7 +79,7 @@ async function npmPublish(cwd) {
     path.join(cwd, ".npmrc"),
     `//registry.npmjs.org/:_authToken=${NPM_KEY}`
   );
-  await exec(`npm publish`, { stdio: [0, 1, 2], cwd });
+  await exec(`npm publish --access public`, { stdio: [0, 1, 2], cwd });
 
   console.log(`Published ${cwd}`);
 }
