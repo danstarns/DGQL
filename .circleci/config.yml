@@ -51,7 +51,7 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^release-/
+              only: /^release-.*/
       # - test_suite:
       #     filters:
       #       branches:
