@@ -1,0 +1,13 @@
+{
+  FOREACH(value: $movies) {
+    ...Movie
+  }
+}
+
+fragment Movie on DGQL {
+  CREATE @node(label: Movie) {
+    SET {
+      id(value: "$this.id")
+    }
+  }
+}

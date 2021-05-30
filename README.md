@@ -48,7 +48,7 @@ Given the below DGQL Query;
       PROJECT {
         id
         name
-        posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+        posts @edge(type: AUTHORED, direction: OUT) @node(label: Post) {
           title
         }
       }
@@ -81,7 +81,7 @@ const [dgql, variables] = builder
         id: property(),
         name: property(),
         posts: edge({
-          type: "HAS_POST",
+          type: "AUTHORED",
           direction: "OUT",
           node: node({ label: "Post" }),
         }).project({
@@ -106,7 +106,7 @@ CALL {
   RETURN user {
       .id,
       .name,
-      posts: [ (user)-[:HAS_POST]->(posts:Post) | { title: posts.title } ]
+      posts: [ (user)-[:AUTHORED]->(posts:Post) | { title: posts.title } ]
   } as user
 }
 RETURN user
@@ -156,7 +156,7 @@ Using the [DGQL Client](https://github.com/danstarns/dgql/tree/main/packages/cli
           title
           comments @edge(type: HAS_COMMENT, direction: OUT) @node(label: Comment) {
             content
-            authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
+            authors @edge(type: AUTHORED, direction: IN) @node(label: User) {
               name
             }
           }
@@ -240,7 +240,7 @@ fragment comments on DGQL {
 }
 
 fragment authors on DGQL {
-  authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
+  authors @edge(type: AUTHORED, direction: IN) @node(label: User) {
     name
   }
 }

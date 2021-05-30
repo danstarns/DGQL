@@ -10,7 +10,7 @@
             @edge(type: HAS_COMMENT, direction: OUT)
             @node(label: Comment) {
             content
-            authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
+            authors @edge(type: AUTHORED, direction: IN) @node(label: User) {
               name
             }
           }
