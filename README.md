@@ -205,6 +205,47 @@ Sometimes you may have a highly specific question, Cypher could better help you 
 }
 ```
 
+### Compose Queries
+
+Use [Fragments](./docs/language/fragments.md) to compose and reuse bits of your query:
+
+```graphql
+{
+  MATCH {
+    blogs @node(label: Blog) {
+      PROJECT {
+        name
+        ...posts
+      }
+    }
+  }
+  RETURN {
+    blogs
+  }
+}
+
+fragment posts on DGQL {
+  posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
+    title
+    ...comments
+    ...authors
+  }
+}
+
+fragment comments on DGQL {
+  comments @edge(type: HAS_COMMENT, direction: OUT) @node(label: Comment) {
+    content
+    ...authors
+  }
+}
+
+fragment authors on DGQL {
+  authors @edge(type: COMMENTED, direction: IN) @node(label: User) {
+    name
+  }
+}
+```
+
 ### Full CRUD Operations
 
 1. [CREATE](./docs/language/create.md)
