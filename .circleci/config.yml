@@ -30,10 +30,7 @@ jobs:
           command: git config --global user.name "DGQL Publisher" && git config --global user.email "danielstarns@hotmail.com"
       - run:
           name: Commit and Push back to git
-          command: | 
-          git add . && 
-          git commit -m "publish: ${CIRCLE_TAG}" && 
-          git push
+          command: git add . && git commit -m "publish: ${CIRCLE_TAG}" && git push
 workflows:
   version: 2
   main_default:
