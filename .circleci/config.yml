@@ -25,12 +25,21 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "f6:ff:d2:0d:1c:2d:12:ff:9c:3d:ea:3f:59:b4:e6:fa"
-      - run: |
-          git config --global user.name "DGQL Publisher"
-          git config --global user.email "danielstarns@hotmail.com"
-          git add .
-          git commit -m "publish: ${CIRCLE_TAG}"
-          git push
+      - run:
+          name: Git User
+          command: git config --global user.name "DGQL Publisher"
+      - run:
+          name: Git Email
+          command: git config --global user.email "danielstarns@hotmail.com"
+      - run:
+          name: Git Add
+          command: git add .
+      - run:
+          name: Git Commit
+          command: git commit -m "publish: ${CIRCLE_TAG}"
+      - run:
+          name: Git Push
+          command: git push
 workflows:
   version: 2
   main_default:
