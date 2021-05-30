@@ -45,8 +45,8 @@ workflows:
   main_default:
     jobs:
       - publish:
-          requires:
-            - test_suite
+          # requires:
+          #   - test_suite
           filters:
             branches:
               ignore: /.*/
