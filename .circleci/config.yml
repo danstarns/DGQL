@@ -36,7 +36,7 @@ jobs:
           command: git add .
       - run:
           name: Git Commit
-          command: git commit -m "publish: ${CIRCLE_TAG}"
+          command: git commit -m "publish"
       - run:
           name: Git Push
           command: git push
