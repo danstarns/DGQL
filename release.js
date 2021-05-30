@@ -4,14 +4,14 @@ const util = require("util");
 const exec = util.promisify(child_process.exec);
 const fs = require("fs/promises");
 
-const { VERSION, NPM_TOKEN } = process.env;
+const { VERSION, NPM_KEY } = process.env;
 
 if (!VERSION) {
   throw new Error("process.env.VERSION required");
 }
 
-if (!NPM_TOKEN) {
-  throw new Error("process.env.NPM_TOKEN required");
+if (!NPM_KEY) {
+  throw new Error("process.env.NPM_KEY required");
 }
 
 const assetsPath = path.join(__dirname, "./docs", "/assets");
@@ -75,7 +75,7 @@ async function publishPlayground() {
 async function npmPublish(cwd) {
   console.log(`Publishing ${cwd}`);
 
-  await fs.writeFile(cwd, `//registry.npmjs.org/:_authToken=${NPM_TOKEN}`);
+  await fs.writeFile(cwd, `//registry.npmjs.org/:_authToken=${NPM_KEY}`);
   await exec(`npm publish`, { stdio: [0, 1, 2], cwd });
 
   console.log(`Published ${cwd}`);
