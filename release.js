@@ -78,6 +78,8 @@ async function npmPublish(cwd) {
 }
 
 async function main() {
+  console.log("Starting with version ", VERSION);
+
   await Promise.all(
     [packages.builder, packages.client, packages.language].map(bumpPackageJson)
   );
