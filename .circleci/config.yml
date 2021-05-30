@@ -49,12 +49,12 @@ workflows:
             - test_suite
           filters:
             branches:
-              only: /main/
+              ignore: /.*/
             tags:
               only: /^release-/
-      - test_suite:
-          filters:
-            branches:
-              only: /main/
-            tags:
-              only: /^release-.*/
+      # - test_suite:
+      #     filters:
+      #       branches:
+      #         only: /main/
+      #       tags:
+      #         only: /^release-.*/
