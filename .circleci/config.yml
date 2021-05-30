@@ -39,7 +39,7 @@ jobs:
           command: git commit -m "publish"
       - run:
           name: Git Push
-          command: git push
+          command: git push origin HEAD:main
 workflows:
   version: 2
   main_default:
