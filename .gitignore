@@ -3,3 +3,4 @@ test-bench.ts
 .env
 dist/
 *.tgz
+.npmrc

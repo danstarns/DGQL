@@ -75,7 +75,10 @@ async function publishPlayground() {
 async function npmPublish(cwd) {
   console.log(`Publishing ${cwd}`);
 
-  await fs.writeFile(cwd, `//registry.npmjs.org/:_authToken=${NPM_KEY}`);
+  await fs.writeFile(
+    path.join(cwd, ".npmrc"),
+    `//registry.npmjs.org/:_authToken=${NPM_KEY}`
+  );
   await exec(`npm publish`, { stdio: [0, 1, 2], cwd });
 
   console.log(`Published ${cwd}`);
