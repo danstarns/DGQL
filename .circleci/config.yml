@@ -21,7 +21,7 @@ jobs:
       - checkout
       - run:
           name: Release to npm
-          command: NPM_TOKEN=NPM_TOKEN VERSION=CIRCLE_TAG npm run release
+          command: NPM_TOKEN=$NPM_TOKEN VERSION=$CIRCLE_TAG npm run release
       - add_ssh_keys:
           fingerprints:
             - "f6:ff:d2:0d:1c:2d:12:ff:9c:3d:ea:3f:59:b4:e6:fa"
