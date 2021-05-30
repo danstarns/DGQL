@@ -12,12 +12,45 @@ jobs:
       - run:
           name: Run Docker Compose Tests
           command: npm run test-docker
-
+  publish:
+    docker:
+      - image: circleci/node:14.16
+    working_directory: ~/repo
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Release to npm
+          command: NPM_TOKEN=NPM_TOKEN VERSION=CIRCLE_TAG npm run release
+      - add_ssh_keys:
+          fingerprints:
+            - "f6:ff:d2:0d:1c:2d:12:ff:9c:3d:ea:3f:59:b4:e6:fa"
+      - run:
+          name: Login Git
+          command: |
+          git config --global user.name "DGQL Publisher" && 
+          git config --global user.email "danielstarns@hotmail.com"
+      - run:
+          name: Commit and Push back to git
+          command: | 
+          git add . && 
+          git commit -m "publish: ${CIRCLE_TAG}" && 
+          git push
 workflows:
   version: 2
   main_default:
     jobs:
-      - test_suite:
+      - publish:
+          requires:
+            - test_suite
           filters:
             branches:
               only: /main/
+            tags:
+              only: /^release-/
+      # - test_suite:
+      #     filters:
+      #       branches:
+      #         only: /main/
+      #       tags:
+      #         only: /^release-.*/
