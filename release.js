@@ -38,15 +38,18 @@ async function bumpPackageJson(cwd) {
   console.log("Bumped ", cwd);
 }
 
+async function buildPackage(cwd) {
+  return exec("npm run build", {
+    stdio: [0, 1, 2],
+    cwd,
+  });
+}
+
 async function publishPlayground() {
   console.log("publishPlayground Start");
 
   await bumpPackageJson(packages.playground);
-
-  await exec("npm run build", {
-    stdio: [0, 1, 2],
-    cwd: packages.playground,
-  });
+  await buildPackage(packages.playground);
 
   const manifest = path.resolve(packages.playground, "./manifest-base.json");
   const manifestTo = path.join(packages.playground, "./dist", "manifest.json");
@@ -89,6 +92,10 @@ async function main() {
 
   await Promise.all(
     [packages.builder, packages.client, packages.language].map(bumpPackageJson)
+  );
+
+  await Promise.all(
+    [packages.builder, packages.client, packages.language].map(buildPackage)
   );
 
   await publishPlayground();
