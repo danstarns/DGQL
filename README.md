@@ -215,7 +215,7 @@ Use [Fragments](./docs/language/fragments.md) to compose and reuse bits of your 
     blogs @node(label: Blog) {
       PROJECT {
         name
-        ...posts
+        ...Posts
       }
     }
   }
@@ -224,22 +224,22 @@ Use [Fragments](./docs/language/fragments.md) to compose and reuse bits of your 
   }
 }
 
-fragment posts on DGQL {
+fragment Posts on DGQL {
   posts @edge(type: HAS_POST, direction: OUT) @node(label: Post) {
     title
-    ...comments
-    ...authors
+    ...Comments
+    ...Authors
   }
 }
 
-fragment comments on DGQL {
+fragment Comments on DGQL {
   comments @edge(type: HAS_COMMENT, direction: OUT) @node(label: Comment) {
     content
-    ...authors
+    ...Authors
   }
 }
 
-fragment authors on DGQL {
+fragment Authors on DGQL {
   authors @edge(type: AUTHORED, direction: IN) @node(label: User) {
     name
   }
