@@ -44,12 +44,6 @@ workflows:
   version: 2
   main_default:
     jobs:
-      - test_suite:
-          filters:
-            branches:
-              only: /main/
-            tags:
-              only: /release-.*/
       - publish:
           requires:
             - test_suite
@@ -57,4 +51,10 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /release-.*/
+              only: /^release-.*/
+      - test_suite:
+          filters:
+            branches:
+              only: /main/
+            tags:
+              only: /^release-.*/
