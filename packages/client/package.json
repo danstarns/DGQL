@@ -3,6 +3,8 @@
   "version": "1.1.0-alpha.3",
   "description": "Translation engine and client for the DGQL Language",
   "main": "./dist/client/src/index.js",
+  "exports": "./dist/client/index.js",
+  "types": "./dist/client/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc"

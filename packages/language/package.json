@@ -2,11 +2,18 @@
   "name": "@dgql/language",
   "version": "1.1.0-alpha.3",
   "description": "The Javascript Implementation For The DGQL Language",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc"
   },
+  "keywords": [
+    "graphql",
+    "cypher",
+    "language"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danstarns/dgql.git"

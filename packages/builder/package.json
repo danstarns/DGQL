@@ -2,11 +2,19 @@
   "name": "@dgql/builder",
   "version": "1.1.0-alpha.3",
   "description": "DGQL Query Builder",
-  "main": "dist/index.js",
+  "main": "./dist/builder/index.js",
+  "exports": "./dist/builder/client/index.js",
+  "types": "./dist/builder/client/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc"
   },
+  "keywords": [
+    "graphql",
+    "cypher",
+    "language",
+    "builder"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danstarns/dgql.git"

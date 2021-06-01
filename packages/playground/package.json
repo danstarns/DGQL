@@ -13,8 +13,14 @@
       "allGraphs"
     ]
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "graphql",
+    "developer",
+    "cypher",
+    "graph",
+    "app"
+  ],
+  "author": "danielstarns@hotmail.com",
   "license": "MIT",
   "scripts": {
     "build": "webpack --config webpack.config.js",
