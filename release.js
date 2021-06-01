@@ -48,17 +48,15 @@ async function buildPackage(cwd) {
 async function publishPlayground() {
   console.log("publishPlayground Start");
 
-  await bumpPackageJson(packages.playground);
-  await buildPackage(packages.playground);
+  const cwd = packages.playground;
 
-  const manifest = path.resolve(packages.playground, "./manifest-base.json");
-  const manifestTo = path.join(packages.playground, "./dist", "manifest.json");
+  await bumpPackageJson(cwd);
+  await buildPackage(cwd);
+
+  const manifest = path.resolve(cwd, "./manifest-base.json");
+  const manifestTo = path.join(cwd, "./dist", "manifest.json");
   const icon = path.resolve(assetsPath, "./dgql-icon-white.png");
-  const iconTo = path.join(
-    packages.playground,
-    "./dist",
-    "./dgql-icon-white.png"
-  );
+  const iconTo = path.join(cwd, "./dist", "./dgql-icon-white.png");
 
   await Promise.all(
     [
@@ -69,7 +67,7 @@ async function publishPlayground() {
 
   await exec("npm pack", {
     stdio: [0, 1, 2],
-    cwd: packages.playground,
+    cwd,
   });
 
   console.log("publishPlayground Done");
