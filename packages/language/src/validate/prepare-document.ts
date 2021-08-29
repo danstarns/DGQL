@@ -15,7 +15,7 @@ function prepareDocument({
   variables: any;
 }): DocumentNode {
   const edited = visit(document, {
-    enter(node, key, parent, path) {
+    enter: (node, key, parent, path) => {
       if (node.kind === "FragmentDefinition") {
         const isOnDGQL = node.typeCondition.name.value === "DGQL";
 
@@ -33,18 +33,18 @@ function prepareDocument({
       }
 
       if (node.selectionSet?.selections.length) {
-        node.selectionSet.selections.forEach((select, i) => {
+        node.selectionSet.selections.forEach((select) => {
           if (select.kind !== "FragmentSpread") {
             return;
           }
 
-          const found = document.definitions.find(
+          const fragment = document.definitions.find(
             (x) =>
               x.kind === "FragmentDefinition" &&
               x.name.value === select.name.value
           ) as FragmentDefinitionNode;
 
-          if (!found) {
+          if (!fragment) {
             const error = locatedError(
               `fragment ${select.name.value} not found`,
               select,
@@ -55,13 +55,18 @@ function prepareDocument({
           }
 
           // @ts-ignore
-          node.selectionSet?.selections[i] = null;
-          // @ts-ignore
-          node.selectionSet?.selections = [
-            ...(node.selectionSet?.selections || []),
-            ...(found.selectionSet.selections || []),
-          ].filter((x) => x !== null);
+          node.selectionSet = {
+            ...node.selectionSet,
+            selections: [
+              ...(node.selectionSet?.selections || []),
+              ...(fragment.selectionSet.selections || []),
+            ],
+          };
         });
+
+        node.selectionSet.selections = node.selectionSet.selections.filter(
+          (selection) => selection.kind !== "FragmentSpread"
+        );
       }
 
       const directives = node?.directives as undefined | DirectiveNode[];
